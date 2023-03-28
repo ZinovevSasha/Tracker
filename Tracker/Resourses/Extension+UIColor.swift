@@ -1,10 +1,3 @@
-//
-//  Extension+UIColor.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 25.03.2023.
-//
-
 import UIKit
 
 extension UIColor {
