@@ -31,7 +31,7 @@ final class TrackersViewController: UIViewController {
         TrackerCategory(
             header: "Спорт",
             trackers: [
-            Tracker(id: "1", name: "Сходить в бассейн", color: .systemOrange, emoji: "🏊‍♂️", daysTracked: 0)])
+            Tracker(id: "1", name: "Сходить в бассейн", color: .systemOrange, emoji: "🏊‍♂️", daysTracked: 2)])
     ]
     var completedTrackers: [TrackerRecord] = []
     var visibleCategories: [TrackerCategory] = []
@@ -39,6 +39,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - UIConstants
     private enum UIConstants {
+        static let trackerHeaderHeight: CGFloat = 30
         static let inset: CGFloat = 16
         static let trailingInset: CGFloat = -16
         static let topInset: CGFloat = 13
@@ -65,6 +66,7 @@ final class TrackersViewController: UIViewController {
 // MARK: - Private methods
 private extension TrackersViewController {
     func initialise() {
+        headerView.delegate = self
         collectionView.dataSource = self
         collectionView.delegate = self
         view.backgroundColor = .myWhite
@@ -143,6 +145,17 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 30)
+        return CGSize(width: collectionView.frame.width, height: UIConstants.trackerHeaderHeight)
+    }
+}
+
+extension TrackersViewController: TrackerHeaderViewDelegate {
+    func datePickerValueChanged() {
+        
+    }
+    
+    func handlePlusButtonTap() {
+        let trackerCreationViewController = ChooseHabitViewController()
+        present(trackerCreationViewController, animated: true)
     }
 }

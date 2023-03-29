@@ -18,6 +18,13 @@ class TrackerCategoryHeaderView: UICollectionReusableView {
         fatalError("Unsupported")
     }
     
+    // MARK: - UIConstants
+    private enum UIConstants {
+        static let categoryLabelLeadingInset: CGFloat = 28
+        static let categoryLabelBottomInset: CGFloat = -12
+    }
+    
+    
     // MARK: - Private properties
     private let categoryLabel: UILabel = {
         let label = UILabel()
@@ -35,10 +42,10 @@ private extension TrackerCategoryHeaderView {
     
     func setConstraints() {
         NSLayoutConstraint.activate([
-            categoryLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 28),
+            categoryLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: UIConstants.categoryLabelLeadingInset),
             categoryLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
             categoryLabel.topAnchor.constraint(equalTo: topAnchor),
-            categoryLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12)
+            categoryLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: UIConstants.categoryLabelBottomInset)
         ])
     }
 }
