@@ -68,7 +68,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         label.textColor = .white
         label.font = UIFont.systemFont(ofSize: UIConstants.trackerNameLabelFontSize)
         var paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.28        
+        paragraphStyle.lineHeightMultiple = 1.28
         label.attributedText = NSMutableAttributedString(
             string: "",
             attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle]
@@ -87,7 +87,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private let emojiContainerView: UIView = {
         let view = UIView()
-        view.layer.cornerRadius = UIConstants.emojiFontSize / 2
+        view.layer.cornerRadius = UIConstants.emojiContainerSize / 2
         view.layer.masksToBounds = true
         view.backgroundColor = .myTranspatent
         view.translatesAutoresizingMaskIntoConstraints = false

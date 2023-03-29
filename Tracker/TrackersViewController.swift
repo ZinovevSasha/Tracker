@@ -9,6 +9,7 @@ final class TrackersViewController: UIViewController {
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .myWhite
         view.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: TrackerCollectionViewCell.identifier)
+        view.register(TrackerCategoryHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TrackerCategoryHeaderView.identifier)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -19,12 +20,19 @@ final class TrackersViewController: UIViewController {
         spacing: UIConstants.cellSpacing
     )
     
-    var trackers: [Tracker] = [
-        Tracker(id: "1", name: "Поливать растения", color: .myBlue, emoji: "❤️", daysTracked: 0),
-        Tracker(id: "1", name: "Поливать растения", color: .systemPink, emoji: "🐶", daysTracked: 0),
-        Tracker(id: "1", name: "Поливать растения", color: .systemYellow, emoji: "⚽️", daysTracked: 0)
+    var categories: [TrackerCategory] = [
+        TrackerCategory(
+            header: "Бытовые дела",
+            trackers: [
+            Tracker(id: "1", name: "Поливать растения", color: .myBlue, emoji: "🪴", daysTracked: 0),
+            Tracker(id: "1", name: "Выгулять собаку", color: .systemPink, emoji: "🐶", daysTracked: 0),
+            Tracker(id: "1", name: "Поиграть в футбол", color: .systemYellow, emoji: "⚽️", daysTracked: 0)]
+        ),
+        TrackerCategory(
+            header: "Спорт",
+            trackers: [
+            Tracker(id: "1", name: "Сходить в бассейн", color: .systemOrange, emoji: "🏊‍♂️", daysTracked: 0)])
     ]
-    var categories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
     var visibleCategories: [TrackerCategory] = []
     var currentDate = Date()
@@ -94,16 +102,28 @@ private extension TrackersViewController {
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return categories.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return trackers.count
+        return categories[section].trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCollectionViewCell.identifier, for: indexPath) as? TrackerCollectionViewCell else {
             return UICollectionViewCell()            
         }
-        cell.configure(with: trackers[indexPath.row])
+        cell.configure(with: categories[indexPath.section].trackers[indexPath.row])
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: TrackerCategoryHeaderView.identifier, for: indexPath) as? TrackerCategoryHeaderView else { return UICollectionReusableView() }
+        header.configure(with: categories[indexPath.section])
+        return header
     }
 }
 
@@ -120,5 +140,9 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return UIConstants.cellSpacing
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 30)
     }
 }
