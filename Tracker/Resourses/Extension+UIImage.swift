@@ -8,4 +8,5 @@ extension UIImage {
     static let placeholderTracker = UIImage(named: "05placeholderTracker")
     static let plus = UIImage(named: "06plus")
     static let logo = UIImage(named: "07Logo")
+    static let plusWhite = UIImage(named: "08plus")
 }

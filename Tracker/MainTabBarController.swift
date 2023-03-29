@@ -6,7 +6,7 @@ final class MainTabBarController: UITabBarController {
         setAppearance()
         viewControllers = [
             generateViewController(
-                TrackerViewController(),
+                TrackersViewController(),
                 image: .leftTabBar,
                 title: "Трекеры"),
             generateViewController(
@@ -29,10 +29,10 @@ private extension MainTabBarController {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .myWhite
-        appearance.selectionIndicatorTintColor = .black
         tabBar.standardAppearance = appearance
         if #available(iOS 15.0, *) {
             tabBar.scrollEdgeAppearance = appearance
         }
+        tabBar.tintColor = .myBlue
     }
 }
