@@ -14,7 +14,3 @@ struct Tracker {
     let emoji: String
     let daysTracked: Int
 }
-
-struct Schedule {
-    
-}

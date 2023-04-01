@@ -9,4 +9,6 @@ extension UIImage {
     static let plus = UIImage(named: "06plus")
     static let logo = UIImage(named: "07Logo")
     static let plusWhite = UIImage(named: "08plus")
+    static let borderCell = UIImage(named: "09cellBorder")
+    static let chevron = UIImage(named: "10chevron")
 }

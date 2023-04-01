@@ -2,17 +2,26 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     // MARK: - Private properties
+    private let placeholderView = PlaceholderView()
     private let headerView = TrackerHeaderView()
     private let searchView = SearchView()
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .myWhite
-        view.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: TrackerCollectionViewCell.identifier)
-        view.register(TrackerCategoryHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TrackerCategoryHeaderView.identifier)
+        view.register(
+            TrackerCollectionViewCell.self,
+            forCellWithReuseIdentifier: TrackerCollectionViewCell.identifier
+        )
+        view.register(
+            TrackerCategoryHeaderView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: TrackerCategoryHeaderView.identifier
+        )
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    
     private let params = GeometryParams(
         cellCount: UIConstants.cellCount,
         leftInset: UIConstants.inset,
@@ -31,7 +40,9 @@ final class TrackersViewController: UIViewController {
         TrackerCategory(
             header: "Спорт",
             trackers: [
-            Tracker(id: "1", name: "Сходить в бассейн", color: .systemOrange, emoji: "🏊‍♂️", daysTracked: 2)])
+            Tracker(id: "1", name: "Сходить в бассейн", color: .systemOrange, emoji: "🏊‍♂️", daysTracked: 2)
+            ]
+        )
     ]
     var completedTrackers: [TrackerRecord] = []
     var visibleCategories: [TrackerCategory] = []
@@ -61,6 +72,15 @@ final class TrackersViewController: UIViewController {
         initialise()
         setConstraints()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if categories.isEmpty && completedTrackers.isEmpty {
+            placeholderView.isHidden = false
+        } else {
+            placeholderView.isHidden = true
+        }
+    }
 }
 
 // MARK: - Private methods
@@ -70,35 +90,57 @@ private extension TrackersViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         view.backgroundColor = .myWhite
-        view.addSubviews(headerView, searchView, collectionView)
+        view.addSubviews(headerView, searchView, collectionView, placeholderView)
+        placeholderView.translatesAutoresizingMaskIntoConstraints = false
         headerView.translatesAutoresizingMaskIntoConstraints = false
         searchView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func setConstraints() {
         let headerViewConstraints = [
-            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: UIConstants.topInset),
-            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: UIConstants.inset),
-            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: UIConstants.trailingInset),
-            headerView.heightAnchor.constraint(equalToConstant: UIConstants.headerHeight),
+            headerView.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor,
+                constant: UIConstants.topInset),
+            headerView.leadingAnchor.constraint(
+                equalTo: view.leadingAnchor,
+                constant: UIConstants.inset),
+            headerView.trailingAnchor.constraint(
+                equalTo: view.trailingAnchor,
+                constant: UIConstants.trailingInset),
+            headerView.heightAnchor.constraint(
+                equalToConstant: UIConstants.headerHeight)
         ]
         let searchViewConstraints = [
-            searchView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: UIConstants.topInset),
+            searchView.topAnchor.constraint(
+                equalTo: headerView.bottomAnchor,
+                constant: UIConstants.topInset),
             searchView.heightAnchor.constraint(equalToConstant: UIConstants.searchHeight),
-            searchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: UIConstants.searchLeading),
-            searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: UIConstants.searchTrailing),
+            searchView.leadingAnchor.constraint(
+                equalTo: view.leadingAnchor,
+                constant: UIConstants.searchLeading),
+            searchView.trailingAnchor.constraint(
+                equalTo: view.trailingAnchor,
+                constant: UIConstants.searchTrailing)
         ]
         let collectionViewConstraints = [
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.topAnchor.constraint(equalTo: searchView.bottomAnchor, constant: UIConstants.collectionToStackOffset),
+            collectionView.topAnchor.constraint(
+                equalTo: searchView.bottomAnchor,
+                constant: UIConstants.collectionToStackOffset),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ]
+        
+        let placeholderImageViewConstraints = [
+            placeholderView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
+            placeholderView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
         ]
         
         NSLayoutConstraint.activate(
             headerViewConstraints +
             searchViewConstraints +
-            collectionViewConstraints
+            collectionViewConstraints +
+            placeholderImageViewConstraints
         )
     }
 }
@@ -113,8 +155,11 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCollectionViewCell.identifier, for: indexPath) as? TrackerCollectionViewCell else {
-            return UICollectionViewCell()            
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: TrackerCollectionViewCell.identifier,
+            for: indexPath) as? TrackerCollectionViewCell
+        else {
+            return UICollectionViewCell()
         }
         cell.configure(with: categories[indexPath.section].trackers[indexPath.row])
         return cell
@@ -123,7 +168,11 @@ extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard let header = collectionView.dequeueReusableSupplementaryView(
             ofKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: TrackerCategoryHeaderView.identifier, for: indexPath) as? TrackerCategoryHeaderView else { return UICollectionReusableView() }
+            withReuseIdentifier: TrackerCategoryHeaderView.identifier,
+            for: indexPath) as? TrackerCategoryHeaderView
+        else {
+            return UICollectionReusableView()
+        }
         header.configure(with: categories[indexPath.section])
         return header
     }
@@ -155,7 +204,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
     }
     
     func handlePlusButtonTap() {
-        let trackerCreationViewController = ChooseHabitViewController()
+        let trackerCreationViewController = ChooseTrackerViewController()
         present(trackerCreationViewController, animated: true)
     }
 }

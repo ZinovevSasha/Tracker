@@ -1,6 +1,6 @@
 import UIKit
 
-final class ChooseHabitViewController: UIViewController {
+final class ChooseTrackerViewController: UIViewController {
     // MARK: Private properties
     private let nameOfScreenLabel: UILabel = {
         let label = UILabel()
@@ -69,7 +69,7 @@ final class ChooseHabitViewController: UIViewController {
 }
 
 // MARK: - Private methods
-private extension ChooseHabitViewController {
+private extension ChooseTrackerViewController {
     func initialise() {
         habitButton.addTarget(self, action: #selector(habitButtonTaped), for: .touchUpInside)
         irregularEventButton.addTarget(self, action: #selector(irregularEventButtonTapped), for: .touchUpInside)
@@ -95,7 +95,8 @@ private extension ChooseHabitViewController {
     
     // MARK: - @objc Target Action methods
     @objc func habitButtonTaped() {
-        print("habitButtonTaped")
+        let vc = CreateTrackerViewController()
+        present(vc, animated: true)
     }
     
     @objc func irregularEventButtonTapped() {

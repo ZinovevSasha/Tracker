@@ -11,4 +11,5 @@ extension UIColor {
     static let myDatePickerBackground = UIColor(named: "myDatePickerBackground")!
     static let myCellBorderColor = UIColor(named: "myCellBorderColor")!
     static let myTranspatent = UIColor(named: "myTranspatent")!
+    static let myCreateButtonColor = UIColor(named: "myCreateButtonColor")!
 }

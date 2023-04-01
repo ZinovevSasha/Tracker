@@ -55,7 +55,11 @@ extension SearchView: UISearchBarDelegate {
 // MARK: - UISearchResultsUpdating
 extension SearchView: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        guard let query = searchController.searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+        guard
+            let query = searchController.searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        else {
+            return
+        }
         delegate?.search(for: query)
     }
 }
