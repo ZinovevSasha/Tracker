@@ -40,8 +40,7 @@ final class TrackerCreationViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
         button.setTitle("Создать", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .myCreateButtonColor
+//        button.setTitleColor(.myBlack, for: .normal)
         return button
     }()
     private let stackView: UIStackView = {
@@ -54,21 +53,28 @@ final class TrackerCreationViewController: UIViewController {
         return view
     }()
     
-    // MARK: - Private @objc methods
-    @objc private func cancelButtonTapped() {
-        dismiss(animated: true)
+    // MARK: - Model
+    private let sections = CreateTrackerCollectionViewSectionsData().sections
+    
+    private let trackerMaker = TrackerMaker()
+    private var valuesForTrackerMaker = TrackerCreationHelper() {
+        didSet {
+            if valuesForTrackerMaker.isAllPropertiesFilled {
+                if buttonState == .unselected {
+                    buttonState.toggle()
+                }
+            } else {
+                if buttonState == .selected {
+                    buttonState.toggle()
+                }
+            }
+        }
     }
     
-    @objc private func createButtonTapped() {
-        trackerMaker.createTrackerWith(
-            name: trackerName,
-            indexPathEmoji: selectedEmojiIndexPath,
-            indexPathColor: selectedColorsIndexPath,
-            weekDays: trackerSchedule,
-            sections: sections
-        )
-        dismiss(animated: false)
-        presentingViewController?.dismiss(animated: true)
+    private var buttonState = ButtonState.unselected {
+        didSet {
+            configureButton()
+        }
     }
     
     // MARK: - Lifecycle
@@ -76,15 +82,27 @@ final class TrackerCreationViewController: UIViewController {
         super.viewDidLoad()
         initialise()
         setConstraints()
+        configureButton()
     }
     
-    // MARK: - Model
-    private var trackerMaker = TrackerMaker()
-    private let sections = CreateTrackerCollectionViewSectionsData().sections
-    private var trackerName = ""
-    private var trackerSchedule: [WeekDay] = []
-    private var selectedEmojiIndexPath: IndexPath?
-    private var selectedColorsIndexPath: IndexPath?
+    // MARK: - Private @objc target action methods
+    @objc private func cancelButtonTapped() {
+        dismiss(animated: true)
+    }
+    
+    @objc private func createButtonTapped() {
+        if valuesForTrackerMaker.isAllPropertiesFilled {
+            trackerMaker.createTrackerWith(
+                values: valuesForTrackerMaker,
+                sections: sections
+            )
+            createButton.isEnabled.toggle()
+            dismiss(animated: false)
+            presentingViewController?.dismiss(animated: true)
+        } else {
+            createButton.shakeSelf()
+        }
+    }
 }
 
 // MARK: - Private methods
@@ -161,6 +179,21 @@ private extension TrackerCreationViewController {
             
             cancelButton.heightAnchor.constraint(equalToConstant: 60)
         ])
+    }
+    
+    func configureButton() {
+        switch buttonState {
+        case .selected:
+            UIView.animate(withDuration: 0.3, delay: 0) {
+                self.createButton.backgroundColor = .myBlack
+                self.createButton.setTitleColor(.myWhite, for: .normal)
+            }
+        case .unselected:
+            UIView.animate(withDuration: 0.3, delay: 0) {
+                self.createButton.backgroundColor = .myGray
+                self.createButton.setTitleColor(.white, for: .normal)
+            }
+        }
     }
 }
 
@@ -454,7 +487,7 @@ extension TrackerCreationViewController: UICollectionViewDelegate {
             scheduleViewController.delegate = self
             present(scheduleViewController, animated: true)
         case .trackerEmoji:
-            if let selectedIndexPath = selectedEmojiIndexPath,
+            if let selectedIndexPath = valuesForTrackerMaker.selectedEmojiIndexPath,
                 selectedIndexPath != indexPath {
                 collectionView.deselectItem(at: selectedIndexPath, animated: true)
                 let cell = collectionView.cellForItem(at: selectedIndexPath) as? TrackerEmojiCollectionViewCell
@@ -462,11 +495,11 @@ extension TrackerCreationViewController: UICollectionViewDelegate {
                 collectionView.reloadItems(at: [selectedIndexPath])
             }
             
-            selectedEmojiIndexPath = indexPath
+            valuesForTrackerMaker.selectedEmojiIndexPath = indexPath
             let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiCollectionViewCell
             cell?.configureSelection()
         case .trackerColor:
-            if let selectedIndexPath = selectedColorsIndexPath,
+            if let selectedIndexPath = valuesForTrackerMaker.selectedColorsIndexPath,
                 selectedIndexPath != indexPath {
                 collectionView.deselectItem(at: selectedIndexPath, animated: true)
                 let cell = collectionView.cellForItem(at: selectedIndexPath) as? TrackerColorCollectionViewCell
@@ -474,7 +507,7 @@ extension TrackerCreationViewController: UICollectionViewDelegate {
                 collectionView.reloadItems(at: [selectedIndexPath])
             }
             
-            selectedColorsIndexPath = indexPath
+            valuesForTrackerMaker.selectedColorsIndexPath = indexPath
             let cell = collectionView.cellForItem(at: indexPath) as? TrackerColorCollectionViewCell
             cell?.configureSelection()
         }
@@ -486,7 +519,7 @@ extension TrackerCreationViewController: UICollectionViewDelegate {
         case .trackerName, .trackersCategory, .trackerSchedule, .trackerEmoji:
             break
         case .trackerColor:
-            if let selectedIndexPath = selectedColorsIndexPath,
+            if let selectedIndexPath = valuesForTrackerMaker.selectedColorsIndexPath,
                 selectedIndexPath != indexPath {
                 let cell = collectionView.cellForItem(at: selectedIndexPath) as? TrackerColorCollectionViewCell
                 cell?.configureSelection()
@@ -500,14 +533,24 @@ extension TrackerCreationViewController: UICollectionViewDelegate {
 
 extension TrackerCreationViewController: TrackerNameCollectionViewCellDelegate {
     func textChanged(_ text: String) {
-        trackerName = text
+        if text.isEmpty {
+            valuesForTrackerMaker.trackerName = nil
+        } else {
+            valuesForTrackerMaker.trackerName = text
+        }
     }
 }
 
 extension TrackerCreationViewController: ScheduleViewControllerDelegate  {
     func weekDaysDidSelected(_ days: [WeekDay]) {
-        guard let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: 2)) as? TrackerScheduleCollectionViewCell else { return }
-        trackerSchedule = days
+        guard
+            let cell = collectionView.cellForItem(
+                at: IndexPath(row: .zero, section: 2)) as? TrackerScheduleCollectionViewCell
+        else {
+            return
+        }
+        
+        valuesForTrackerMaker.trackerSchedule = days
         if days.count == 7 {
             cell.configure(with: "Каждый день")
         } else {

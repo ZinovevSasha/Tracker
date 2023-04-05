@@ -12,6 +12,7 @@ protocol ScheduleViewControllerDelegate: AnyObject {
 }
 
 final class ScheduleViewController: UIViewController {
+    // MARK: - Delegate
     weak var delegate: ScheduleViewControllerDelegate?
     // MARK: - Private properties
     private let nameOfScreenLabel: UILabel = {
@@ -44,12 +45,15 @@ final class ScheduleViewController: UIViewController {
         return button
     }()
     
-    @objc func handleReadyButton() {
-        var orderedDays = selectedWeekDays
-            .flatMap { $0.value }
-            .sorted { $0.sortValue < $1.sortValue }
-        delegate?.weekDaysDidSelected(orderedDays)
-        dismiss(animated: true)
+    // MARK: UIConstants
+    private enum UIConstants {
+        static let nameOfScreenLabelToTop: CGFloat = 27
+        static let tableViewSidesInset: CGFloat = 4
+        static let tableViewToNameOfScreenLabelOffset: CGFloat = 14
+        static let tableViewToReadyButtonOffset: CGFloat = -39
+        static let readyButtonSideInsets: CGFloat = 20
+        static let readyButtonHeight: CGFloat = 60
+        static let readyButtonToBottomInset: CGFloat = 24
     }
     
     // MARK: - Data
@@ -63,6 +67,15 @@ final class ScheduleViewController: UIViewController {
         super.viewDidLoad()
         initialise()
         setConstraints()
+    }
+    
+    // MARK: - Private @objc target action methods
+    @objc private func handleReadyButton() {
+        var orderedDays = selectedWeekDays
+            .compactMap { $0.value }
+            .sorted { $0.sortValue < $1.sortValue }
+        delegate?.weekDaysDidSelected(orderedDays)
+        dismiss(animated: true)
     }
 }
 
@@ -80,36 +93,38 @@ private extension ScheduleViewController {
         NSLayoutConstraint.activate([
             nameOfScreenLabel.topAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.topAnchor,
-                constant: 27),
+                constant: UIConstants.nameOfScreenLabelToTop),
             nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             tableView.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor,
-                constant: -4),
+                constant: -UIConstants.tableViewSidesInset),
             tableView.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
-                constant: 4),
+                constant: UIConstants.tableViewSidesInset),
             tableView.topAnchor.constraint(
                 equalTo: nameOfScreenLabel.bottomAnchor,
-                constant: 14),
+                constant: UIConstants.tableViewToNameOfScreenLabelOffset),
             tableView.bottomAnchor.constraint(
                 equalTo: readyButton.topAnchor,
-                constant: -39),
+                constant: UIConstants.tableViewToReadyButtonOffset),
             
             readyButton.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor,
-                constant: 20),
+                constant: UIConstants.readyButtonSideInsets),
             readyButton.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
-                constant: -20),
-            readyButton.heightAnchor.constraint(equalToConstant: 60),
+                constant: -UIConstants.readyButtonSideInsets),
+            readyButton.heightAnchor.constraint(
+                equalToConstant: UIConstants.readyButtonHeight),
             readyButton.bottomAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.bottomAnchor,
-                constant: -24)
+                constant: -UIConstants.readyButtonToBottomInset)
         ])
     }
 }
 
+// MARK: - UITableViewDataSource
 extension ScheduleViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         weekDays.count
@@ -122,28 +137,30 @@ extension ScheduleViewController: UITableViewDataSource {
                 for: indexPath) as? ScheduleTableViewCell
         else {
             return UITableViewCell()
-        }
-        cell.delegate = self
+        }      
         let info = weekDays[indexPath.row].fullDayName
         cell.configure(with: info)
+        cell.delegate = self
         return cell
     }
 }
 
+// MARK: - UITableViewDelegate
 extension ScheduleViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
     }
 }
 
+// MARK: - ScheduleTableViewCellDelegate
 extension ScheduleViewController: ScheduleTableViewCellDelegate {
-    func daySelected(on cell: ScheduleTableViewCell) {
+    func weekDaySelected(on cell: ScheduleTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let selectedWeekDay = weekDays[indexPath.row]
         selectedWeekDays.updateValue(selectedWeekDay, forKey: indexPath.row)
     }
     
-    func dayUnselected(on cell: ScheduleTableViewCell) {
+    func weekDayUnselected(on cell: ScheduleTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         selectedWeekDays.removeValue(forKey: indexPath.row)
     }

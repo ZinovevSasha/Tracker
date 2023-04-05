@@ -11,7 +11,7 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
     static let identifier = String(describing: TrackerEmojiCollectionViewCell.self)
     // MARK: - Public
     func configureSelection() {
-        contentView.backgroundColor = .myBackground
+        contentView.backgroundColor = .myLightGrey
     }
     
     func configureDeselection() {

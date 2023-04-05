@@ -26,9 +26,9 @@ final class TrackerNameCollectionViewCell: UICollectionViewCell {
     // MARK: - Private properties    
     private let textField: UITextField = {
         let view = UITextField()
-        view.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: view.frame.height))
+        view.leftView = UIView(frame: CGRect(x: .zero, y: .zero, width: 16, height: view.frame.height))
         view.leftViewMode = .always
-        view.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: view.frame.height))
+        view.rightView = UIView(frame: CGRect(x: .zero, y: .zero, width: 16, height: view.frame.height))
         view.rightViewMode = .always
         view.backgroundColor = .myBackground
         view.textColor = .myBlack

@@ -21,30 +21,6 @@ final class TrackersViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-        
-    // MARK: - Models
-    var categories: [TrackerCategory] = [] {
-        didSet {
-            visibleCategories = categories
-        }
-    }
-    
-    var visibleCategories: [TrackerCategory] = [] {
-        didSet {
-            visibleCategories.isEmpty ? placeholderView.unhide() : placeholderView.hide()
-            collectionView.reloadData()
-        }
-    }
-    var completedTrackers: [TrackerRecord] = []
-    var completedTrackersId: Set<UUID> = []
-    var currentDate = Date()
-    
-    private let params = GeometryParams(
-        cellCount: UIConstants.cellCount,
-        leftInset: UIConstants.inset,
-        rightInset: UIConstants.inset,
-        spacing: UIConstants.cellSpacing
-    )
     
     // MARK: - UIConstants
     private enum UIConstants {
@@ -64,14 +40,6 @@ final class TrackersViewController: UIViewController {
         static let cellCount = 2
     }
     
-    // MARK: - Lifecycle
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        initialise()
-        setConstraints()
-        addObserver()
-    }
-    
     // MARK: - Notification
     private var trackerObserver: NSObjectProtocol?
     
@@ -87,6 +55,42 @@ final class TrackersViewController: UIViewController {
                     guard let category = category else { return }
                     self.categories.append(category)
             }
+    }
+    
+    // MARK: - Models
+    private var categories: [TrackerCategory] = [] {
+        didSet {
+            visibleCategories = categories
+        }
+    }
+    
+    private var visibleCategories: [TrackerCategory] = [] {
+        didSet {
+            if visibleCategories.isEmpty {
+                placeholderView.unhide()
+            } else {
+                placeholderView.hide()
+            }
+            collectionView.reloadData()
+        }
+    }
+    private var completedTrackers: [TrackerRecord] = []
+    private var completedTrackersId: Set<UUID> = []
+    private var currentDate = Date()
+    
+    private let params = GeometryParams(
+        cellCount: UIConstants.cellCount,
+        leftInset: UIConstants.inset,
+        rightInset: UIConstants.inset,
+        spacing: UIConstants.cellSpacing
+    )
+    
+    // MARK: - Lifecycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        initialise()
+        setConstraints()
+        addObserver()
     }
 }
 
@@ -139,7 +143,6 @@ private extension TrackersViewController {
                 constant: UIConstants.collectionToStackOffset),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
-        
         let placeholderImageViewConstraints = [
             placeholderView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
             placeholderView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
@@ -151,12 +154,6 @@ private extension TrackersViewController {
             collectionViewConstraints +
             placeholderImageViewConstraints
         )
-    }
-    
-    func  currentWeekDayNumber(from day: Date) -> Int {
-        let calendar = Calendar(identifier: .coptic)
-        let dayNumber = calendar.component(.weekday, from: day)
-        return dayNumber
     }
 }
 
@@ -246,8 +243,8 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
 extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
         currentDate = date
-        let today = currentWeekDayNumber(from: Date())
-        let selectedDay = currentWeekDayNumber(from: currentDate)
+        let today = Date.currentWeekDayNumber(from: Date())
+        let selectedDay = Date.currentWeekDayNumber(from: currentDate)
         
         if today != selectedDay {
             guard
@@ -285,10 +282,11 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
     }
 }
 
+// MARK: - SearchViewDelegate
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
-        let today = currentWeekDayNumber(from: Date())
-        let selectedDay = currentWeekDayNumber(from: currentDate)
+        let today = Date.currentWeekDayNumber(from: Date())
+        let selectedDay = Date.currentWeekDayNumber(from: currentDate)
         
         if searchText.isEmpty {
             if today != selectedDay {
@@ -307,7 +305,6 @@ extension TrackersViewController: SearchViewDelegate {
         } else {
             visibleCategories = searchTrackerWithName(name: searchText) ?? []
         }
-        collectionView.reloadData()
     }
     
     private func searchTrackerWithName(name: String) -> [TrackerCategory]? {

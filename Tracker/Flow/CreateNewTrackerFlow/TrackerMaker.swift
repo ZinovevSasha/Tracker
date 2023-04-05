@@ -22,15 +22,13 @@ final class TrackerMaker {
     }
     
     func createTrackerWith(
-        name: String,
-        indexPathEmoji: IndexPath?,
-        indexPathColor: IndexPath?,
-        weekDays: [WeekDay],
+        values: TrackerCreationHelper,
         sections: [CreateTrackerCollectionViewSections]
     ) {
         guard
-            let indexPathEmoji = indexPathEmoji,
-            let indexPathColor = indexPathColor
+            let name = values.trackerName,
+            let indexPathEmoji = values.selectedEmojiIndexPath,
+            let indexPathColor = values.selectedColorsIndexPath
         else {
             return
         }
@@ -45,7 +43,7 @@ final class TrackerMaker {
                     name: name,
                     color: color,
                     emoji: emoji,
-                    schedule: weekDays
+                    schedule: values.trackerSchedule
                 )
             ]
         )

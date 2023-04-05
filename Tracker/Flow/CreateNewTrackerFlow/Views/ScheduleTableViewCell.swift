@@ -8,8 +8,8 @@
 import UIKit
 
 protocol ScheduleTableViewCellDelegate: AnyObject {
-    func daySelected(on cell: ScheduleTableViewCell)
-    func dayUnselected(on cell: ScheduleTableViewCell)
+    func weekDaySelected(on cell: ScheduleTableViewCell)
+    func weekDayUnselected(on cell: ScheduleTableViewCell)
 }
 
 final class ScheduleTableViewCell: UITableViewCell {
@@ -21,15 +21,6 @@ final class ScheduleTableViewCell: UITableViewCell {
     
     weak var delegate: ScheduleTableViewCellDelegate?
     
-    // MARK: - Init
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initialise()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("Unsupported")
-    }
     
     // MARK: - Private properties
     private let weakDayLabel: UILabel = {
@@ -58,12 +49,24 @@ final class ScheduleTableViewCell: UITableViewCell {
         return view
     }()
     
+    // MARK: - Init
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        initialise()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("Unsupported")
+    }
+    
+    // MARK: - Model
     private var isSwitchOn = false
     
-    // MARK: - Target Action
-    @objc func handleWeakDaySwitch() {
+    // MARK: - Private @objc target action methods
+    @objc private func handleWeakDaySwitch() {
         isSwitchOn.toggle()
-        isSwitchOn ? delegate?.daySelected(on: self) : delegate?.dayUnselected(on: self)        
+        isSwitchOn ? delegate?.weekDaySelected(on: self) :
+        delegate?.weekDayUnselected(on: self)
     }
 }
 

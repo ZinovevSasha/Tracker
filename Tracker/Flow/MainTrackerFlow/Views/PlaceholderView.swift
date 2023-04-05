@@ -17,16 +17,6 @@ final class PlaceholderView: UIView {
         self.isHidden = false
     }
     
-    // MARK: - Init
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        initialise()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("Unsupported")
-    }
-    
     // MARK: - UIConstants
     private enum UIConstants {
         static let placeholderText: CGFloat = 12
@@ -48,6 +38,16 @@ final class PlaceholderView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    // MARK: - Init
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        initialise()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("Unsupported")
+    }
 }
 
 // MARK: - Private methods
@@ -66,4 +66,3 @@ private extension PlaceholderView {
         ])
     }
 }
-

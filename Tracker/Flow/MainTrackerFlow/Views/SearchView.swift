@@ -8,15 +8,6 @@ final class SearchView: UIView {
     // MARK: - Public
     weak var delegate: SearchViewDelegate?
     
-    // MARK: - Private properties
-    private let searchBar: UISearchBar = {
-        let view = UISearchBar()
-        view.searchBarStyle = .minimal
-        view.placeholder = "Поиск"
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-        
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -27,8 +18,19 @@ final class SearchView: UIView {
         fatalError("Unsupported")
     }
     
-    // MARK: - Private methods
-    private func initialise() {
+    // MARK: - Private properties
+    private let searchBar: UISearchBar = {
+        let view = UISearchBar()
+        view.searchBarStyle = .minimal
+        view.placeholder = "Поиск"
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+}
+
+// MARK: - Private methods
+private extension SearchView {
+    func initialise() {
         searchBar.delegate = self
         
         addSubview(searchBar)

@@ -21,11 +21,6 @@ struct Tracker {
     }
 }
 
-func ff() {
-    let traker = Tracker(name: "Fd", color: "Fds", emoji: "fdsf", schedule: [.monday,.friday])
-    let filteredTrackers = traker.schedule.filter { $0.rawValue == 2 }
-}
-
 enum WeekDay: Int {
     case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
     

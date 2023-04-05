@@ -27,4 +27,3 @@ struct GeometryParams {
         self.emptySpaceWidth = leftInset + rightInset + CGFloat(cellCount - 1) * spacing
     }
 }
-

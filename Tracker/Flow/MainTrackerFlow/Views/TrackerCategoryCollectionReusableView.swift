@@ -7,6 +7,20 @@ final class TrackerCollectionSectionCategoryHeaderView: UICollectionReusableView
         categoryLabel.text = info.header
     }
     
+    // MARK: - Private properties
+    private let categoryLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    // MARK: - UIConstants
+    private enum UIConstants {
+        static let categoryLabelLeadingInset: CGFloat = 28
+        static let categoryLabelBottomInset: CGFloat = -12
+    }
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -17,21 +31,6 @@ final class TrackerCollectionSectionCategoryHeaderView: UICollectionReusableView
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
     }
-    
-    // MARK: - UIConstants
-    private enum UIConstants {
-        static let categoryLabelLeadingInset: CGFloat = 28
-        static let categoryLabelBottomInset: CGFloat = -12
-    }
-    
-    
-    // MARK: - Private properties
-    private let categoryLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
 }
 
 // MARK: - Private methods

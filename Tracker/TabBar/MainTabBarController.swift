@@ -18,7 +18,7 @@ final class MainTabBarController: UITabBarController {
 }
 
 private extension MainTabBarController {
-    func generateViewController(_ rootViewController: UIViewController, image: UIImage, title: String) -> UIViewController {
+    func generateViewController(_ rootViewController: UIViewController, image: UIImage?, title: String) -> UIViewController {
         let viewController = rootViewController
         viewController.tabBarItem.image = image
         viewController.tabBarItem.title = title

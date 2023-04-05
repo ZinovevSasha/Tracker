@@ -66,6 +66,16 @@ final class ChooseTrackerViewController: UIViewController {
         initialise()
         setConstraints()
     }
+    
+    // MARK: - Private @objc target action methods
+    @objc private func habitButtonTaped() {
+        let vc = TrackerCreationViewController()
+        present(vc, animated: true)
+    }
+    
+    @objc private func irregularEventButtonTapped() {
+        print("irregularEventButtonTapped")
+    }
 }
 
 // MARK: - Private methods
@@ -85,21 +95,12 @@ private extension ChooseTrackerViewController {
                 constant: UIConstants.nameLabelTopInset),
             nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             habitButton.heightAnchor.constraint(equalToConstant: UIConstants.buttonsHeight),
-            irregularEventButton.heightAnchor.constraint(equalToConstant: UIConstants.buttonsHeight),
+            irregularEventButton.heightAnchor.constraint(
+                equalToConstant: UIConstants.buttonsHeight),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: UIConstants.stackLeadingInset),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: UIConstants.stackTrailingInset),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
-    }
-    
-    // MARK: - @objc Target Action methods
-    @objc func habitButtonTaped() {
-        let vc = TrackerCreationViewController()
-        present(vc, animated: true)
-    }
-    
-    @objc func irregularEventButtonTapped() {
-        print("irregularEventButtonTapped")
     }
 }

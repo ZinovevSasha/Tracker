@@ -6,26 +6,8 @@ protocol TrackerHeaderViewDelegate: AnyObject {
 }
 
 final class TrackerHeaderView: UIView {
+    // MARK: - Delegate
     weak var delegate: TrackerHeaderViewDelegate?
-    // MARK: - Init
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        initialise()
-        setConstraints()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("Unsupported")
-    }
-    
-    // MARK: - UIConstants
-    private enum UIConstants {
-        static let trackerLabelFontSize: CGFloat = 34
-        static let trackerToPlusButtonOffset: CGFloat = 13
-        static let trackerToDatePickerOffset: CGFloat = -12
-        static let datePickerWidth: CGFloat = 100
-        static let datePickerCornerRadius: CGFloat = 8
-    }
     
     // MARK: - Private properties
     private let plusButton: UIButton = {
@@ -65,6 +47,35 @@ final class TrackerHeaderView: UIView {
         view.distribution = .fillProportionally
         return view
     }()
+    
+    // MARK: - UIConstants
+    private enum UIConstants {
+        static let trackerLabelFontSize: CGFloat = 34
+        static let trackerToPlusButtonOffset: CGFloat = 13
+        static let trackerToDatePickerOffset: CGFloat = -12
+        static let datePickerWidth: CGFloat = 100
+        static let datePickerCornerRadius: CGFloat = 8
+    }
+    
+    // MARK: - Init
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        initialise()
+        setConstraints()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("Unsupported")
+    }
+    
+    // MARK: - Private @objc target action methods
+    @objc private func datePickerValueChanged() {
+        delegate?.datePickerValueChanged(date: datePicker.date)
+    }
+    
+    @objc private func handlePlusButtonTap() {
+        delegate?.handlePlusButtonTap()
+    }
 }
 
 // MARK: - Private methods
@@ -99,14 +110,5 @@ private extension TrackerHeaderView {
             datePickerConstraints +
             stackConstraints
         )
-    }
-    
-    // MARK: - objc target action methods
-    @objc func datePickerValueChanged() {        
-        delegate?.datePickerValueChanged(date: datePicker.date)
-    }
-    
-    @objc func handlePlusButtonTap() {
-        delegate?.handlePlusButtonTap()
     }
 }
