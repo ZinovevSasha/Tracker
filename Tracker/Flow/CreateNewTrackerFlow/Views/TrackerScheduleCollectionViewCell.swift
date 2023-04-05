@@ -7,11 +7,15 @@
 
 import UIKit
 
-class ScheduleCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: ScheduleCollectionViewCell.self)
+final class TrackerScheduleCollectionViewCell: UICollectionViewCell {
+    static let identifier = String(describing: TrackerScheduleCollectionViewCell.self)
     // MARK: Public
-    func configure(with info: CreateTrackerModel) {
+    func configure(with info: Text) {
         textLabel.text = info.title
+    }
+    
+    func configure(with supplementaryInfo: String) {
+        supplementaryTextLabel.text = supplementaryInfo
     }
     
     // MARK: Init
@@ -40,12 +44,33 @@ class ScheduleCollectionViewCell: UICollectionViewCell {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    
+    private let supplementaryTextLabel: UILabel = {
+        let view = UILabel()
+        view.textColor = .myGray
+        view.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let stackView: UIStackView = {
+        let view = UIStackView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.axis = .vertical
+        view.alignment = .leading
+        view.spacing = 2
+        view.distribution = .fill
+        return view
+    }()
 }
 
 // MARK: Private methods
-private extension ScheduleCollectionViewCell {
+private extension TrackerScheduleCollectionViewCell {
     func initialise() {
-        contentView.addSubview(textLabel)
+        stackView.addArrangedSubview(textLabel)
+        stackView.addArrangedSubview(supplementaryTextLabel)
+        
+        contentView.addSubview(stackView)
         contentView.addSubview(accessoryImageView)
         contentView.backgroundColor = .myBackground
         contentView.layer.cornerRadius = 16
@@ -53,16 +78,16 @@ private extension ScheduleCollectionViewCell {
         contentView.layer.masksToBounds = true
         
         NSLayoutConstraint.activate([
-            textLabel.leadingAnchor.constraint(
+            stackView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor,
                 constant: 16),
-            textLabel.topAnchor.constraint(
+            stackView.topAnchor.constraint(
                 equalTo: contentView.topAnchor,
-                constant: 27),
-            textLabel.bottomAnchor.constraint(
+                constant: 15),
+            stackView.bottomAnchor.constraint(
                 equalTo: contentView.bottomAnchor,
-                constant: -26),
-            textLabel.trailingAnchor.constraint(equalTo: accessoryImageView.leadingAnchor, constant: -10),
+                constant: -14),
+            stackView.trailingAnchor.constraint(equalTo: accessoryImageView.leadingAnchor, constant: -10),
 
             accessoryImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             accessoryImageView.trailingAnchor.constraint(

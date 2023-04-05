@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CollectionReusableView: UICollectionReusableView {
+final class CollectionReusableView: UICollectionReusableView {
     static let identifier = String(describing: CollectionReusableView.self)
     // MARK: Public
     func configure(with info: String) {
@@ -30,7 +30,7 @@ class CollectionReusableView: UICollectionReusableView {
         view.font = UIFont.systemFont(ofSize: 19, weight: .bold)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
-    }()    
+    }()
 }
 
 // MARK: Private methods

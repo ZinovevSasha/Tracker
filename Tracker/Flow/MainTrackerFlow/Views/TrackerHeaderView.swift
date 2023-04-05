@@ -1,7 +1,7 @@
 import UIKit
 
 protocol TrackerHeaderViewDelegate: AnyObject {
-    func datePickerValueChanged()
+    func datePickerValueChanged(date: Date)
     func handlePlusButtonTap()
 }
 
@@ -102,8 +102,8 @@ private extension TrackerHeaderView {
     }
     
     // MARK: - objc target action methods
-    @objc func datePickerValueChanged() {
-        delegate?.datePickerValueChanged()
+    @objc func datePickerValueChanged() {        
+        delegate?.datePickerValueChanged(date: datePicker.date)
     }
     
     @objc func handlePlusButtonTap() {

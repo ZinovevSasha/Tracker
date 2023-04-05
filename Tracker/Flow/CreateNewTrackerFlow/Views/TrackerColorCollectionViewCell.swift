@@ -7,8 +7,8 @@
 
 import UIKit
 
-class ColorsCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: ColorsCollectionViewCell.self)
+final class TrackerColorCollectionViewCell: UICollectionViewCell {
+    static let identifier = String(describing: TrackerColorCollectionViewCell.self)
     // MARK: Public
     func configureSelection() {
         let image = UIImage.borderCell?
@@ -20,9 +20,8 @@ class ColorsCollectionViewCell: UICollectionViewCell {
         highlightedImage.image = nil
     }
     
-    func configure(with info: CreateTrackerModel) {
-        guard let name = info.colors else { return }
-        colorView.backgroundColor = UIColor(named: name)
+    func configure(with info: Text) {
+        colorView.backgroundColor = UIColor(named: info.title)
     }
     
     // MARK: Init
@@ -65,7 +64,7 @@ class ColorsCollectionViewCell: UICollectionViewCell {
 }
 
 // MARK: Private methods
-private extension ColorsCollectionViewCell {
+private extension TrackerColorCollectionViewCell {
     func initialise() {
         contentView.addSubview(colorView)
         contentView.addSubview(highlightedImage)

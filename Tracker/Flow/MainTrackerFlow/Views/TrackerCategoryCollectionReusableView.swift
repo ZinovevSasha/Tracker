@@ -1,7 +1,7 @@
 import UIKit
 
-class TrackerCategoryHeaderView: UICollectionReusableView {
-    static let identifier = String(describing: TrackerCategoryHeaderView.self)
+final class TrackerCollectionSectionCategoryHeaderView: UICollectionReusableView {
+    static let identifier = String(describing: TrackerCollectionSectionCategoryHeaderView.self)
     // MARK: - Public
     func configure(with info: TrackerCategory) {
         categoryLabel.text = info.header
@@ -35,14 +35,17 @@ class TrackerCategoryHeaderView: UICollectionReusableView {
 }
 
 // MARK: - Private methods
-private extension TrackerCategoryHeaderView {
+private extension TrackerCollectionSectionCategoryHeaderView {
     func initialise() {
         addSubview(categoryLabel)
     }
     
     func setConstraints() {
         NSLayoutConstraint.activate([
-            categoryLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: UIConstants.categoryLabelLeadingInset),
+            categoryLabel.leadingAnchor.constraint(
+                equalTo: leadingAnchor,
+                constant: UIConstants.categoryLabelLeadingInset
+            ),
             categoryLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
             categoryLabel.topAnchor.constraint(equalTo: topAnchor),
             categoryLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: UIConstants.categoryLabelBottomInset)

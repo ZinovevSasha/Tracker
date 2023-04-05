@@ -7,8 +7,8 @@
 
 import UIKit
 
-class EmojiCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: EmojiCollectionViewCell.self)
+final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
+    static let identifier = String(describing: TrackerEmojiCollectionViewCell.self)
     // MARK: - Public
     func configureSelection() {
         contentView.backgroundColor = .myBackground
@@ -18,7 +18,7 @@ class EmojiCollectionViewCell: UICollectionViewCell {
         contentView.backgroundColor = .clear
     }
     
-    func configure(with info: CreateTrackerModel) {
+    func configure(with info: Text) {
         text.text = info.title
     }
     
@@ -44,7 +44,7 @@ class EmojiCollectionViewCell: UICollectionViewCell {
 }
 
 // MARK: Private methods
-private extension EmojiCollectionViewCell {
+private extension TrackerEmojiCollectionViewCell {
     func initialise() {
         contentView.addSubview(text)
         contentView.layer.cornerRadius = 16

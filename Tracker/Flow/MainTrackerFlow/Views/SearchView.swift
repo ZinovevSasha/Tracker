@@ -1,18 +1,14 @@
 import UIKit
 
 protocol SearchViewDelegate: AnyObject {
-    func search(for query: String)
-    func cancelSearch()
+    func searchView(_ searchView: SearchView, textDidChange searchText: String)
 }
 
 final class SearchView: UIView {
     // MARK: - Public
-    func setDelegate(delegate: SearchViewDelegate) {
-        self.delegate = delegate
-    }
+    weak var delegate: SearchViewDelegate?
     
     // MARK: - Private properties
-    private weak var delegate: SearchViewDelegate?
     private let searchBar: UISearchBar = {
         let view = UISearchBar()
         view.searchBarStyle = .minimal
@@ -34,6 +30,7 @@ final class SearchView: UIView {
     // MARK: - Private methods
     private func initialise() {
         searchBar.delegate = self
+        
         addSubview(searchBar)
 
         NSLayoutConstraint.activate([
@@ -47,19 +44,7 @@ final class SearchView: UIView {
 
 // MARK: - UISearchBarDelegate
 extension SearchView: UISearchBarDelegate {
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        delegate?.cancelSearch()
-    }
-}
-
-// MARK: - UISearchResultsUpdating
-extension SearchView: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        guard
-            let query = searchController.searchBar.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-        else {
-            return
-        }
-        delegate?.search(for: query)
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        delegate?.searchView(self, textDidChange: searchText)
     }
 }

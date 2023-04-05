@@ -7,26 +7,59 @@
 
 import UIKit
 
+protocol TrackerCollectionViewCellDelegate: AnyObject {
+    func plusButtonTapped(for cell: TrackerCollectionViewCell)
+}
+
+enum ButtonState {
+    case selected
+    case unselected
+    
+    mutating func toggle() {
+        switch self {
+        case .selected:
+            self = .unselected
+        case .unselected:
+            self = .selected
+        }
+    }
+}
+
 final class TrackerCollectionViewCell: UICollectionViewCell {
     static let identifier = String(describing: TrackerCollectionViewCell.self)
     // MARK: - Public
     func configure(with info: Tracker) {
+        let color = UIColor(named: info.color)
         emojiLabel.text = info.emoji
         trackerNameLabel.text = info.name
-        trackedDaysLabel.text = "\(info.daysTracked) days"
-        trackerContainerView.backgroundColor = info.color
-        addButton.backgroundColor = info.color
+        trackerContainerView.backgroundColor = color
+        addButton.backgroundColor = color
     }
+    
+    func configure(with trackedDays: Int) {
+        trackedDaysLabel.text = "\(trackedDays) days"        
+    }
+    
+    // MARK: - Delegate
+    weak var delegate: TrackerCollectionViewCellDelegate?
     
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
         initialise()
         setConstraints()
+        configureButton()
     }
     
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
+    }
+    
+    // MARK: - Button State
+    private var buttonState = ButtonState.unselected {
+        didSet {
+            configureButton()
+        }
     }
     
     // MARK: UIConstants
@@ -43,7 +76,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         static let emojiWidth: CGFloat = 16
         static let emojiLeadingInset: CGFloat = 4
         static let emojiTopInset: CGFloat = 1
-        static let emojiFontSize: CGFloat = 12
+        static let emojiFontSize: CGFloat = 14
         static let stackInsetLeading: CGFloat = 12
         static let stackInsetTrailing: CGFloat = -12
         static let stackHeight: CGFloat = 58
@@ -66,20 +99,17 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     private let trackerNameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
+        label.numberOfLines = 0
         label.font = UIFont.systemFont(ofSize: UIConstants.trackerNameLabelFontSize)
-        var paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.28
-        label.attributedText = NSMutableAttributedString(
-            string: "",
-            attributes: [NSAttributedString.Key.paragraphStyle: paragraphStyle]
-        )
+        label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
         
     private let emojiLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: UIConstants.emojiFontSize)
+        label.numberOfLines = 0
+        label.font = UIFont.systemFont(ofSize: UIConstants.emojiFontSize, weight: .medium)
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -103,24 +133,17 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private let addButton: UIButton = {
         let button = UIButton(type: .system)
-        let image = UIImage(systemName: "plus")?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite)
-        button.setImage(image, for: .normal)
-        button.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)
         button.layer.cornerRadius = UIConstants.buttonSize / 2
         button.layer.masksToBounds = true
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private let stackView: UIStackView = {
-        let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.axis = .horizontal
-        view.alignment = .center
-        view.spacing = UIConstants.stackViewSpacing
-        view.distribution = .fill
-        return view
-    }()
+    // MARK: - Private target action methods
+    @objc private func handleAddButtonTap() {
+        delegate?.plusButtonTapped(for: self)
+        buttonState.toggle()
+    }
 }
 
 // MARK: - Private methods
@@ -128,14 +151,8 @@ private extension TrackerCollectionViewCell {
     func initialise() {
         emojiContainerView.addSubview(emojiLabel)
         trackerContainerView.addSubviews(emojiContainerView, trackerNameLabel)
-        stackView.addArrangedSubview(trackedDaysLabel)
-        stackView.addArrangedSubview(addButton)
-        contentView.addSubviews(trackerContainerView, stackView)
+        contentView.addSubviews(trackerContainerView, trackedDaysLabel, addButton)
         addButton.addTarget(self, action: #selector(handleAddButtonTap), for: .touchUpInside)
-    }
-    
-    @objc func handleAddButtonTap() {
-        print("tapped")
     }
     
     func setConstraints() {
@@ -158,43 +175,34 @@ private extension TrackerCollectionViewCell {
         ]
         
         let emojiConstraints = [
-            emojiLabel.leadingAnchor.constraint(
-                equalTo: emojiContainerView.leadingAnchor,
-                constant: UIConstants.emojiLeadingInset),
-            emojiLabel.topAnchor.constraint(
-                equalTo: emojiContainerView.topAnchor,
-                constant: UIConstants.emojiTopInset),
-            emojiLabel.widthAnchor.constraint(equalToConstant: UIConstants.emojiWidth),
-            emojiLabel.heightAnchor.constraint(equalToConstant: UIConstants.emojiHeight)
+            emojiLabel.centerXAnchor.constraint(equalTo: emojiContainerView.centerXAnchor),
+            emojiLabel.centerYAnchor.constraint(equalTo: emojiContainerView.centerYAnchor)
         ]
         
         let trackNameConstraints = [
             trackerNameLabel.leadingAnchor.constraint(
                 equalTo: trackerContainerView.leadingAnchor,
                 constant: UIConstants.trackerNameLabelInset),
+            trackerNameLabel.trailingAnchor.constraint(
+                equalTo: trackerContainerView.trailingAnchor,
+                constant: -UIConstants.trackerNameLabelInset),
             trackerNameLabel.bottomAnchor.constraint(
                 equalTo: trackerContainerView.bottomAnchor,
                 constant: (-UIConstants.trackerNameLabelInset)),
-            trackerNameLabel.trailingAnchor.constraint(
-                equalTo: trackerContainerView.trailingAnchor,
-                constant: (-UIConstants.trackerNameLabelInset)),
             trackerNameLabel.heightAnchor.constraint(equalToConstant: UIConstants.trackerNameLabelHeight)
-        ]
-
-        let stackConstraints = [
-            stackView.leadingAnchor.constraint(
-                equalTo: contentView.leadingAnchor,
-                constant: UIConstants.stackInsetLeading),
-            stackView.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor,
-                constant: UIConstants.stackInsetTrailing),
-            stackView.topAnchor.constraint(equalTo: trackerContainerView.bottomAnchor),
-            stackView.heightAnchor.constraint(equalToConstant: UIConstants.stackHeight)
         ]
         
         let buttonConstraints = [
             addButton.heightAnchor.constraint(equalToConstant: UIConstants.buttonSize),
-            addButton.widthAnchor.constraint(equalToConstant: UIConstants.buttonSize)
+            addButton.widthAnchor.constraint(equalToConstant: UIConstants.buttonSize),
+            addButton.topAnchor.constraint(equalTo: trackerContainerView.bottomAnchor, constant: 8),
+            addButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            addButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
+        ]
+        
+        let label = [
+            trackedDaysLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            trackedDaysLabel.topAnchor.constraint(equalTo: trackerContainerView.bottomAnchor, constant: 16)
         ]
         
         NSLayoutConstraint.activate(
@@ -202,8 +210,23 @@ private extension TrackerCollectionViewCell {
             emojiContainerConstraints +
             emojiConstraints +
             trackNameConstraints +
-            stackConstraints +
+            label +
             buttonConstraints
         )
+    }
+    
+    func configureButton() {
+        switch buttonState {
+        case .selected:
+            let image = UIImage.done?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite)
+            addButton.setImage(image, for: .normal)
+//            addButton.imageView?.layer.transform = CATransform3DMakeScale(1,1,1)
+            addButton.alpha = 0.3
+        case .unselected:
+            let image = UIImage(systemName: "plus")?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite)
+            addButton.setImage(image, for: .normal)
+//            addButton.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)
+            addButton.alpha = 1
+        }
     }
 }

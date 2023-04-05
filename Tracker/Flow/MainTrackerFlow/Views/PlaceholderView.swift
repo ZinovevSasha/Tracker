@@ -8,6 +8,15 @@
 import UIKit
 
 final class PlaceholderView: UIView {
+    // MARK: - Public
+    func hide() {
+        self.isHidden = true
+    }
+    
+    func unhide() {
+        self.isHidden = false
+    }
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)

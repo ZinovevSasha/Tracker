@@ -1,6 +1,13 @@
 import UIKit
 
-class CreateTrackerViewController: UIViewController {
+protocol TrackerCreationViewControllerDelegate: AnyObject {
+    func didCreateTracker(_ category: TrackerCategory)
+}
+
+final class TrackerCreationViewController: UIViewController {
+    // MARK: - Public
+    weak var delegate: TrackerCreationViewControllerDelegate?
+    
     // MARK: - Private properties
     private let nameOfScreenLabel: UILabel = {
         let label = UILabel()
@@ -52,7 +59,17 @@ class CreateTrackerViewController: UIViewController {
         dismiss(animated: true)
     }
     
-    @objc private func createButtonTapped() {}
+    @objc private func createButtonTapped() {
+        trackerMaker.createTrackerWith(
+            name: trackerName,
+            indexPathEmoji: selectedEmojiIndexPath,
+            indexPathColor: selectedColorsIndexPath,
+            weekDays: trackerSchedule,
+            sections: sections
+        )
+        dismiss(animated: false)
+        presentingViewController?.dismiss(animated: true)
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -62,13 +79,16 @@ class CreateTrackerViewController: UIViewController {
     }
     
     // MARK: - Model
-    private let sections = TrackerCreationData().sections
-    private var selectedColorsIndexPath: IndexPath?
+    private var trackerMaker = TrackerMaker()
+    private let sections = CreateTrackerCollectionViewSectionsData().sections
+    private var trackerName = ""
+    private var trackerSchedule: [WeekDay] = []
     private var selectedEmojiIndexPath: IndexPath?
+    private var selectedColorsIndexPath: IndexPath?
 }
 
 // MARK: - Private methods
-private extension CreateTrackerViewController {
+private extension TrackerCreationViewController {
     func initialise() {
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
@@ -77,24 +97,24 @@ private extension CreateTrackerViewController {
         collectionView.delegate = self
         
         collectionView.register(
-            SearchCollectionViewCell.self,
-            forCellWithReuseIdentifier: SearchCollectionViewCell.identifier)
+            TrackerNameCollectionViewCell.self,
+            forCellWithReuseIdentifier: TrackerNameCollectionViewCell.identifier)
         
         collectionView.register(
-            CategoryCollectionViewCell.self,
-            forCellWithReuseIdentifier: CategoryCollectionViewCell.identifier)
+            TrackersCategoryCollectionViewCell.self,
+            forCellWithReuseIdentifier: TrackersCategoryCollectionViewCell.identifier)
         
         collectionView.register(
-            ScheduleCollectionViewCell.self,
-            forCellWithReuseIdentifier: ScheduleCollectionViewCell.identifier)
+            TrackerScheduleCollectionViewCell.self,
+            forCellWithReuseIdentifier: TrackerScheduleCollectionViewCell.identifier)
         
         collectionView.register(
-            EmojiCollectionViewCell.self,
-            forCellWithReuseIdentifier: EmojiCollectionViewCell.identifier)
+            TrackerEmojiCollectionViewCell.self,
+            forCellWithReuseIdentifier: TrackerEmojiCollectionViewCell.identifier)
         
         collectionView.register(
-            ColorsCollectionViewCell.self,
-            forCellWithReuseIdentifier: ColorsCollectionViewCell.identifier)
+            TrackerColorCollectionViewCell.self,
+            forCellWithReuseIdentifier: TrackerColorCollectionViewCell.identifier)
         
         collectionView.register(
             CollectionReusableView.self,
@@ -129,36 +149,38 @@ private extension CreateTrackerViewController {
                 equalTo: stackView.topAnchor,
                 constant: -16),
             
-            
-            cancelButton.heightAnchor.constraint(equalToConstant: 60),
             stackView.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor,
                 constant: 16),
             stackView.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
                 constant: -16),
-            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24)
+            stackView.bottomAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                constant: -24),
+            
+            cancelButton.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
 }
 
 // MARK: - Layout
-private extension CreateTrackerViewController {
+private extension TrackerCreationViewController {
     func createLayout() -> UICollectionViewCompositionalLayout {
         UICollectionViewCompositionalLayout { [weak self] sectionIndex, _ in
             guard let self = self else { return nil }
             
             let section = self.sections[sectionIndex]
             switch section {
-            case .sales:
+            case .trackerName:
                 return self.createSaleSection()
-            case .category:
+            case .trackersCategory:
                 return self.createCategorySection()
-            case .category2:
+            case .trackerSchedule:
                 return self.createCategorySection2()
-            case .emoji:
+            case .trackerEmoji:
                 return self.createEmojiSection()
-            case .colors:
+            case .trackerColor:
                 return self.createColorsSection()
             }
         }
@@ -335,63 +357,64 @@ private extension CreateTrackerViewController {
     }
 }
 
-extension CreateTrackerViewController: UICollectionViewDataSource {
+// MARK: - UICollectionViewDataSource
+extension TrackerCreationViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        sections.count
+        return sections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        sections[section].count
+        return sections[section].itemsCount
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         switch sections[indexPath.section] {
-        case .sales(let sale):
+        case .trackerName(let sale):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: SearchCollectionViewCell.identifier,
-                for: indexPath) as? SearchCollectionViewCell
+                withReuseIdentifier: TrackerNameCollectionViewCell.identifier,
+                for: indexPath) as? TrackerNameCollectionViewCell
             else {
                 return UICollectionViewCell()
             }
-            
+            cell.delegate = self
             cell.configure(with: sale[indexPath.row])
             return cell
-        case .category(let categ):
+        case .trackersCategory(let categ):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: CategoryCollectionViewCell.identifier,
-                for: indexPath) as? CategoryCollectionViewCell
+                withReuseIdentifier: TrackersCategoryCollectionViewCell.identifier,
+                for: indexPath) as? TrackersCategoryCollectionViewCell
             else {
                 return UICollectionViewCell()
             }
             
             cell.configure(with: categ[indexPath.row])
             return cell
-        case .category2(let categ):
+        case .trackerSchedule(let categ):
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: ScheduleCollectionViewCell.identifier,
-                for: indexPath) as? ScheduleCollectionViewCell
+                withReuseIdentifier: TrackerScheduleCollectionViewCell.identifier,
+                for: indexPath) as? TrackerScheduleCollectionViewCell
             else {
                 return UICollectionViewCell()
             }
             
             cell.configure(with: categ[indexPath.row])
             return cell
-        case .emoji(let other):
+        case .trackerEmoji(let other):
             
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: EmojiCollectionViewCell.identifier,
-                for: indexPath) as? EmojiCollectionViewCell
+                withReuseIdentifier: TrackerEmojiCollectionViewCell.identifier,
+                for: indexPath) as? TrackerEmojiCollectionViewCell
             else {
                 return UICollectionViewCell()
             }
             
             cell.configure(with: other[indexPath.row])
             return cell
-        case .colors(let color):
+        case .trackerColor(let color):
             
             guard let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: ColorsCollectionViewCell.identifier,
-                for: indexPath) as? ColorsCollectionViewCell
+                withReuseIdentifier: TrackerColorCollectionViewCell.identifier,
+                for: indexPath) as? TrackerColorCollectionViewCell
             else {
                 return UICollectionViewCell()
             }
@@ -411,7 +434,7 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
             else {
                 return UICollectionReusableView()
             }
-            header.configure(with: sections[indexPath.section].title)
+            header.configure(with: sections[indexPath.section].headerTitle)
             return header
         default:
             return UICollectionReusableView()
@@ -419,42 +442,40 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
     }
 }
 
-
-extension CreateTrackerViewController: UICollectionViewDelegate {
+// MARK: - UICollectionViewDelegate
+extension TrackerCreationViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: false)
-        
-        let section = self.sections[indexPath.section]
+        let section = sections[indexPath.section]
         switch section {
-        case .sales:
+        case .trackerName, .trackersCategory:
             break
-        case .category:
-            break
-        case .category2:
-            break
-        case .emoji:
+        case .trackerSchedule:
+            let scheduleViewController = ScheduleViewController()
+            scheduleViewController.delegate = self
+            present(scheduleViewController, animated: true)
+        case .trackerEmoji:
             if let selectedIndexPath = selectedEmojiIndexPath,
                 selectedIndexPath != indexPath {
                 collectionView.deselectItem(at: selectedIndexPath, animated: true)
-                let cell = collectionView.cellForItem(at: selectedIndexPath) as? EmojiCollectionViewCell
+                let cell = collectionView.cellForItem(at: selectedIndexPath) as? TrackerEmojiCollectionViewCell
                 cell?.configureDeselection()
                 collectionView.reloadItems(at: [selectedIndexPath])
             }
             
             selectedEmojiIndexPath = indexPath
-            let cell = collectionView.cellForItem(at: indexPath) as? EmojiCollectionViewCell
+            let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojiCollectionViewCell
             cell?.configureSelection()
-        case .colors:
+        case .trackerColor:
             if let selectedIndexPath = selectedColorsIndexPath,
                 selectedIndexPath != indexPath {
                 collectionView.deselectItem(at: selectedIndexPath, animated: true)
-                let cell = collectionView.cellForItem(at: selectedIndexPath) as? ColorsCollectionViewCell
+                let cell = collectionView.cellForItem(at: selectedIndexPath) as? TrackerColorCollectionViewCell
                 cell?.configureDeselection()
                 collectionView.reloadItems(at: [selectedIndexPath])
             }
             
             selectedColorsIndexPath = indexPath
-            let cell = collectionView.cellForItem(at: indexPath) as? ColorsCollectionViewCell
+            let cell = collectionView.cellForItem(at: indexPath) as? TrackerColorCollectionViewCell
             cell?.configureSelection()
         }
     }
@@ -462,17 +483,39 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let section = self.sections[indexPath.section]
         switch section {
-        case .sales, .category, .category2, .emoji:
+        case .trackerName, .trackersCategory, .trackerSchedule, .trackerEmoji:
             break
-        case .colors:
+        case .trackerColor:
             if let selectedIndexPath = selectedColorsIndexPath,
                 selectedIndexPath != indexPath {
-                let cell = collectionView.cellForItem(at: selectedIndexPath) as? ColorsCollectionViewCell
+                let cell = collectionView.cellForItem(at: selectedIndexPath) as? TrackerColorCollectionViewCell
                 cell?.configureSelection()
             } else {
-                let cell = collectionView.cellForItem(at: indexPath) as? ColorsCollectionViewCell
+                let cell = collectionView.cellForItem(at: indexPath) as? TrackerColorCollectionViewCell
                 cell?.configureDeselection()
             }
         }
+    }
+}
+
+extension TrackerCreationViewController: TrackerNameCollectionViewCellDelegate {
+    func textChanged(_ text: String) {
+        trackerName = text
+    }
+}
+
+extension TrackerCreationViewController: ScheduleViewControllerDelegate  {
+    func weekDaysDidSelected(_ days: [WeekDay]) {
+        guard let cell = collectionView.cellForItem(at: IndexPath(row: 0, section: 2)) as? TrackerScheduleCollectionViewCell else { return }
+        trackerSchedule = days
+        if days.count == 7 {
+            cell.configure(with: "Каждый день")
+        } else {
+            let string = days
+                .map { "\($0.dayShorthand)" }
+                .joined(separator: ", ")
+            cell.configure(with: string)
+        }
+        collectionView.reloadData()
     }
 }

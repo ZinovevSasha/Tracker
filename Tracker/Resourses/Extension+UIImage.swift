@@ -11,4 +11,5 @@ extension UIImage {
     static let plusWhite = UIImage(named: "08plus")
     static let borderCell = UIImage(named: "09cellBorder")
     static let chevron = UIImage(named: "10chevron")
+    static let done = UIImage(named: "11done")    
 }

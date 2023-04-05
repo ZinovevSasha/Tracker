@@ -95,7 +95,7 @@ private extension ChooseTrackerViewController {
     
     // MARK: - @objc Target Action methods
     @objc func habitButtonTaped() {
-        let vc = CreateTrackerViewController()
+        let vc = TrackerCreationViewController()
         present(vc, animated: true)
     }
     

@@ -1,12 +1,19 @@
 import UIKit
 
-class SearchCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: SearchCollectionViewCell.self)
+protocol TrackerNameCollectionViewCellDelegate: AnyObject {
+    func textChanged(_ text: String)
+}
+
+final class TrackerNameCollectionViewCell: UICollectionViewCell {
+    static let identifier = String(describing: TrackerNameCollectionViewCell.self)
     // MARK: Public
-    func configure(with info: CreateTrackerModel) {
+    func configure(with info: Text) {
         textField.placeholder = info.title
     }
     
+    weak var delegate: TrackerNameCollectionViewCellDelegate?
+    
+    // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
         initialise()
@@ -32,8 +39,9 @@ class SearchCollectionViewCell: UICollectionViewCell {
 }
 
 // MARK: Private methods
-private extension SearchCollectionViewCell {
+private extension TrackerNameCollectionViewCell {
     func initialise() {
+        textField.delegate = self
         contentView.addSubview(textField)
         contentView.layer.cornerRadius = 16
         contentView.layer.masksToBounds = true
@@ -44,5 +52,15 @@ private extension SearchCollectionViewCell {
             textField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             textField.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
+    }
+}
+
+extension TrackerNameCollectionViewCell: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        delegate?.textChanged(updatedText)
+        return true
     }
 }

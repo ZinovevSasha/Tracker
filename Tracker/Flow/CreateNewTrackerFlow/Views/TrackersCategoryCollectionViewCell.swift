@@ -7,10 +7,10 @@
 
 import UIKit
 
-class CategoryCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: CategoryCollectionViewCell.self)
+final class TrackersCategoryCollectionViewCell: UICollectionViewCell {
+    static let identifier = String(describing: TrackersCategoryCollectionViewCell.self)
     // MARK: Public
-    func configure(with info: CreateTrackerModel) {
+    func configure(with info: Text) {
         textLabel.text = info.title
     }
     
@@ -50,7 +50,7 @@ class CategoryCollectionViewCell: UICollectionViewCell {
 }
 
 // MARK: Private methods
-private extension CategoryCollectionViewCell {
+private extension TrackersCategoryCollectionViewCell {
     func initialise() {
         contentView.addSubview(textLabel)
         contentView.addSubview(seperatorView)
