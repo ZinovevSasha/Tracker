@@ -15,7 +15,7 @@ struct TrackerCreationHelper {
     var selectedColorsIndexPath: IndexPath?
     
     var isAllPropertiesFilled: Bool {
-        if trackerName != nil,            
+        if trackerName != nil,
             selectedEmojiIndexPath != nil,
             selectedColorsIndexPath != nil {
             return true

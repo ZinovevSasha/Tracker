@@ -8,12 +8,12 @@
 import UIKit
 
 protocol ScheduleViewControllerDelegate: AnyObject {
-    func weekDaysDidSelected(_ days: [WeekDay])
+    var weekDaysToShow: (([WeekDay]) -> Void)? { get }
 }
 
 final class ScheduleViewController: UIViewController {
-    // MARK: - Delegate
-    weak var delegate: ScheduleViewControllerDelegate?
+    // MARK: - Call Back
+    var weekDaysToShow: (([WeekDay]) -> Void)?
     // MARK: - Private properties
     private let nameOfScreenLabel: UILabel = {
         let label = UILabel()
@@ -31,6 +31,7 @@ final class ScheduleViewController: UIViewController {
         view.contentInsetAdjustmentBehavior = .never
         view.backgroundColor = .myWhite
         view.allowsSelection = false
+        view.separatorColor = .myGray
         return view
     }()
     
@@ -71,10 +72,10 @@ final class ScheduleViewController: UIViewController {
     
     // MARK: - Private @objc target action methods
     @objc private func handleReadyButton() {
-        var orderedDays = selectedWeekDays
+        let orderedDays = selectedWeekDays
             .compactMap { $0.value }
             .sorted { $0.sortValue < $1.sortValue }
-        delegate?.weekDaysDidSelected(orderedDays)
+        weekDaysToShow?(orderedDays)
         dismiss(animated: true)
     }
 }
@@ -137,10 +138,10 @@ extension ScheduleViewController: UITableViewDataSource {
                 for: indexPath) as? ScheduleTableViewCell
         else {
             return UITableViewCell()
-        }      
-        let info = weekDays[indexPath.row].fullDayName
-        cell.configure(with: info)
-        cell.delegate = self
+        }
+        let info = weekDays[indexPath.row].fullDayName        
+        cell.configure(with: info, number: selectedWeekDays[indexPath.row])
+        cell.delegate = self        
         return cell
     }
 }

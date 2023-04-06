@@ -17,7 +17,7 @@ final class TrackerMaker {
             .post(
                 name: TrackerMaker.myNotificationName,
                 object: self,
-                userInfo: ["c" : category]
+                userInfo: ["c": category]
             )
     }
     

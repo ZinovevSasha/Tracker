@@ -40,7 +40,6 @@ final class TrackerCreationViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
         button.setTitle("Создать", for: .normal)
-//        button.setTitleColor(.myBlack, for: .normal)
         return button
     }()
     private let stackView: UIStackView = {
@@ -312,7 +311,7 @@ private extension TrackerCreationViewController {
     func createEmojiSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(
             layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1/6),
+                widthDimension: .fractionalWidth(1 / 6),
                 heightDimension: .fractionalHeight(1)
             )
         )
@@ -320,7 +319,7 @@ private extension TrackerCreationViewController {
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1),
-                heightDimension: .fractionalWidth(1/6)
+                heightDimension: .fractionalWidth(1 / 6)
             ),
             subitem: item,
             count: 6)
@@ -337,7 +336,7 @@ private extension TrackerCreationViewController {
     func createColorsSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(
             layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1/6),
+                widthDimension: .fractionalWidth(1 / 6),
                 heightDimension: .fractionalHeight(1)
             )
         )
@@ -345,7 +344,7 @@ private extension TrackerCreationViewController {
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1),
-                heightDimension: .fractionalWidth(1/6)
+                heightDimension: .fractionalWidth(1 / 6)
             ),
             subitem: item,
             count: 6)
@@ -484,7 +483,19 @@ extension TrackerCreationViewController: UICollectionViewDelegate {
             break
         case .trackerSchedule:
             let scheduleViewController = ScheduleViewController()
-            scheduleViewController.delegate = self
+            scheduleViewController.weekDaysToShow = { [weak self] weekDays in
+                guard let self = self else { return }
+                let cell = collectionView.cellForItem(at: indexPath) as? TrackerScheduleCollectionViewCell
+                self.valuesForTrackerMaker.trackerSchedule = weekDays
+                if weekDays.count == 7 {
+                    cell?.configure(with: "Каждый день")
+                } else {
+                    let string = weekDays
+                        .map { "\($0.dayShorthand)" }
+                        .joined(separator: ", ")
+                    cell?.configure(with: string)
+                }
+            }
             present(scheduleViewController, animated: true)
         case .trackerEmoji:
             if let selectedIndexPath = valuesForTrackerMaker.selectedEmojiIndexPath,
@@ -538,27 +549,5 @@ extension TrackerCreationViewController: TrackerNameCollectionViewCellDelegate {
         } else {
             valuesForTrackerMaker.trackerName = text
         }
-    }
-}
-
-extension TrackerCreationViewController: ScheduleViewControllerDelegate  {
-    func weekDaysDidSelected(_ days: [WeekDay]) {
-        guard
-            let cell = collectionView.cellForItem(
-                at: IndexPath(row: .zero, section: 2)) as? TrackerScheduleCollectionViewCell
-        else {
-            return
-        }
-        
-        valuesForTrackerMaker.trackerSchedule = days
-        if days.count == 7 {
-            cell.configure(with: "Каждый день")
-        } else {
-            let string = days
-                .map { "\($0.dayShorthand)" }
-                .joined(separator: ", ")
-            cell.configure(with: string)
-        }
-        collectionView.reloadData()
     }
 }

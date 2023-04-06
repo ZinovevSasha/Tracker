@@ -15,12 +15,14 @@ protocol ScheduleTableViewCellDelegate: AnyObject {
 final class ScheduleTableViewCell: UITableViewCell {
     static let identifier = String(describing: ScheduleTableViewCell.self)
     // MARK: - Public
-    func configure(with info: String) {
+    func configure(with info: String, number: WeekDay?) {
         weakDayLabel.text = info
+        if number != nil {
+            weakDaySwitch.isOn = true
+        }
     }
     
     weak var delegate: ScheduleTableViewCellDelegate?
-    
     
     // MARK: - Private properties
     private let weakDayLabel: UILabel = {
@@ -59,14 +61,20 @@ final class ScheduleTableViewCell: UITableViewCell {
         fatalError("Unsupported")
     }
     
-    // MARK: - Model
-    private var isSwitchOn = false
+    override func layoutSubviews() {
+        super.layoutSubviews()        
+        if layer.cornerRadius != 16 {
+            layer.cornerRadius = 16
+        }
+    }
     
     // MARK: - Private @objc target action methods
-    @objc private func handleWeakDaySwitch() {
-        isSwitchOn.toggle()
-        isSwitchOn ? delegate?.weekDaySelected(on: self) :
-        delegate?.weekDayUnselected(on: self)
+    @objc private func handleWeakDaySwitch(_ sender: UISwitch) {
+        if sender.isOn {
+            delegate?.weekDaySelected(on: self)
+        } else {
+            delegate?.weekDayUnselected(on: self)
+        }
     }
 }
 
@@ -77,6 +85,7 @@ private extension ScheduleTableViewCell {
         stackView.addArrangedSubviews(weakDayLabel, weakDaySwitch)
         contentView.addSubview(stackView)
         contentView.backgroundColor = .myBackground
+        separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(
@@ -88,7 +97,17 @@ private extension ScheduleTableViewCell {
             stackView.topAnchor.constraint(
                 equalTo: contentView.topAnchor),
             stackView.bottomAnchor.constraint(
-                equalTo: contentView.bottomAnchor)          
+                equalTo: contentView.bottomAnchor)
         ])
+    }
+}
+
+extension UITableViewCell {
+    func roundedCorners(_ corners: UIRectCorner, cornerRadius: CGFloat) {
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = UIBezierPath(roundedRect: self.bounds,
+                                      byRoundingCorners: corners,
+                                      cornerRadii: CGSize(width: cornerRadius,height: cornerRadius)).cgPath
+        self.layer.mask = maskLayer
     }
 }
