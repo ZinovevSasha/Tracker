@@ -18,8 +18,8 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
         contentView.backgroundColor = .clear
     }
     
-    func configure(with info: Text) {
-        text.text = info.title
+    func configure(with info: String) {
+        text.text = info
     }
     
         

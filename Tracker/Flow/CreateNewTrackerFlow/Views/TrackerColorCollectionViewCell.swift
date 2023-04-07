@@ -20,8 +20,8 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
         highlightedImage.image = nil
     }
     
-    func configure(with info: Text) {
-        colorView.backgroundColor = UIColor(named: info.title)
+    func configure(with info: String) {
+        colorView.backgroundColor = UIColor(named: info)
     }
     
     // MARK: Init

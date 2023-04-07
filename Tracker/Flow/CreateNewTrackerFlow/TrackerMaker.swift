@@ -8,7 +8,7 @@
 import Foundation
 
 final class TrackerMaker {
-    static let myNotificationName = Notification.Name("TrackerMade")
+    static let myNotificationName = Notification.Name("TrackerMaker")
     
     private(set) var category: TrackerCategory?
     

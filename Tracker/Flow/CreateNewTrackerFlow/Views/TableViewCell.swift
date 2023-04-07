@@ -7,20 +7,17 @@
 
 import UIKit
 
-final class TrackerScheduleCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: TrackerScheduleCollectionViewCell.self)
-    // MARK: Public
-    func configure(with info: Text) {
-        textLabel.text = info.title
+final class MyTableViewCell: UITableViewCell {
+    static let identifier = String(describing: MyTableViewCell.self)
+    // MARK: - Public
+    func configure(with info: RowData) {
+        myTextLabel.text = info.title
+        supplementaryTextLabel.text = info.subtitle
     }
     
-    func configure(with supplementaryInfo: String) {
-        supplementaryTextLabel.text = supplementaryInfo
-    }
-    
-    // MARK: Init
-    override init(frame: CGRect) {
-        super.init(frame: .zero)
+    // MARK: - Init
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         initialise()
     }
     
@@ -28,7 +25,7 @@ final class TrackerScheduleCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: Private properties
+    // MARK: - Private properties
     private let accessoryImageView: UIImageView = {
         let view = UIImageView()
         view.image = UIImage.chevron?
@@ -37,7 +34,7 @@ final class TrackerScheduleCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
-    private let textLabel: UILabel = {
+    private let myTextLabel: UILabel = {
         let view = UILabel()
         view.textColor = .myBlack
         view.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -64,18 +61,12 @@ final class TrackerScheduleCollectionViewCell: UICollectionViewCell {
     }()
 }
 
-// MARK: Private methods
-private extension TrackerScheduleCollectionViewCell {
+// MARK: - Private methods
+private extension MyTableViewCell {
     func initialise() {
-        stackView.addArrangedSubview(textLabel)
-        stackView.addArrangedSubview(supplementaryTextLabel)
-        
-        contentView.addSubview(stackView)
-        contentView.addSubview(accessoryImageView)
+        stackView.addArrangedSubviews(myTextLabel, supplementaryTextLabel)
+        contentView.addSubviews(stackView, accessoryImageView)
         contentView.backgroundColor = .myBackground
-        contentView.layer.cornerRadius = 16
-        contentView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-        contentView.layer.masksToBounds = true
         
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(

@@ -39,7 +39,7 @@ private extension CollectionReusableView {
         addSubview(text)
         
         NSLayoutConstraint.activate([
-            text.leadingAnchor.constraint(equalTo: leadingAnchor),
+            text.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
             text.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }

@@ -80,8 +80,11 @@ final class TrackersViewController: UIViewController {
     
     private let params = GeometryParams(
         cellCount: UIConstants.cellCount,
+        cellSize: .zero,
         leftInset: UIConstants.inset,
         rightInset: UIConstants.inset,
+        topInset: .zero,
+        bottomInset: .zero,
         spacing: UIConstants.cellSpacing
     )
     
@@ -205,7 +208,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        UIEdgeInsets(top: .zero, left: params.leftInset, bottom: .zero, right: params.rightInset)
+        UIEdgeInsets(top: params.topInset, left: params.leftInset, bottom: params.bottomInset, right: params.rightInset)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

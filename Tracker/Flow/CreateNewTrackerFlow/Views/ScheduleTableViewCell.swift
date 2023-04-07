@@ -101,13 +101,3 @@ private extension ScheduleTableViewCell {
         ])
     }
 }
-
-extension UITableViewCell {
-    func roundedCorners(_ corners: UIRectCorner, cornerRadius: CGFloat) {
-        let maskLayer = CAShapeLayer()
-        maskLayer.path = UIBezierPath(roundedRect: self.bounds,
-                                      byRoundingCorners: corners,
-                                      cornerRadii: CGSize(width: cornerRadius,height: cornerRadius)).cgPath
-        self.layer.mask = maskLayer
-    }
-}

@@ -6,12 +6,13 @@
 //
 
 import UIKit
+import SnapKit
 
-protocol ScheduleViewControllerDelegate: AnyObject {
+protocol ChooseScheduleViewControllerDelegate: AnyObject {
     var weekDaysToShow: (([WeekDay]) -> Void)? { get }
 }
 
-final class ScheduleViewController: UIViewController {
+final class ChooseScheduleViewController: UIViewController {
     // MARK: - Call Back
     var weekDaysToShow: (([WeekDay]) -> Void)?
     // MARK: - Private properties
@@ -81,7 +82,7 @@ final class ScheduleViewController: UIViewController {
 }
 
 // MARK: - Private Methods
-private extension ScheduleViewController {
+private extension ChooseScheduleViewController {
     func initialise() {
         view.backgroundColor = .myWhite
         view.addSubviews(nameOfScreenLabel, tableView, readyButton)
@@ -126,7 +127,7 @@ private extension ScheduleViewController {
 }
 
 // MARK: - UITableViewDataSource
-extension ScheduleViewController: UITableViewDataSource {
+extension ChooseScheduleViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         weekDays.count
     }
@@ -147,14 +148,14 @@ extension ScheduleViewController: UITableViewDataSource {
 }
 
 // MARK: - UITableViewDelegate
-extension ScheduleViewController: UITableViewDelegate {
+extension ChooseScheduleViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
     }
 }
 
 // MARK: - ScheduleTableViewCellDelegate
-extension ScheduleViewController: ScheduleTableViewCellDelegate {
+extension ChooseScheduleViewController: ScheduleTableViewCellDelegate {
     func weekDaySelected(on cell: ScheduleTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let selectedWeekDay = weekDays[indexPath.row]
