@@ -21,20 +21,37 @@ final class TrackerMaker {
             )
     }
     
-    func createTrackerWith(
-        values: TrackerCreationHelper,
-        sections: [CreateTrackerCollectionViewSections]
+    func createTrackerFrom(
+        userInputData data: User,
+        tableData: [RowData],
+        collectionData: [CollectionViewData]
     ) {
         guard
-            let name = values.trackerName,
-            let indexPathEmoji = values.selectedEmojiIndexPath,
-            let indexPathColor = values.selectedColorsIndexPath
+            let name = data.selectedName,
+            let emojiIndexPath = data.selectedEmoji,
+            let colorIndexPath = data.selectedColor
         else {
             return
         }
         
-        let color = sections[indexPathColor.section].items[indexPathColor.row].title
-        let emoji = sections[indexPathEmoji.section].items[indexPathEmoji.row].title
+        let emojiSections = collectionData[emojiIndexPath.section]
+        var emoji = ""
+        switch emojiSections {
+        case .firstSection(items: let items):
+            emoji = items[emojiIndexPath.row]
+        default:
+            break
+        }
+        
+        let colorSections = collectionData[colorIndexPath.section]
+        var color = ""
+        switch colorSections {
+        case .secondSection(items: let items):
+            color = items[colorIndexPath.row].rawValue
+        default:
+            break
+        }
+        
         
         category = TrackerCategory(
             header: "Здоровье",
@@ -43,7 +60,7 @@ final class TrackerMaker {
                     name: name,
                     color: color,
                     emoji: emoji,
-                    schedule: values.trackerSchedule
+                    schedule: data.selectedWeekDay
                 )
             ]
         )

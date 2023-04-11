@@ -8,7 +8,6 @@
 import UIKit
 
 final class MyTableViewCell: UITableViewCell {
-    static let identifier = String(describing: MyTableViewCell.self)
     // MARK: - Public
     func configure(with info: RowData) {
         myTextLabel.text = info.title
@@ -45,7 +44,7 @@ final class MyTableViewCell: UITableViewCell {
     private let supplementaryTextLabel: UILabel = {
         let view = UILabel()
         view.textColor = .myGray
-        view.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        view.font = .regular17
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -67,6 +66,7 @@ private extension MyTableViewCell {
         stackView.addArrangedSubviews(myTextLabel, supplementaryTextLabel)
         contentView.addSubviews(stackView, accessoryImageView)
         contentView.backgroundColor = .myBackground
+        selectionStyle = .none
         
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(

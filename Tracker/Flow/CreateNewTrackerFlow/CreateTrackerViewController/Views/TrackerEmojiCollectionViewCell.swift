@@ -8,21 +8,22 @@
 import UIKit
 
 final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: TrackerEmojiCollectionViewCell.self)
     // MARK: - Public
-    func configureSelection() {
-        contentView.backgroundColor = .myLightGrey
-    }
-    
-    func configureDeselection() {
-        contentView.backgroundColor = .clear
-    }
-    
     func configure(with info: String) {
         text.text = info
     }
     
-        
+    func highlightUnhighlight() {
+        cellState.toggle()
+    }
+    
+    // MARK: - Cell State
+    private var cellState = State.unselected {
+        didSet {
+            configureCell()
+        }
+    }
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -37,7 +38,7 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
     private let text: UILabel = {
         let view = UILabel()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.font = UIFont.systemFont(ofSize: 32, weight: .bold)
+        view.font = .bold32
         view.textAlignment = .center
         return view
     }()
@@ -54,5 +55,14 @@ private extension TrackerEmojiCollectionViewCell {
             text.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             text.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
+    }
+    
+    func configureCell() {
+        switch cellState {
+        case .selected:
+            contentView.backgroundColor = .myLightGrey
+        case .unselected:
+            contentView.backgroundColor = .clear
+        }
     }
 }

@@ -13,7 +13,6 @@ protocol ScheduleTableViewCellDelegate: AnyObject {
 }
 
 final class ScheduleTableViewCell: UITableViewCell {
-    static let identifier = String(describing: ScheduleTableViewCell.self)
     // MARK: - Public
     func configure(with info: String, number: WeekDay?) {
         weakDayLabel.text = info
@@ -28,7 +27,7 @@ final class ScheduleTableViewCell: UITableViewCell {
     private let weakDayLabel: UILabel = {
         let view = UILabel()
         view.textColor = .myBlack
-        view.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        view.font = .regular17
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -37,7 +36,7 @@ final class ScheduleTableViewCell: UITableViewCell {
         let weakDaySwitch = UISwitch()
         weakDaySwitch.onTintColor = .myBlue
         weakDaySwitch.backgroundColor = .myLightGrey
-        weakDaySwitch.layer.cornerRadius = 16
+        weakDaySwitch.layer.cornerRadius = .cornerRadius
         weakDaySwitch.layer.masksToBounds = true
         weakDaySwitch.translatesAutoresizingMaskIntoConstraints = false
         return weakDaySwitch
@@ -61,13 +60,6 @@ final class ScheduleTableViewCell: UITableViewCell {
         fatalError("Unsupported")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()        
-        if layer.cornerRadius != 16 {
-            layer.cornerRadius = 16
-        }
-    }
-    
     // MARK: - Private @objc target action methods
     @objc private func handleWeakDaySwitch(_ sender: UISwitch) {
         if sender.isOn {
@@ -85,7 +77,7 @@ private extension ScheduleTableViewCell {
         stackView.addArrangedSubviews(weakDayLabel, weakDaySwitch)
         contentView.addSubview(stackView)
         contentView.backgroundColor = .myBackground
-        separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        separatorInset = .visibleCellSeparator
         
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(

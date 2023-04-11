@@ -11,20 +11,6 @@ protocol TrackerCollectionViewCellDelegate: AnyObject {
     func plusButtonTapped(for cell: TrackerCollectionViewCell)
 }
 
-enum ButtonState {
-    case selected
-    case unselected
-    
-    mutating func toggle() {
-        switch self {
-        case .selected:
-            self = .unselected
-        case .unselected:
-            self = .selected
-        }
-    }
-}
-
 final class TrackerCollectionViewCell: UICollectionViewCell {
     static let identifier = String(describing: TrackerCollectionViewCell.self)
     // MARK: - Public
@@ -58,8 +44,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     private let trackerNameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .myWhite
+        label.font = .medium12
         label.numberOfLines = .zero
-        label.font = UIFont.systemFont(ofSize: UIConstants.trackerNameLabelFontSize)
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -68,7 +54,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     private let emojiLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = .zero
-        label.font = UIFont.systemFont(ofSize: UIConstants.emojiFontSize, weight: .medium)
+        label.font = .medium16
         label.textAlignment = .left
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -76,9 +62,9 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private let emojiContainerView: UIView = {
         let view = UIView()
+        view.backgroundColor = .myTranspatent
         view.layer.cornerRadius = UIConstants.emojiContainerSize / 2
         view.layer.masksToBounds = true
-        view.backgroundColor = .myTranspatent
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -106,13 +92,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         static let emojiContainerInset: CGFloat = 12
         static let trackerNameLabelInset: CGFloat = 12
         static let trackerNameLabelHeight: CGFloat = 34
-        static let trackerNameLabelFontSize: CGFloat = 14
         static let emojiContainerSize: CGFloat = 24
         static let emojiHeight: CGFloat = 22
         static let emojiWidth: CGFloat = 16
         static let emojiLeadingInset: CGFloat = 4
         static let emojiTopInset: CGFloat = 1
-        static let emojiFontSize: CGFloat = 14
         static let stackInsetLeading: CGFloat = 12
         static let stackInsetTrailing: CGFloat = -12
         static let stackHeight: CGFloat = 58
@@ -121,7 +105,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Button State
-    private var buttonState = ButtonState.unselected {
+    private var buttonState = State.unselected {
         didSet {
             configureButton()
         }

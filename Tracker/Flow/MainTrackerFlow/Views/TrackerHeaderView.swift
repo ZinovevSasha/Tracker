@@ -21,7 +21,7 @@ final class TrackerHeaderView: UIView {
     private let trackerLabel: UILabel = {
         let label = UILabel()
         label.text = "Трекеры"
-        label.font = UIFont.systemFont(ofSize: UIConstants.trackerLabelFontSize, weight: .bold)
+        label.font = .bold34
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -50,7 +50,6 @@ final class TrackerHeaderView: UIView {
     
     // MARK: - UIConstants
     private enum UIConstants {
-        static let trackerLabelFontSize: CGFloat = 34
         static let trackerToPlusButtonOffset: CGFloat = 13
         static let trackerToDatePickerOffset: CGFloat = -12
         static let datePickerWidth: CGFloat = 100

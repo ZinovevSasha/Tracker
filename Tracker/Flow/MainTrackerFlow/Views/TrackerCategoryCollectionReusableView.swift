@@ -10,7 +10,7 @@ final class TrackerCollectionSectionCategoryHeaderView: UICollectionReusableView
     // MARK: - Private properties
     private let categoryLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
+        label.font = .bold19
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

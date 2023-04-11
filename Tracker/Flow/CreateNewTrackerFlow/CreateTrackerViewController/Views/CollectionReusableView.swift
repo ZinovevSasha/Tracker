@@ -8,7 +8,6 @@
 import UIKit
 
 final class CollectionReusableView: UICollectionReusableView {
-    static let identifier = String(describing: CollectionReusableView.self)
     // MARK: Public
     func configure(with info: String) {
         text.text = info
@@ -27,7 +26,7 @@ final class CollectionReusableView: UICollectionReusableView {
     // MARK: Private properties
     private let text: UILabel = {
         let view = UILabel()
-        view.font = UIFont.systemFont(ofSize: 19, weight: .bold)
+        view.font = .bold19
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()

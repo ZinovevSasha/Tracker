@@ -8,22 +8,22 @@
 import UIKit
 
 final class TrackerColorCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: TrackerColorCollectionViewCell.self)
     // MARK: Public
-    func configureSelection() {
-        let image = UIImage.borderCell?
-            .withTintColor(colorView.backgroundColor ?? .clear, renderingMode: .alwaysOriginal)
-        highlightedImage.image = image
-    }
-    
-    func configureDeselection() {
-        highlightedImage.image = nil
-    }
-    
     func configure(with info: String) {
         colorView.backgroundColor = UIColor(named: info)
     }
     
+    func addOrRemoveBorders() {
+        cellState.toggle()
+    }
+    
+    // MARK: - Cell State
+    private var cellState = State.unselected {
+        didSet {
+            configureCell()
+        }
+    }
+  
     // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -44,7 +44,7 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
     private let text: UILabel = {
         let view = UILabel()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.font = UIFont.systemFont(ofSize: 32, weight: .bold)
+        view.font = .bold32
         return view
     }()
     
@@ -79,5 +79,18 @@ private extension TrackerColorCollectionViewCell {
             colorView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             colorView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
         ])
+    }
+    
+    func configureCell() {
+        switch cellState {
+        case .selected:
+            let image = UIImage.borderCell?
+                .withTintColor(colorView.backgroundColor ?? .clear, renderingMode: .alwaysOriginal)
+            UIView.animate(withDuration: 0.3, delay: 0) {
+                self.highlightedImage.image = image
+            }
+        case .unselected:
+            highlightedImage.image = nil
+        }
     }
 }

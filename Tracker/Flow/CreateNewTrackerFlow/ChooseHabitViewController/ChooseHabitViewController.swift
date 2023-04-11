@@ -5,7 +5,7 @@ final class ChooseTrackerViewController: UIViewController {
     private let nameOfScreenLabel: UILabel = {
         let label = UILabel()
         label.text = "Создание трекера"
-        label.font = UIFont.systemFont(ofSize: UIConstants.textFontSize)
+        label.font = .medium16
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -19,35 +19,8 @@ final class ChooseTrackerViewController: UIViewController {
         return view
     }()
     
-    private let habitButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.titleLabel?.font = UIFont.systemFont(
-            ofSize: UIConstants.textFontSize,
-            weight: .medium
-        )
-        button.tintColor = UIColor.myWhite
-        button.backgroundColor = .myBlack
-        button.setTitle("Привычка", for: .normal)
-        button.layer.cornerRadius = UIConstants.textFontSize
-        button.layer.masksToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    private let irregularEventButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.titleLabel?.font = UIFont.systemFont(
-            ofSize: UIConstants.textFontSize,
-            weight: .medium
-        )
-        button.tintColor = UIColor.myWhite
-        button.backgroundColor = .myBlack
-        button.setTitle("Нерегулярные событие", for: .normal)
-        button.layer.cornerRadius = UIConstants.buttonsCornerRadius
-        button.layer.masksToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+    let habitButton = ActionButton(colorType: .black, title: "Привычка")
+    let irregularEventButton = ActionButton(colorType: .black, title: "Нерегулярные событие")
     
     // MARK: UIConstants
     private enum UIConstants {
@@ -57,7 +30,6 @@ final class ChooseTrackerViewController: UIViewController {
         static let stackLeadingInset: CGFloat = 20
         static let stackTrailingInset: CGFloat = -20
         static let buttonsHeight: CGFloat = 60
-        static let textFontSize: CGFloat = 16
     }
     
     // MARK: - Lifecycle
@@ -82,8 +54,13 @@ final class ChooseTrackerViewController: UIViewController {
 // MARK: - Private methods
 private extension ChooseTrackerViewController {
     func initialise() {
-        habitButton.addTarget(self, action: #selector(habitButtonTaped), for: .touchUpInside)
-        irregularEventButton.addTarget(self, action: #selector(irregularEventButtonTapped), for: .touchUpInside)
+        // Add targets
+        habitButton.addTarget(
+            self, action: #selector(habitButtonTaped), for: .touchUpInside)
+        irregularEventButton.addTarget(
+            self, action: #selector(irregularEventButtonTapped), for: .touchUpInside)
+        
+        // Add subviews
         stackView.addArrangedSubviews(habitButton, irregularEventButton)
         view.addSubviews(nameOfScreenLabel, stackView)
         view.backgroundColor = .myWhite
@@ -95,9 +72,7 @@ private extension ChooseTrackerViewController {
                 equalTo: view.safeAreaLayoutGuide.topAnchor,
                 constant: UIConstants.nameLabelTopInset),
             nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            habitButton.heightAnchor.constraint(equalToConstant: UIConstants.buttonsHeight),
-            irregularEventButton.heightAnchor.constraint(
-                equalToConstant: UIConstants.buttonsHeight),
+
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: UIConstants.stackLeadingInset),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: UIConstants.stackTrailingInset),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),

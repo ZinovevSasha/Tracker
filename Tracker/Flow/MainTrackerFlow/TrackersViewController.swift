@@ -2,22 +2,15 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     // MARK: - Private properties
-    private let placeholderView = PlaceholderView()
+    private let placeholderView = PlaceholderView(placeholder: .star, text: "Что будем отслеживать?")
     private let headerView = TrackerHeaderView()
     private let searchView = SearchView()
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .myWhite
-        view.register(
-            TrackerCollectionViewCell.self,
-            forCellWithReuseIdentifier: TrackerCollectionViewCell.identifier
-        )
-        view.register(
-            TrackerCollectionSectionCategoryHeaderView.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: TrackerCollectionSectionCategoryHeaderView.identifier
-        )
+        view.registerHeader(TrackerCollectionSectionCategoryHeaderView.self)
+        view.register(cellClass: TrackerCollectionViewCell.self)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -171,15 +164,9 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: TrackerCollectionViewCell.identifier,
-            for: indexPath) as? TrackerCollectionViewCell
-        else {
-            return UICollectionViewCell()
-        }
+        let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
         let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
         let matchingTrackers = completedTrackers.filter { $0.id == tracker.id }
-        
         cell.configure(with: matchingTrackers.count)
         cell.configure(with: visibleCategories[indexPath.section].trackers[indexPath.row])
         cell.delegate = self
@@ -187,13 +174,7 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        guard let header = collectionView.dequeueReusableSupplementaryView(
-            ofKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: TrackerCollectionSectionCategoryHeaderView.identifier,
-            for: indexPath) as? TrackerCollectionSectionCategoryHeaderView
-        else {
-            return UICollectionReusableView()
-        }
+        let header: TrackerCollectionSectionCategoryHeaderView = collectionView.dequeueHeader(ofKind: UICollectionView.elementKindSectionHeader, for: indexPath)
         header.configure(with: visibleCategories[indexPath.section])
         return header
     }

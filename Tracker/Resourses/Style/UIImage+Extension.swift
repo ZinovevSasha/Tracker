@@ -11,5 +11,28 @@ extension UIImage {
     static let rightTabBar        = UIImage(named: "01leftTabBar")
     static let onboardingRed      = UIImage(named: "04onboardingRed")
     static let onboardingBlue     = UIImage(named: "03onboardingBlue")
-    static let placeholderTracker = UIImage(named: "05placeholderTracker")
+    static let star               = UIImage(named: "05placeholderTracker")
+    static let noResult           = UIImage(named: "12placeholderNoStatistic")
+    static let noStatistic        = UIImage(named: "13placeholderNoResult")
+    static let checkmarkBlue      = UIImage(named: "14checkmark")
+    
+    enum Placeholder {
+        case star
+        case noResult
+        case noStatistic
+        
+        var image: UIImage? {
+            switch self {
+            case .star:
+                return .star
+            case .noResult:
+                return .noResult
+            case .noStatistic:
+                return .noStatistic
+            }
+        }
+    }
 }
+
+
+
