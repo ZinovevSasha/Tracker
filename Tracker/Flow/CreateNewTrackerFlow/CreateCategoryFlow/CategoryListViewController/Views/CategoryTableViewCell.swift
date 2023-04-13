@@ -1,23 +1,17 @@
-//
-//  ScheduleTableViewCell.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 04.04.2023.
-//
-
 import UIKit
-
-protocol CategoryTableViewCellDelegate: AnyObject {
-  
-}
 
 final class CategoryTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with info: String) {
+    func configure(with info: String, setImage: Bool) {
         categoryName.text = info
+        if setImage {
+            selectedCategory.image = .checkmarkBlue
+        }
     }
     
-    weak var delegate: CategoryTableViewCellDelegate?
+    func configureImage() {
+        selectedCategory.image = .checkmarkBlue
+    }
     
     // MARK: - Private properties
     private let categoryName: UILabel = {
@@ -30,6 +24,7 @@ final class CategoryTableViewCell: UITableViewCell {
     
     private let selectedCategory: UIImageView = {
         let view = UIImageView()
+        view.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -46,6 +41,7 @@ final class CategoryTableViewCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         initialise()
+        setConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -59,9 +55,10 @@ private extension CategoryTableViewCell {
         stackView.addArrangedSubviews(categoryName, selectedCategory)
         contentView.addSubview(stackView)
         contentView.backgroundColor = .myBackground
-        separatorInset = .visibleCellSeparator
         selectionStyle = .none
-        
+    }
+    
+    func setConstraints() {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor,

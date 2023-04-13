@@ -1,21 +1,14 @@
-//
-//  DataForCreateTrackerController.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 07.04.2023.
-//
-
 import Foundation
 
 enum CollectionViewData {
-    case firstSection(items: [String])
-    case secondSection(items: [CollectionViewColors])
+    case emojiSection(items: [String])
+    case colorSection(items: [CollectionViewColors])
     
     var title: String {
         switch self {
-        case .firstSection:
+        case .emojiSection:
             return "Emojis"
-        case .secondSection:
+        case .colorSection:
             return "Цвет"
         }
     }
@@ -23,13 +16,13 @@ enum CollectionViewData {
 
 struct DataForCollectionInCreateTrackerController {
     let dataSource: [CollectionViewData] = [
-        .firstSection(items:  [
+        .emojiSection(items:  [
             "🙂", "😻", "🌺", "🐶", "❤️",
             "😱", "😇","😡", "🥶", "🤔",
             "🙌", "🍔", "🥦", "🏓", "🥇",
             "🎸", "🏝️", "😪"
         ]),
-        .secondSection(items: CollectionViewColors.array)
+        .colorSection(items: CollectionViewColors.array)
     ]
 }
 

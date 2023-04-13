@@ -1,10 +1,3 @@
-//
-//  ScheduleTableViewCell.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 04.04.2023.
-//
-
 import UIKit
 
 protocol ScheduleTableViewCellDelegate: AnyObject {
@@ -14,9 +7,9 @@ protocol ScheduleTableViewCellDelegate: AnyObject {
 
 final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with info: String, number: WeekDay?) {
+    func configure(with info: String, selectedWeekDays: WeekDay?) {
         weakDayLabel.text = info
-        if number != nil {
+        if selectedWeekDays != nil {
             weakDaySwitch.isOn = true
         }
     }
@@ -77,7 +70,8 @@ private extension ScheduleTableViewCell {
         stackView.addArrangedSubviews(weakDayLabel, weakDaySwitch)
         contentView.addSubview(stackView)
         contentView.backgroundColor = .myBackground
-        separatorInset = .visibleCellSeparator
+        
+        selectionStyle = .none
         
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(

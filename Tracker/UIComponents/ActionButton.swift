@@ -1,13 +1,6 @@
-//
-//  ActionButton.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 08.04.2023.
-//
-
 import UIKit
 
-// MARK: - ButtonState
+// MARK: - State
 enum State {
     case selected
     case unselected
@@ -37,7 +30,11 @@ final class ActionButton: UIButton {
     private var title: String?
     
     // MARK: - Init
-    init(type: UIButton.ButtonType = .system, colorType: ColorType, title: String) {
+    init(
+        type: UIButton.ButtonType = .system,
+        colorType: ColorType,
+        title: String
+    ) {
         super.init(frame: .zero)
         self.colorType = colorType
         self.title = title
@@ -54,6 +51,7 @@ final class ActionButton: UIButton {
         titleLabel?.font = .medium16
         translatesAutoresizingMaskIntoConstraints = false
         heightAnchor.constraint(equalToConstant: .buttonsHeight).isActive = true
+        
         
         switch colorType {
         case .black:

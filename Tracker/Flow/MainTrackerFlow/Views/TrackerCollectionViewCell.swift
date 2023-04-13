@@ -1,10 +1,3 @@
-//
-//  TrackerCollectionViewCell.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 28.03.2023.
-//
-
 import UIKit
 
 protocol TrackerCollectionViewCellDelegate: AnyObject {

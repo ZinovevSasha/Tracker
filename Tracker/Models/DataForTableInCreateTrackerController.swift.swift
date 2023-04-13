@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 07.04.2023.
-//
-
 import Foundation
 
 struct DataForTableInCreateTrackerController {
@@ -19,11 +12,11 @@ struct DataForTableInCreateTrackerController {
         [category, schedule]
     }
     
-    mutating func addCategory(subtitle: String) {
+    mutating func addCategory(_ subtitle: String) {
         category.subtitle = subtitle
     }
     
-    mutating func addSchedule(subtitle: String) {
+    mutating func addSchedule(_ subtitle: String) {
         schedule.subtitle = subtitle
     }
 }
@@ -37,7 +30,3 @@ struct RowData {
         self.subtitle = subtitle
     }
 }
-
-
-
-

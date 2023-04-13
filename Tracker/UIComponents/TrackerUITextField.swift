@@ -1,10 +1,3 @@
-//
-//  TrackerUITextField.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 09.04.2023.
-//
-
 import UIKit
 
 protocol TrackerUITextFieldDelegate: AnyObject {
@@ -65,7 +58,7 @@ private extension TrackerUITextField {
             textField.trailingAnchor.constraint(equalTo: trailingAnchor),
             textField.topAnchor.constraint(equalTo: topAnchor),
             textField.bottomAnchor.constraint(equalTo: bottomAnchor),
-            textField.heightAnchor.constraint(equalToConstant: .buttonsHeight)
+            textField.heightAnchor.constraint(equalToConstant: .cellHeight)
         ])
     }
 }
@@ -83,4 +76,10 @@ extension TrackerUITextField: UITextFieldDelegate {
         delegate?.textDidEntered(in: self, text: updatedText)
         return true
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+         // Hide the keyboard when the return button is pressed
+         textField.resignFirstResponder()
+         return true
+     }
 }

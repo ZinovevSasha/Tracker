@@ -1,10 +1,3 @@
-//
-//  ScheduleViewController.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 04.04.2023.
-//
-
 import UIKit
 
 protocol ChooseScheduleViewControllerDelegate: AnyObject {
@@ -21,7 +14,8 @@ final class ChooseScheduleViewController: FrameViewController {
         view.contentInset.top = UIConstants.topInset
         view.separatorColor = .myGray
         view.backgroundColor = .myWhite
-        view.allowsSelection = false
+        view.allowsSelection = true
+        view.separatorStyle = .singleLine
         view.showsVerticalScrollIndicator = false
         view.translatesAutoresizingMaskIntoConstraints = false
         view.register(cellClass: ScheduleTableViewCell.self)
@@ -36,7 +30,6 @@ final class ChooseScheduleViewController: FrameViewController {
     }
     
     // MARK: - DataToChangeStatesOfSwitchesAndGiveTextToLabels
-    private let weekDays = WeekDay.array
     private var selectedWeekDays: [Int: WeekDay]
     
     init(weekDays: [Int: WeekDay] = [:]) {
@@ -61,7 +54,7 @@ final class ChooseScheduleViewController: FrameViewController {
     // MARK: - Private @objc target action methods
     override func handleButtonCenterTap() {
         weekDaysToShow?(selectedWeekDays)
-        dismiss(animated: true)
+        navigationController?.popViewController(animated: true)
     }
 }
 
@@ -89,30 +82,23 @@ private extension ChooseScheduleViewController {
 // MARK: - UITableViewDataSource
 extension ChooseScheduleViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return weekDays.count
+        return WeekDay.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ScheduleTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+        cell.setCorners(in: tableView, at: indexPath)        
+        cell.configure(
+            with: WeekDay.array[indexPath.row].fullDayName,
+            selectedWeekDays: selectedWeekDays[indexPath.row]
+        )
         cell.delegate = self
-        cell.setCellCorners(in: tableView, at: indexPath)
-        cell.configure(with: weekDays[indexPath.row].fullDayName, number: selectedWeekDays[indexPath.row])
         return cell
     }
     
-//    private func roundCornersIn(cell: UITableViewCell, at indexPath: IndexPath, in tableView: UITableView) {
-//        if indexPath.row == .zero {
-//            setCorners([.layerMinXMinYCorner, .layerMaxXMinYCorner], for: cell)
-//        }
-//        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
-//            setCorners([.layerMinXMaxYCorner, .layerMaxXMaxYCorner], for: cell)
-//        }
-//    }
-//
-//    private func setCorners(_ corners: CACornerMask, for cell: UITableViewCell) {
-//        cell.contentView.layer.cornerRadius = .cornerRadius
-//        cell.contentView.layer.maskedCorners = [corners]
-//    }
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.setSeparatorInset(in: tableView, at: indexPath)
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -120,21 +106,13 @@ extension ChooseScheduleViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UIConstants.cellHeight
     }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
-            cell.separatorInset = .noCellSeparator
-        } else {
-            cell.separatorInset = .visibleCellSeparator
-        }
-    }
 }
 
 // MARK: - ScheduleTableViewCellDelegate
 extension ChooseScheduleViewController: ScheduleTableViewCellDelegate {
     func weekDaySelected(on cell: ScheduleTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let selectedWeekDay = weekDays[indexPath.row]
+        let selectedWeekDay = WeekDay.array[indexPath.row]
         selectedWeekDays.updateValue(selectedWeekDay, forKey: indexPath.row)
     }
     

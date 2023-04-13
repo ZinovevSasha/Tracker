@@ -1,10 +1,3 @@
-//
-//  TrackerMaker.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 02.04.2023.
-//
-
 import Foundation
 
 final class TrackerMaker {
@@ -23,10 +16,12 @@ final class TrackerMaker {
     
     func createTrackerFrom(
         userInputData data: User,
+        categories: [TrackerCategory],
         tableData: [RowData],
         collectionData: [CollectionViewData]
     ) {
         guard
+            let categoryName = data.selectedCategory,
             let name = data.selectedName,
             let emojiIndexPath = data.selectedEmoji,
             let colorIndexPath = data.selectedColor
@@ -34,10 +29,12 @@ final class TrackerMaker {
             return
         }
         
+        let header = categories[categoryName].header
+        
         let emojiSections = collectionData[emojiIndexPath.section]
         var emoji = ""
         switch emojiSections {
-        case .firstSection(items: let items):
+        case .emojiSection(items: let items):
             emoji = items[emojiIndexPath.row]
         default:
             break
@@ -46,7 +43,7 @@ final class TrackerMaker {
         let colorSections = collectionData[colorIndexPath.section]
         var color = ""
         switch colorSections {
-        case .secondSection(items: let items):
+        case .colorSection(items: let items):
             color = items[colorIndexPath.row].rawValue
         default:
             break
@@ -54,7 +51,7 @@ final class TrackerMaker {
         
         
         category = TrackerCategory(
-            header: "Здоровье",
+            header: header,
             trackers: [
                 Tracker(
                     name: name,

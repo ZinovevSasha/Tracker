@@ -1,18 +1,14 @@
-//
-//  WeekDays.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 08.04.2023.
-//
-
 import Foundation
 
-
-enum WeekDay: Int, CaseIterable {
+enum WeekDay: Int {
     case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
         
     static var array: [WeekDay] {
-        return WeekDay.allCases
+        [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
+    }
+    
+    static var count: Int {
+        array.count
     }
     
     var dayShorthand: String {

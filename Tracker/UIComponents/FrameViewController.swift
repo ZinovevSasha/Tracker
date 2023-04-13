@@ -1,10 +1,3 @@
-//
-//  FrameViewController.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 08.04.2023.
-//
-
 import UIKit
 
 protocol FrameViewControllerProtocol {
@@ -77,7 +70,6 @@ class FrameViewController: UIViewController, FrameViewControllerProtocol {
         static let bottom: CGFloat = -24
         static let nameLabelTopInset: CGFloat = 27
         static let containerToTitleInset: CGFloat = 14
-        static let buttonHeight: CGFloat = 60
     }
     
     // MARK: - Lifecycle
@@ -106,11 +98,11 @@ private extension FrameViewController {
         if let buttonLeft, let buttonRight  {
             screenButtons.addArrangedSubview(buttonLeft)
             screenButtons.addArrangedSubview(buttonRight)
-            buttonLeft.heightAnchor.constraint(equalToConstant: UIConstants.buttonHeight)
+            buttonLeft.heightAnchor.constraint(equalToConstant: .buttonsHeight)
         }
         if let buttonCenter {
             screenButtons.addArrangedSubview(buttonCenter)
-            buttonCenter.heightAnchor.constraint(equalToConstant: UIConstants.buttonHeight)
+            buttonCenter.heightAnchor.constraint(equalToConstant: .buttonsHeight)
         }
     }
     
@@ -131,8 +123,8 @@ private extension FrameViewController {
             screenButtons.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor, constant: UIConstants.trailing),
             screenButtons.bottomAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: UIConstants.bottom),
-            screenButtons.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+                equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: UIConstants.bottom),            
+            screenButtons.heightAnchor.constraint(equalToConstant: .buttonsHeight)
         ])
     }
 }

@@ -1,10 +1,3 @@
-//
-//  CGFloat.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 10.04.2023.
-//
-
 import Foundation
 
 extension CGFloat {

@@ -1,7 +1,7 @@
 import UIKit
 
-final class TrackerCollectionSectionCategoryHeaderView: UICollectionReusableView {
-    static let identifier = String(describing: TrackerCollectionSectionCategoryHeaderView.self)
+final class TrackerHeader: UICollectionReusableView {
+    static let identifier = String(describing: TrackerHeader.self)
     // MARK: - Public
     func configure(with info: TrackerCategory) {
         categoryLabel.text = info.header
@@ -34,7 +34,7 @@ final class TrackerCollectionSectionCategoryHeaderView: UICollectionReusableView
 }
 
 // MARK: - Private methods
-private extension TrackerCollectionSectionCategoryHeaderView {
+private extension TrackerHeader {
     func initialise() {
         addSubview(categoryLabel)
     }

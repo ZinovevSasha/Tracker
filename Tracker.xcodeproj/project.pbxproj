@@ -39,8 +39,9 @@
 		F97E8FDF29E34E2B002BB0C8 /* TrackerUITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E8FDE29E34E2B002BB0C8 /* TrackerUITextField.swift */; };
 		F97E8FE229E3FF82002BB0C8 /* CGFloat+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E8FE129E3FF82002BB0C8 /* CGFloat+Extension.swift */; };
 		F97E8FE429E407E5002BB0C8 /* UICollectionView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E8FE329E407E5002BB0C8 /* UICollectionView+Extension.swift */; };
+		F9B926E129E7E57200D98F28 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B926E029E7E57200D98F28 /* UIButton+Extension.swift */; };
+		F9B926E329E800CB00D98F28 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B926E229E800CB00D98F28 /* DataSource.swift */; };
 		F9BB8C9029DDC6CA00F03FF9 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BB8C8F29DDC6CA00F03FF9 /* User.swift */; };
-		F9EC69B729E2AFC800D77C5F /* UIEdgeInsets+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EC69B629E2AFC800D77C5F /* UIEdgeInsets+Extension.swift */; };
 		F9EC69BC29E2C76E00D77C5F /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EC69BB29E2C76E00D77C5F /* CategoryTableViewCell.swift */; };
 		F9F1233029D897B60039D1B3 /* CreateTrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1232F29D897B60039D1B3 /* CreateTrackerViewController.swift */; };
 		F9F1233B29D899050039D1B3 /* CollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1233529D899050039D1B3 /* CollectionReusableView.swift */; };
@@ -88,8 +89,9 @@
 		F97E8FDE29E34E2B002BB0C8 /* TrackerUITextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerUITextField.swift; sourceTree = "<group>"; };
 		F97E8FE129E3FF82002BB0C8 /* CGFloat+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Extension.swift"; sourceTree = "<group>"; };
 		F97E8FE329E407E5002BB0C8 /* UICollectionView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Extension.swift"; sourceTree = "<group>"; };
+		F9B926E029E7E57200D98F28 /* UIButton+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
+		F9B926E229E800CB00D98F28 /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		F9BB8C8F29DDC6CA00F03FF9 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		F9EC69B629E2AFC800D77C5F /* UIEdgeInsets+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIEdgeInsets+Extension.swift"; sourceTree = "<group>"; };
 		F9EC69BB29E2C76E00D77C5F /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
 		F9F1232F29D897B60039D1B3 /* CreateTrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTrackerViewController.swift; sourceTree = "<group>"; };
 		F9F1233529D899050039D1B3 /* CollectionReusableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionReusableView.swift; sourceTree = "<group>"; };
@@ -151,8 +153,8 @@
 				F918018E29CEECCC00767F16 /* Assets.xcassets */,
 				F97E8FE029E3FF5C002BB0C8 /* Style */,
 				F97E8FD829E328B4002BB0C8 /* UITableView+Extension.swift */,
+				F9B926E029E7E57200D98F28 /* UIButton+Extension.swift */,
 				F97E8FE329E407E5002BB0C8 /* UICollectionView+Extension.swift */,
-				F9EC69B629E2AFC800D77C5F /* UIEdgeInsets+Extension.swift */,
 				F97774E229D3631500959E7C /* UIView+Extension.swift */,
 				F9F1236729DB60A40039D1B3 /* Date+Extension.swift */,
 				F918019329CEECCC00767F16 /* Info.plist */,
@@ -246,6 +248,7 @@
 				F9BB8C8F29DDC6CA00F03FF9 /* User.swift */,
 				F967CCC629E0901000E3C811 /* DataForTableInCreateTrackerController.swift.swift */,
 				F967CCBF29E08C2F00E3C811 /* DataForCollectionInCreateTrackerController.swift */,
+				F9B926E229E800CB00D98F28 /* DataSource.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -443,7 +446,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9F1236229D8ADE90039D1B3 /* PlaceholderView.swift in Sources */,
-				F9EC69B729E2AFC800D77C5F /* UIEdgeInsets+Extension.swift in Sources */,
 				F97774DD29D3360100959E7C /* SearchView.swift in Sources */,
 				F97774E729D3722F00959E7C /* Tracker.swift in Sources */,
 				F97774B729D2DE5400959E7C /* UIImage+Extension.swift in Sources */,
@@ -476,6 +478,7 @@
 				F967CCF229E1B5CE00E3C811 /* CategoryListViewController.swift in Sources */,
 				F967CCF929E1C75F00E3C811 /* FrameViewController.swift in Sources */,
 				F967CCC729E0901000E3C811 /* DataForTableInCreateTrackerController.swift.swift in Sources */,
+				F9B926E329E800CB00D98F28 /* DataSource.swift in Sources */,
 				F97774B529D2DB5900959E7C /* StatisticViewController.swift in Sources */,
 				F918018829CEECCB00767F16 /* SceneDelegate.swift in Sources */,
 				F97E8FE429E407E5002BB0C8 /* UICollectionView+Extension.swift in Sources */,
@@ -484,6 +487,7 @@
 				F918019B29CEED3C00767F16 /* UIColor+Extension.swift in Sources */,
 				F97E8FDF29E34E2B002BB0C8 /* TrackerUITextField.swift in Sources */,
 				F97E8FD929E328B4002BB0C8 /* UITableView+Extension.swift in Sources */,
+				F9B926E129E7E57200D98F28 /* UIButton+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

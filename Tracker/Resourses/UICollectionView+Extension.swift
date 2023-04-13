@@ -1,10 +1,3 @@
-//
-//  UICollectionView+Extension.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 10.04.2023.
-//
-
 import UIKit
 
 extension UIView {

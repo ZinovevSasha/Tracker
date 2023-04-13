@@ -10,8 +10,8 @@ final class TrackerHeaderView: UIView {
     weak var delegate: TrackerHeaderViewDelegate?
     
     // MARK: - Private properties
-    private let plusButton: UIButton = {
-        let button = UIButton(type: .system)
+    private let plusButton: ExtendedButton = {
+        let button = ExtendedButton(type: .system)
         button.setImage(.plus, for: .normal)
         button.tintColor = .myBlack
         button.translatesAutoresizingMaskIntoConstraints = false

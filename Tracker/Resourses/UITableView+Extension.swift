@@ -1,36 +1,34 @@
-//
-//  UITableView+Extension.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 09.04.2023.
-//
-
 import UIKit
 
 extension UITableViewCell {
     // MARK: - Public
-    func setCellCorners(in tableView: UITableView, at indexPath: IndexPath, radius: CGFloat = .cornerRadius) {
+    func setSeparatorInset(in tableView: UITableView, at indexPath: IndexPath) {
+        if tableView.cellIsOnlyOne(at: indexPath) {
+            tableView.separatorInset = UIEdgeInsets(
+                top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
+        } else if tableView.cellIsLast(at: indexPath) {
+            tableView.separatorInset = UIEdgeInsets(
+                top: .zero, left: .zero, bottom: .zero, right: tableView.bounds.width)
+        } else {
+            tableView.separatorInset = UIEdgeInsets(
+                top: .zero, left: 16, bottom: .zero, right: 16)
+        }
+    }
+    
+    func setCorners(in tableView: UITableView, at indexPath: IndexPath, radius: CGFloat = .cornerRadius) {
         let corners: CACornerMask
         
         if tableView.cellIsOnlyOne(at: indexPath) {
-            corners = CACornerMask(all: true)
+            corners = CACornerMask(allCorners: true)
         } else if tableView.cellIsFirst(at: indexPath){
-            corners = CACornerMask(top: true)
+            corners = CACornerMask(topCorners: true)
         } else if tableView.cellIsLast(at: indexPath) {
-            corners = CACornerMask(bottom: true)
+            corners = CACornerMask(bottomCorners: true)
         } else {
             corners = []
         }
         
         set(corners, with: radius)
-    }
-    
-    func setSeparatorInset(in tableView: UITableView, at indexPath: IndexPath) {
-        if tableView.cellIsOnlyOne(at: indexPath) || tableView.cellIsLast(at: indexPath) {
-            self.separatorInset = .noCellSeparator
-        } else {
-            self.separatorInset = .visibleCellSeparator
-        }
     }
     
     // MARK: - Private
@@ -60,34 +58,27 @@ extension UITableView {
     func cellIsFirst(at indexPath: IndexPath) -> Bool {
         return indexPath.row == 0
     }
-
+    
     func cellIsLast(at indexPath: IndexPath) -> Bool {
         return indexPath.row == numberOfRows(inSection: indexPath.section) - 1
     }
-
+    
     func cellIsOnlyOne(at indexPath: IndexPath) -> Bool {
         return numberOfRows(inSection: indexPath.section) == 1
     }
 }
 
-extension CALayer {
-    func setCorner(_ corners: CACornerMask, radius: CGFloat) {
-        self.cornerRadius = radius
-        self.maskedCorners = corners
-    }
-}
-
 extension CACornerMask {
-    init(top: Bool = false, bottom: Bool = false, all: Bool = false) {
-        if all {
+    init(topCorners: Bool = false, bottomCorners: Bool = false, allCorners: Bool = false) {
+        if allCorners {
             self = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         } else {
             var mask: CACornerMask = []
-            if top {
+            if topCorners {
                 mask.insert(.layerMinXMinYCorner)
                 mask.insert(.layerMaxXMinYCorner)
             }
-            if bottom {
+            if bottomCorners {
                 mask.insert(.layerMinXMaxYCorner)
                 mask.insert(.layerMaxXMaxYCorner)
             }

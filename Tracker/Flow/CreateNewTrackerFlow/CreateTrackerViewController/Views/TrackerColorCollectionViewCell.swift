@@ -1,10 +1,3 @@
-//
-//  OtherCollectionViewCell.swift
-//  CompositionalLayout
-//
-//  Created by Александр Зиновьев on 01.04.2023.
-//
-
 import UIKit
 
 final class TrackerColorCollectionViewCell: UICollectionViewCell {

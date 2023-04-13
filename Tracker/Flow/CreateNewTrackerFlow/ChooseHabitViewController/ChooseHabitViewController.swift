@@ -32,6 +32,20 @@ final class ChooseTrackerViewController: UIViewController {
         static let buttonsHeight: CGFloat = 60
     }
     
+    private var trackersController: TrackersViewController?
+    private var categories = [TrackerCategory]()
+    init(categories: [TrackerCategory], from controller: TrackersViewController) {
+        self.categories = categories
+        self.trackersController = controller
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    var initialInteractivePopGestureRecognizerDelegate: UIGestureRecognizerDelegate?
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,15 +53,33 @@ final class ChooseTrackerViewController: UIViewController {
         setConstraints()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        
+        // we must set the delegate to nil whether we are popping or pushing to..
+        // ..this view controller, thus we set it in viewWillAppear()
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = nil
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        
+        // and every time we leave this view controller we must set the delegate back..
+        // ..to what it was originally
+        self.navigationController?.interactivePopGestureRecognizer?.delegate = initialInteractivePopGestureRecognizerDelegate
+    }
+    
     // MARK: - Private @objc target action methods
     @objc private func habitButtonTaped() {
-        let vc = CreateTrackerViewController(configuration: .twoRows)
-        present(vc, animated: true)
+        let vc = CreateTrackerViewController(configuration: .twoRows, addCategories: categories)
+        vc.delegate = trackersController
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc private func irregularEventButtonTapped() {
-        let vc = CreateTrackerViewController(configuration: .oneRow)
-        present(vc, animated: true)
+        let vc = CreateTrackerViewController(configuration: .oneRow, addCategories: categories)
+        vc.delegate = trackersController
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 

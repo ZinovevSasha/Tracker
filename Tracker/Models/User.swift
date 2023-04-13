@@ -1,14 +1,7 @@
-//
-//  Model.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 05.04.2023.
-//
-
 import Foundation
 
 struct User {
-    var selectedCategory: String?
+    var selectedCategory: Int?
     var selectedName: String?
     var selectedWeekDay: [WeekDay] = []
     var selectedEmoji: IndexPath?
@@ -25,7 +18,7 @@ struct User {
         }
     }
     
-    mutating func setCategory(_ selectedCategory: String?) {
+    mutating func setCategory(_ selectedCategory: Int?) {
         self.selectedCategory = selectedCategory
     }
     

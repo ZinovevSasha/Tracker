@@ -20,5 +20,3 @@ struct Tracker {
         self.schedule = schedule
     }
 }
-
-

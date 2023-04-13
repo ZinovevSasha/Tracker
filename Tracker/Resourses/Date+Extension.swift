@@ -1,10 +1,3 @@
-//
-//  Date+Extension.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 03.04.2023.
-//
-
 import Foundation
 
 extension Date {

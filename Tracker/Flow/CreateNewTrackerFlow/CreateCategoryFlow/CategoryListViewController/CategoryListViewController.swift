@@ -1,15 +1,8 @@
-//
-//  CreateCategoryViewController.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 08.04.2023.
-//
-
 import UIKit
 
 final class CategoryListViewController: FrameViewController {
     // MARK: - Call Back
-    var trackerCategories: (([TrackerCategory]) -> Void)?
+    var trackerCategories: (([TrackerCategory], String, Int?) -> Void)?
     
     // MARK: - Private properties
     private let placeholder = PlaceholderView(
@@ -17,11 +10,16 @@ final class CategoryListViewController: FrameViewController {
         text: "Привычки и события\n можно объединить по смыслу"
     )
     
+    deinit {
+        print(String(describing: self))
+    }
+    
     private let tableView: UITableView = {
         let view = UITableView()
         view.contentInset.top = UIConstants.topInset
         view.separatorColor = .myGray
         view.backgroundColor = .myWhite
+        view.separatorStyle = .singleLine
         view.showsVerticalScrollIndicator = false
         view.translatesAutoresizingMaskIntoConstraints = false
         view.register(cellClass: CategoryTableViewCell.self)
@@ -33,19 +31,19 @@ final class CategoryListViewController: FrameViewController {
         static let topInset: CGFloat = 24
         static let bottomInset: CGFloat = -16
     }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        initialise()
-        setConstraints()
-    }
-    
+   
     // MARK: - Data
-    private var categories: [TrackerCategory]
+    private var categories: [TrackerCategory] {
+        didSet {
+            categories.isEmpty ? placeholder.unhide() : placeholder.hide()
+        }
+    }
+    private var lastRow: Int?
     
     // MARK: - Init
-    init(categories: [TrackerCategory]) {
+    init(categories: [TrackerCategory], lastRow: Int?) {
         self.categories = categories
+        self.lastRow = lastRow
         categories.isEmpty ? placeholder.unhide() : placeholder.hide()
         super.init(
             title: "Категория",
@@ -54,12 +52,18 @@ final class CategoryListViewController: FrameViewController {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("Unsupported")
     }
     
-    // @objc
-    override func handleButtonCenterTap() {
-        let createNewCategoryViewController = CreateNewCategoryViewController(categories: categories)
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        initialise()
+        setConstraints()
+    }
+    
+    // MARK: - Private @objc target action methods
+    override internal func handleButtonCenterTap() {
+        let createNewCategoryViewController = CreateNewCategoryViewController()
         createNewCategoryViewController.delegate = self
         present(createNewCategoryViewController, animated: true)
     }
@@ -95,9 +99,10 @@ extension CategoryListViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let isImage = lastRow == indexPath.row
         let cell: CategoryTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        cell.setCellCorners(in: tableView, at: indexPath)
-        cell.configure(with: categories[indexPath.section].header)
+        cell.setCorners(in: tableView, at: indexPath)
+        cell.configure(with: categories[indexPath.row].header, setImage: isImage)
         return cell
     }
 }
@@ -111,12 +116,30 @@ extension CategoryListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.setSeparatorInset(in: tableView, at: indexPath)
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let cell = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
+            let header = categories[indexPath.row].header
+            lastRow = indexPath.row
+            trackerCategories?(categories, header, lastRow)
+            tableView.reloadData()
+//            dismiss(animated: true)
+            navigationController?.popViewController(animated: true)
+        }
+    }
 }
-
 // MARK: - CreateNewCategoryViewControllerDelegate
 extension CategoryListViewController: CreateNewCategoryViewControllerDelegate {
     func categoryNameDidEntered(categoryName name: String) {
         categories.append(TrackerCategory(header: name, trackers: []))
-        trackerCategories?(categories)
+//        let isPreviousExist = categories.count - 1 > 0
+//        var indexPathLast = [IndexPath(row: categories.count - 1, section: .zero)]
+//        var indexPathLastAndPrevious = [IndexPath(row: categories.count - 1, section: .zero)]
+//        if isPreviousExist {
+//            indexPathLastAndPrevious.append(IndexPath(row: categories.count - 2, section: .zero))
+//        }
+//        tableView.insertRows(at: indexPathLast, with: .automatic)
+//        tableView.reloadRows(at: indexPathLastAndPrevious, with: .automatic)
+        tableView.reloadData()
     }
 }

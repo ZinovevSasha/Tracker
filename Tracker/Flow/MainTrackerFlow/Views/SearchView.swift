@@ -2,6 +2,7 @@ import UIKit
 
 protocol SearchViewDelegate: AnyObject {
     func searchView(_ searchView: SearchView, textDidChange searchText: String)
+    func hideKeyboard()
 }
 
 final class SearchView: UIView {
@@ -26,13 +27,17 @@ final class SearchView: UIView {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    
+    @objc func hideKeyboard() {
+        searchBar.resignFirstResponder()
+    }
 }
 
 // MARK: - Private methods
 private extension SearchView {
     func initialise() {
         searchBar.delegate = self
-        
+    
         addSubview(searchBar)
 
         NSLayoutConstraint.activate([
@@ -42,6 +47,7 @@ private extension SearchView {
             searchBar.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
+    
 }
 
 // MARK: - UISearchBarDelegate

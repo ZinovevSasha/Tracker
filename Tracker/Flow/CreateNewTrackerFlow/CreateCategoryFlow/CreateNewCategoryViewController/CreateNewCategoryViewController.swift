@@ -1,10 +1,3 @@
-//
-//  CreateNewCategoryViewController.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 09.04.2023.
-//
-
 import UIKit
 
 protocol CreateNewCategoryViewControllerDelegate: AnyObject {
@@ -17,6 +10,7 @@ final class CreateNewCategoryViewController: FrameViewController {
     
     // MARK: - Private properties
     private let textField = TrackerUITextField(text: "Введите название категории")
+    private let containerForTextField = UIView()
     
     // MARK: Lifecicle
     override func viewDidLoad() {
@@ -29,7 +23,7 @@ final class CreateNewCategoryViewController: FrameViewController {
     private var categoryName: String?
     
     // MARK: - Init
-    init(categories: [TrackerCategory]) {
+    init() {
         // Super init from base class(with title and buttons at bottom)
         super.init(
             title: "Новая категория",
@@ -55,16 +49,22 @@ final class CreateNewCategoryViewController: FrameViewController {
 // MARK: - Private Methods
 private extension CreateNewCategoryViewController {
     func initialise() {
-        container.addSubview(textField)
+        containerForTextField.addSubview(textField)
+        containerForTextField.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(containerForTextField)
         textField.delegate = self
     }
     
     func setConstraints() {
         NSLayoutConstraint.activate([
+            containerForTextField.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            containerForTextField.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            containerForTextField.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle),
+            containerForTextField.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            
             textField.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             textField.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle),
-            textField.bottomAnchor.constraint(equalTo: container.bottomAnchor)
         ])
     }
 }
