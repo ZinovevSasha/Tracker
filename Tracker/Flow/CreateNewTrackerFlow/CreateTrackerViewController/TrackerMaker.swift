@@ -1,35 +1,22 @@
 import Foundation
 
 final class TrackerMaker {
-    static let myNotificationName = Notification.Name("TrackerMaker")
-    
     private(set) var category: TrackerCategory?
-    
-    private func postNotification() {
-        NotificationCenter.default
-            .post(
-                name: TrackerMaker.myNotificationName,
-                object: self,
-                userInfo: ["c": category]
-            )
-    }
     
     func createTrackerFrom(
         userInputData data: User,
         categories: [TrackerCategory],
         tableData: [RowData],
         collectionData: [CollectionViewData]
-    ) {
+    ) -> TrackerCategory? {
         guard
             let categoryName = data.selectedCategory,
             let name = data.selectedName,
             let emojiIndexPath = data.selectedEmoji,
             let colorIndexPath = data.selectedColor
         else {
-            return
+            return nil
         }
-        
-        let header = categories[categoryName].header
         
         let emojiSections = collectionData[emojiIndexPath.section]
         var emoji = ""
@@ -50,8 +37,8 @@ final class TrackerMaker {
         }
         
         
-        category = TrackerCategory(
-            header: header,
+        return TrackerCategory(
+            header: categoryName,
             trackers: [
                 Tracker(
                     name: name,
@@ -61,6 +48,5 @@ final class TrackerMaker {
                 )
             ]
         )
-        postNotification()
     }
 }

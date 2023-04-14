@@ -1,7 +1,7 @@
 import UIKit
 
 protocol TrackerUITextFieldDelegate: AnyObject {
-    func textDidEntered(in: TrackerUITextField, text: String)
+    func isChangeText(text: String, newLength: Int) -> Bool
 }
 
 final class TrackerUITextField: UIView {
@@ -42,6 +42,10 @@ final class TrackerUITextField: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func hideKeyBoard() {
+        textField.resignFirstResponder()
+    }
 }
 
 // MARK: - Private Methods
@@ -65,21 +69,17 @@ private extension TrackerUITextField {
 
 // MARK: - UITextFieldDelegate
 extension TrackerUITextField: UITextFieldDelegate {
-    func textField(
-        _ textField: UITextField,
-        shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
-    ) -> Bool {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
         let currentText = textField.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
-        delegate?.textDidEntered(in: self, text: updatedText)
-        return true
+        let newLength = currentText.count + string.count - range.length
+        return delegate?.isChangeText(text: updatedText, newLength: newLength) ?? true
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-         // Hide the keyboard when the return button is pressed
-         textField.resignFirstResponder()
-         return true
-     }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {        
+        textField.resignFirstResponder()
+        return true
+    }
 }

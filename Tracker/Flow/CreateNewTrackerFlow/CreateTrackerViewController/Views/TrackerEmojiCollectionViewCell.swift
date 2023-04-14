@@ -17,6 +17,15 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    // MARK: - Private properties
+    private let text: UILabel = {
+        let view = UILabel()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.font = .bold32
+        view.textAlignment = .center
+        return view
+    }()
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -26,15 +35,6 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Private properties
-    private let text: UILabel = {
-        let view = UILabel()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.font = .bold32
-        view.textAlignment = .center
-        return view
-    }()
 }
 
 // MARK: Private methods

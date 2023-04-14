@@ -7,16 +7,6 @@ final class MyTableViewCell: UITableViewCell {
         supplementaryTextLabel.text = info.subtitle
     }
     
-    // MARK: - Init
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initialise()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - Private properties
     private let accessoryImageView: UIImageView = {
         let view = UIImageView()
@@ -51,6 +41,16 @@ final class MyTableViewCell: UITableViewCell {
         view.distribution = .fill
         return view
     }()
+    
+    // MARK: - Init
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        initialise()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 // MARK: - Private methods

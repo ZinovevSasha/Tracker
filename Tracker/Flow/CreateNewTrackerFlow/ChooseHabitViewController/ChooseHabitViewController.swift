@@ -33,7 +33,9 @@ final class ChooseTrackerViewController: UIViewController {
     }
     
     private var trackersController: TrackersViewController?
-    private var categories = [TrackerCategory]()
+    private var categories: [TrackerCategory] = []
+    
+    // MARK: - Init
     init(categories: [TrackerCategory], from controller: TrackersViewController) {
         self.categories = categories
         self.trackersController = controller
@@ -55,7 +57,6 @@ final class ChooseTrackerViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        
         // we must set the delegate to nil whether we are popping or pushing to..
         // ..this view controller, thus we set it in viewWillAppear()
         self.navigationController?.interactivePopGestureRecognizer?.delegate = nil
@@ -63,7 +64,6 @@ final class ChooseTrackerViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        
         // and every time we leave this view controller we must set the delegate back..
         // ..to what it was originally
         self.navigationController?.interactivePopGestureRecognizer?.delegate = initialInteractivePopGestureRecognizerDelegate

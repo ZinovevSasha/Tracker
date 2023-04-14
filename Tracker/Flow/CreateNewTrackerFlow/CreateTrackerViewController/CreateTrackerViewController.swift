@@ -2,8 +2,6 @@ import UIKit
 
 protocol CreateTrackerViewControllerDelegate: AnyObject {
     func addTrackerCategory(_ category: TrackerCategory)
-    func addTracker(_ tracker: Tracker)
-    func isNameAvailable(name: String) -> Bool
 }
 
 final class CreateTrackerViewController: UIViewController {
@@ -25,31 +23,17 @@ final class CreateTrackerViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    private var mainStackView: UIStackView = {
+    private let mainStackView: UIStackView = {
         let view = UIStackView()
         view.alignment = .fill
         view.axis = .vertical
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    private lazy var titleTextfield: UITextField = {
-        let view = UITextField()
-        view.delegate = self
-        view.placeholder = "Ведите название трекера"
-        view.leftView = UIView(frame: CGRect(x: .zero, y: .zero, width: 16, height: view.frame.height))
-        view.leftViewMode = .always
-        view.rightView = UIView(frame: CGRect(x: .zero, y: .zero, width: 16, height: view.frame.height))
-        view.rightViewMode = .always
-        view.backgroundColor = .myBackground
-        view.textColor = .myBlack
-        view.layer.cornerRadius = .cornerRadius
-        view.layer.masksToBounds = true
-        view.font = .regular17
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
+    
+    private let titleTextfield = TrackerUITextField(text: "Ведите название трекера")
 
-    private var warningCharactersLabel: UILabel = {
+    private let warningCharactersLabel: UILabel = {
         let view = UILabel()
         view.text = "Ограничение 38 символов"
         view.font = .regular17
@@ -97,7 +81,7 @@ final class CreateTrackerViewController: UIViewController {
         return view
     }()
     private let container = UIView()
-    private var mainScrollView = UIScrollView()
+    private let mainScrollView = UIScrollView()
     
     let params = GeometryParams(
         cellCount: 6,
@@ -110,11 +94,13 @@ final class CreateTrackerViewController: UIViewController {
     )
     
     // MARK: - Model
+    
     // Categories to pass to CategoryListViewController(categories: categories)
     private var categories: [TrackerCategory] = []
     private var lastRow: Int?
+    
     // Days to pass to ChooseScheduleViewController(weekDays: days) to show them updated
-    private var days: [Int: WeekDay] = [:]
+    private var days: [WeekDay] = []
     
     private var dataForTableView = DataForTableInCreateTrackerController()
     private var dataForCollectionView = DataForCollectionInCreateTrackerController().dataSource
@@ -154,6 +140,10 @@ final class CreateTrackerViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private var parametersCollectionViewHeight: NSLayoutConstraint?
+    private var warningLabelHeight: NSLayoutConstraint?
+    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .heavy)
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -161,10 +151,6 @@ final class CreateTrackerViewController: UIViewController {
         setConstraints()
         configureButton()
     }
-    
-    private var parametersCollectionViewHeight: NSLayoutConstraint?
-    private var warningLabelHeight: NSLayoutConstraint?
-    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .heavy)
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
@@ -180,15 +166,16 @@ final class CreateTrackerViewController: UIViewController {
     
     @objc private func createButtonTapped() {
         if user.isUserGaveEnoughToCreateTracker {
-            trackerMaker.createTrackerFrom(
+            if let category = trackerMaker.createTrackerFrom(
                 userInputData: user,
                 categories: categories,
                 tableData: dataForTableView.twoRows,
-                collectionData: dataForCollectionView
-            )
-            createButton.isEnabled.toggle()
-            dismiss(animated: false)
-            presentingViewController?.dismiss(animated: true)
+                collectionData: dataForCollectionView) {
+                // Give newly created category to delegate
+                delegate?.addTrackerCategory(category)
+                createButton.isEnabled.toggle()
+                dismiss(animated: false)
+            }
         } else {
             feedbackGenerator.impactOccurred()
             createButton.shakeSelf()
@@ -199,14 +186,17 @@ final class CreateTrackerViewController: UIViewController {
 // MARK: - Private methods
 private extension CreateTrackerViewController {
     func initialise() {
+        titleTextfield.delegate = self
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
+        
         container.translatesAutoresizingMaskIntoConstraints = false
         mainScrollView.translatesAutoresizingMaskIntoConstraints = false
         mainScrollView.showsVerticalScrollIndicator = false
-        
+                
         view.backgroundColor = .myWhite
         view.addSubviews(nameOfScreenLabel, container, buttonStackView)
+        
         buttonStackView.addArrangedSubviews(cancelButton, createButton)
         container.addSubview(mainScrollView)
         mainScrollView.addSubview(mainStackView)
@@ -330,28 +320,26 @@ extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch configuration {
         case .oneRow:
-            let categoryController = CategoryListViewController(categories: categories, lastRow: lastRow)
-//            present(categoryController, animated: true)
+            let categoryController = CategoryListViewController(tempCategory: categories, lastRow: lastRow)
             navigationController?.pushViewController(categoryController, animated: true)
-            // Configure cell
+            // call back
             categoryController.trackerCategories =
-            {  [weak self] categories, header, row in
-                self?.lastRow = row
-                self?.user.selectedCategory = row
+            {  [weak self] categories, header, lastRow in
+                self?.lastRow = lastRow
+                self?.user.selectedCategory = header
                 self?.categories = categories
                 self?.dataForTableView.addCategory(header)
                 tableView.reloadData()
             }
         case .twoRows:
             if indexPath.row == .zero {
-                let categoryController = CategoryListViewController(categories: categories, lastRow: lastRow)
-                //present(categoryController, animated: true)
+                let categoryController = CategoryListViewController(tempCategory: categories, lastRow: lastRow)
                 navigationController?.pushViewController(categoryController, animated: true)
-                // Configure cell
+                // call back
                 categoryController.trackerCategories =
-                { [weak self] categories, header, row in
-                    self?.lastRow = row
-                    self?.user.selectedCategory = row
+                { [weak self] categories, header, lastRow in
+                    self?.lastRow = lastRow
+                    self?.user.selectedCategory = header
                     self?.categories = categories
                     self?.dataForTableView.addCategory(header)
                     tableView.reloadData()
@@ -359,16 +347,14 @@ extension CreateTrackerViewController: UITableViewDelegate {
             } else {
                 // Presenting controller
                 let scheduleController = ChooseScheduleViewController(weekDays: days)
-                //present(scheduleController, animated: true)
                 navigationController?.pushViewController(scheduleController, animated: true)
                 // Configuring call back
                 scheduleController.weekDaysToShow = { [weak self] days in
                     guard let self = self else { return }
-                    let orderedDays = ordered(days)
                     
                     self.days = days
-                    self.user.selectedWeekDay = orderedDays
-                    self.dataForTableView.addSchedule(subtitleFrom(orderedDays))
+                    self.user.selectedWeekDay = days
+                    self.dataForTableView.addSchedule(WeekDay.shortNamesFor(days) ?? "Error")
                     tableView.reloadData()
                 }
             }
@@ -381,19 +367,6 @@ extension CreateTrackerViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.setSeparatorInset(in: tableView, at: indexPath)
-    }
-    
-    // Private
-    private func ordered(_ days: [Int : WeekDay]) -> [WeekDay] {
-        return days.compactMap { $0.value }.sorted { $0.sortValue < $1.sortValue }
-    }
-    
-    private func subtitleFrom(_ days: [WeekDay]) -> String {
-        if days.count == 7 {
-            return  "Каждый день"
-        } else {
-            return days.map { "\($0.dayShorthand)" }.joined(separator: ", ")
-        }
     }
 }
 // MARK: - Layout
@@ -424,7 +397,7 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         dataForCollectionView.count
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch dataForCollectionView[section] {
         case .emojiSection(let items):
@@ -443,7 +416,6 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
             return cell
         case .colorSection(let items):
             let cell: TrackerColorCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
-            
             cell.configure(with: items[indexPath.row].rawValue)
             return cell
         }
@@ -499,51 +471,45 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
 }
 
 // MARK: - UITextFieldDelegate
-extension CreateTrackerViewController: UITextFieldDelegate {
-    func textField(
-        _ textField: UITextField,
-        shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
-    ) -> Bool {
-        let currentText = textField.text ?? ""
-        guard let stringRange = Range(range, in: currentText) else { return false }
-        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
-
-        if updatedText.isEmpty {
-            user.setTitle(nil)
+extension CreateTrackerViewController: TrackerUITextFieldDelegate {
+    func isChangeText(text: String, newLength: Int) -> Bool {
+        // Save text as tracker Name
+        if text.isEmpty {
+            self.user.setTitle(nil)
         } else {
-            user.setTitle(updatedText)
+            self.user.setTitle(text)
         }
-
-        let shouldChangeCharacter = shouldChangeCharactersIn(currentText: currentText, string: string, range: range)
-        if updatedText.count > 38 && warningLabelHeight?.constant == 22 {
-            self.warningCharactersLabel.shakeSelf()
-            self.feedbackGenerator.impactOccurred()
-        }
-        showAlertAndAnimate(isHide: shouldChangeCharacter)
-        return shouldChangeCharacter
+        
+        let maxLength = 3
+        let isTextTooLong = newLength > maxLength      
+        
+        // Show animation if text more than 38, and shake if continue typing
+        forbidEnterTextAnimationWillShowIf(isTextTooLong)
+        return !isTextTooLong
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        // Hide the keyboard when the return button is pressed
-        textField.resignFirstResponder()
-        return true
-    }
-
-    private func shouldChangeCharactersIn(currentText: String, string: String, range: NSRange) -> Bool {
-        let maxLength = 38
-        let newLength = currentText.count + string.count - range.length
-        return newLength <= maxLength
-    }
-
-    private func showAlertAndAnimate(isHide: Bool) {
-        UIView.animate(withDuration: 0.3, delay: 0) {
-            if isHide {
-                self.warningLabelHeight?.constant = .zero
-            } else {
-                self.warningLabelHeight?.constant = 22
+    func forbidEnterTextAnimationWillShowIf(_ isTextTooLong: Bool) {
+        if isTextTooLong {
+            let warningHeight: CGFloat = 20
+            // Shake if label fully opened
+            if warningLabelHeight?.constant == warningHeight {
+                warningCharactersLabel.shakeSelf()
             }
-            self.view.layoutIfNeeded()
+            // Animate constraint to 20
+            UIView.animate(withDuration: 0.3) {
+                if self.warningLabelHeight?.constant != warningHeight {
+                    self.warningLabelHeight?.constant = warningHeight
+                    self.view.layoutIfNeeded()
+                }
+            }
+        } else {
+            // Animate constraint back to 0
+            UIView.animate(withDuration: 0.3) {
+                if self.warningLabelHeight?.constant != .zero {
+                    self.warningLabelHeight?.constant = .zero
+                    self.view.layoutIfNeeded()
+                }
+            }
         }
     }
 }

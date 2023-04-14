@@ -3,8 +3,8 @@ import UIKit
 final class TrackerHeader: UICollectionReusableView {
     static let identifier = String(describing: TrackerHeader.self)
     // MARK: - Public
-    func configure(with info: TrackerCategory) {
-        categoryLabel.text = info.header
+    func configure(with header: String) {
+        categoryLabel.text = header
     }
     
     // MARK: - Private properties

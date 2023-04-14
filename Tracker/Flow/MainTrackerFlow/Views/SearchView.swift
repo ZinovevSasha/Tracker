@@ -9,6 +9,15 @@ final class SearchView: UIView {
     // MARK: - Public
     weak var delegate: SearchViewDelegate?
     
+    // MARK: - Private properties
+    private let searchBar: UISearchBar = {
+        let view = UISearchBar()
+        view.searchBarStyle = .minimal
+        view.placeholder = "Поиск"
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,15 +27,6 @@ final class SearchView: UIView {
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
     }
-    
-    // MARK: - Private properties
-    private let searchBar: UISearchBar = {
-        let view = UISearchBar()
-        view.searchBarStyle = .minimal
-        view.placeholder = "Поиск"
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
     
     @objc func hideKeyboard() {
         searchBar.resignFirstResponder()
@@ -47,7 +47,6 @@ private extension SearchView {
             searchBar.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
-    
 }
 
 // MARK: - UISearchBarDelegate

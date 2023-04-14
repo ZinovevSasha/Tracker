@@ -1,15 +1,14 @@
 import Foundation
 
 struct User {
-    var selectedCategory: Int?
+    var selectedCategory: String?
     var selectedName: String?
     var selectedWeekDay: [WeekDay] = []
     var selectedEmoji: IndexPath?
     var selectedColor: IndexPath?
     
     var isUserGaveEnoughToCreateTracker: Bool {
-        if 
-            selectedName != nil,
+        if selectedName != nil,
             selectedEmoji != nil,
             selectedColor != nil {
             return true
@@ -18,7 +17,7 @@ struct User {
         }
     }
     
-    mutating func setCategory(_ selectedCategory: Int?) {
+    mutating func setCategory(_ selectedCategory: String?) {
         self.selectedCategory = selectedCategory
     }
     

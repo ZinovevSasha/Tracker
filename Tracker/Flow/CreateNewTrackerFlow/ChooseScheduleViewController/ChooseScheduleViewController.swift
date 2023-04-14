@@ -1,12 +1,12 @@
 import UIKit
 
 protocol ChooseScheduleViewControllerDelegate: AnyObject {
-    var weekDaysToShow: (([Int: WeekDay]) -> Void)? { get }
+    var weekDaysToShow: (([WeekDay]) -> Void)? { get }
 }
 
 final class ChooseScheduleViewController: FrameViewController {
     // MARK: - Call Back
-    var weekDaysToShow: (([Int: WeekDay]) -> Void)?
+    var weekDaysToShow: (([WeekDay]) -> Void)?
     // MARK: - Private properties
         
     private let tableView: UITableView = {
@@ -30,9 +30,9 @@ final class ChooseScheduleViewController: FrameViewController {
     }
     
     // MARK: - DataToChangeStatesOfSwitchesAndGiveTextToLabels
-    private var selectedWeekDays: [Int: WeekDay]
+    private var selectedWeekDays: [WeekDay]
     
-    init(weekDays: [Int: WeekDay] = [:]) {
+    init(weekDays: [WeekDay]) {
         self.selectedWeekDays = weekDays
         super.init(
             title: "Расписание",
@@ -53,7 +53,7 @@ final class ChooseScheduleViewController: FrameViewController {
     
     // MARK: - Private @objc target action methods
     override func handleButtonCenterTap() {
-        weekDaysToShow?(selectedWeekDays)
+        weekDaysToShow?(selectedWeekDays.sorted())
         navigationController?.popViewController(animated: true)
     }
 }
@@ -87,11 +87,11 @@ extension ChooseScheduleViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ScheduleTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        cell.setCorners(in: tableView, at: indexPath)        
-        cell.configure(
-            with: WeekDay.array[indexPath.row].fullDayName,
-            selectedWeekDays: selectedWeekDays[indexPath.row]
-        )
+        let weekDays = WeekDay.array[indexPath.row].fullDayName
+        let isSwitchOn = selectedWeekDays.map { $0.rawValue }.contains(indexPath.row)
+        
+        cell.setCorners(in: tableView, at: indexPath)
+        cell.configure(with: weekDays, isSwitchOn: isSwitchOn)
         cell.delegate = self
         return cell
     }
@@ -113,11 +113,11 @@ extension ChooseScheduleViewController: ScheduleTableViewCellDelegate {
     func weekDaySelected(on cell: ScheduleTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         let selectedWeekDay = WeekDay.array[indexPath.row]
-        selectedWeekDays.updateValue(selectedWeekDay, forKey: indexPath.row)
+        selectedWeekDays.append(selectedWeekDay)
     }
     
     func weekDayUnselected(on cell: ScheduleTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        selectedWeekDays.removeValue(forKey: indexPath.row)
+        selectedWeekDays.removeAll { $0.rawValue == indexPath.row }
     }
 }

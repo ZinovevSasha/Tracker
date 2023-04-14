@@ -1,38 +1,34 @@
 import Foundation
 
-enum WeekDay: Int {
-    case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
-        
+enum WeekDay: Int, CaseIterable, Comparable {
+    case monday, tuesday, wednesday, thursday, friday, saturday, sunday
+    
     static var array: [WeekDay] {
-        [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
+        WeekDay.allCases
     }
     
     static var count: Int {
         array.count
     }
     
-    var dayShorthand: String {
-        switch self {
-        case .monday: return "Пн"
-        case .tuesday: return "Вт"
-        case .wednesday: return "Ср"
-        case .thursday: return "Чт"
-        case .friday: return "Пт"
-        case .saturday: return "Сб"
-        case .sunday: return "Вс"
-        }
+    static func shortNameFor(_ dayNumber: Int) -> String? {
+        let days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+        // check if the dayNumber is within the range of
+        // valid indices for the days array (i.e., 0 to 6).
+        guard 0..<days.count ~= dayNumber else { return nil }
+        return days[dayNumber]
     }
     
-    var sortValue: Int {
-        switch self {
-        case .monday: return 1
-        case .tuesday: return 2
-        case .wednesday: return 3
-        case .thursday: return 4
-        case .friday: return 5
-        case .saturday: return 6
-        case .sunday: return 7
-        }
+    static func shortNameFor(_ day: Self) -> String? {
+        shortNameFor(day.rawValue)
+    }
+    
+    static func shortNamesFor(_ days: [Self]) -> String? {
+        days.count == 7 ? "Каждый день" : days.compactMap { shortNameFor($0) }.joined(separator: ", ")
+    }
+    
+    static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
+        lhs.rawValue < rhs.rawValue
     }
     
     var fullDayName: String {

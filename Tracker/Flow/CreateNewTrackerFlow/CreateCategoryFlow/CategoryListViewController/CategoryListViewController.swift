@@ -3,16 +3,13 @@ import UIKit
 final class CategoryListViewController: FrameViewController {
     // MARK: - Call Back
     var trackerCategories: (([TrackerCategory], String, Int?) -> Void)?
+    var checkForCategoryName: ((String) -> Bool)?
     
     // MARK: - Private properties
     private let placeholder = PlaceholderView(
         placeholder: .star,
         text: "Привычки и события\n можно объединить по смыслу"
     )
-    
-    deinit {
-        print(String(describing: self))
-    }
     
     private let tableView: UITableView = {
         let view = UITableView()
@@ -33,18 +30,13 @@ final class CategoryListViewController: FrameViewController {
     }
    
     // MARK: - Data
-    private var categories: [TrackerCategory] {
-        didSet {
-            categories.isEmpty ? placeholder.unhide() : placeholder.hide()
-        }
-    }
+    private var tempCategory: [TrackerCategory] = []
     private var lastRow: Int?
     
     // MARK: - Init
-    init(categories: [TrackerCategory], lastRow: Int?) {
-        self.categories = categories
+    init(tempCategory: [TrackerCategory], lastRow: Int?) {
+        self.tempCategory = tempCategory
         self.lastRow = lastRow
-        categories.isEmpty ? placeholder.unhide() : placeholder.hide()
         super.init(
             title: "Категория",
             buttonCenter: ActionButton(colorType: .black, title: "Добавить категорию")
@@ -95,14 +87,14 @@ private extension CategoryListViewController {
 // MARK: - UITableViewDataSource
 extension CategoryListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories.count
+        return tempCategory.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let isImage = lastRow == indexPath.row
         let cell: CategoryTableViewCell = tableView.dequeueReusableCell(for: indexPath)
         cell.setCorners(in: tableView, at: indexPath)
-        cell.configure(with: categories[indexPath.row].header, setImage: isImage)
+        cell.configure(with: tempCategory[indexPath.row].header, setImage: isImage)
         return cell
     }
 }
@@ -119,27 +111,23 @@ extension CategoryListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
-            let header = categories[indexPath.row].header
+            let header = tempCategory[indexPath.row].header
             lastRow = indexPath.row
-            trackerCategories?(categories, header, lastRow)
+            trackerCategories?(tempCategory, header, lastRow)
             tableView.reloadData()
-//            dismiss(animated: true)
             navigationController?.popViewController(animated: true)
         }
     }
 }
+
 // MARK: - CreateNewCategoryViewControllerDelegate
 extension CategoryListViewController: CreateNewCategoryViewControllerDelegate {
+    func isNameAvailable(name: String) -> Bool {
+        !tempCategory.contains { $0.header == name }
+    }
+    
     func categoryNameDidEntered(categoryName name: String) {
-        categories.append(TrackerCategory(header: name, trackers: []))
-//        let isPreviousExist = categories.count - 1 > 0
-//        var indexPathLast = [IndexPath(row: categories.count - 1, section: .zero)]
-//        var indexPathLastAndPrevious = [IndexPath(row: categories.count - 1, section: .zero)]
-//        if isPreviousExist {
-//            indexPathLastAndPrevious.append(IndexPath(row: categories.count - 2, section: .zero))
-//        }
-//        tableView.insertRows(at: indexPathLast, with: .automatic)
-//        tableView.reloadRows(at: indexPathLastAndPrevious, with: .automatic)
+        tempCategory.append(TrackerCategory(header: name, trackers: []))
         tableView.reloadData()
     }
 }

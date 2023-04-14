@@ -7,11 +7,9 @@ protocol ScheduleTableViewCellDelegate: AnyObject {
 
 final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with info: String, selectedWeekDays: WeekDay?) {
+    func configure(with info: String, isSwitchOn: Bool) {
         weakDayLabel.text = info
-        if selectedWeekDays != nil {
-            weakDaySwitch.isOn = true
-        }
+        weakDaySwitch.isOn = isSwitchOn
     }
     
     weak var delegate: ScheduleTableViewCellDelegate?

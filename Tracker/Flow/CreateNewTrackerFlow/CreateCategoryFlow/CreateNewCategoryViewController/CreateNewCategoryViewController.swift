@@ -2,6 +2,7 @@ import UIKit
 
 protocol CreateNewCategoryViewControllerDelegate: AnyObject {
     func categoryNameDidEntered(categoryName name: String)
+    func isNameAvailable(name: String) -> Bool
 }
 
 final class CreateNewCategoryViewController: FrameViewController {
@@ -10,7 +11,27 @@ final class CreateNewCategoryViewController: FrameViewController {
     
     // MARK: - Private properties
     private let textField = TrackerUITextField(text: "Введите название категории")
-    private let containerForTextField = UIView()
+    
+    private var mainStackView: UIStackView = {
+        let view = UIStackView()
+        view.alignment = .fill
+        view.axis = .vertical
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private var warningCharactersLabel: UILabel = {
+        let view = UILabel()
+        view.text = "Такая категория уже есть 🤯"
+        view.numberOfLines = .zero
+        view.font = .regular17
+        view.textColor = .myRed
+        view.alpha = .zero
+        view.textAlignment = .center
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     
     // MARK: Lifecicle
     override func viewDidLoad() {
@@ -49,18 +70,17 @@ final class CreateNewCategoryViewController: FrameViewController {
 // MARK: - Private Methods
 private extension CreateNewCategoryViewController {
     func initialise() {
-        containerForTextField.addSubview(textField)
-        containerForTextField.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(containerForTextField)
+        container.addSubview(mainStackView)
+        mainStackView.addArrangedSubviews(textField)
+        mainStackView.setCustomSpacing(8, after: textField)
         textField.delegate = self
     }
     
     func setConstraints() {
         NSLayoutConstraint.activate([
-            containerForTextField.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            containerForTextField.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            containerForTextField.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle),
-            containerForTextField.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            mainStackView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            mainStackView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            mainStackView.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle),
             
             textField.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: container.trailingAnchor),
@@ -71,13 +91,32 @@ private extension CreateNewCategoryViewController {
 
 // MARK: - TrackerUITextFieldDelegate
 extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
-    func textDidEntered(in: TrackerUITextField, text: String) {
-        if text.isEmpty {
+    func isChangeText(text: String, newLength: Int) -> Bool {
+        if !text.isEmpty {
+            if delegate?.isNameAvailable(name: text) ?? false {
+                mainStackView.removeArrangedSubview(warningCharactersLabel)
+                warningCharactersLabel.removeFromSuperview()
+                UIView.animate(withDuration: 0.3) {
+                    self.warningCharactersLabel.alpha = 0
+                }
+                categoryName = text
+                buttonCenter?.colorType = .black
+            } else {
+                mainStackView.addArrangedSubview(warningCharactersLabel)
+                UIView.animate(withDuration: 0.3) {
+                    self.warningCharactersLabel.alpha = 1
+                }
+            }
+        } else {
+            mainStackView.removeArrangedSubview(warningCharactersLabel)
+            warningCharactersLabel.removeFromSuperview()
+            UIView.animate(withDuration: 0.3) {
+                self.warningCharactersLabel.alpha = 0
+            }
+            view.layoutIfNeeded()
             categoryName = nil
             buttonCenter?.colorType = .grey
-        } else {
-            categoryName = text
-            buttonCenter?.colorType = .black
         }
+        return true
     }
 }

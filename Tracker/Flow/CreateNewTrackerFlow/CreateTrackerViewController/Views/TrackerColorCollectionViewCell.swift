@@ -16,16 +16,6 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
             configureCell()
         }
     }
-  
-    // MARK: Init
-    override init(frame: CGRect) {
-        super.init(frame: .zero)
-        initialise()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: - Selection
     private enum EmojiState {
@@ -54,6 +44,16 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    
+    // MARK: Init
+    override init(frame: CGRect) {
+        super.init(frame: .zero)
+        initialise()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 // MARK: Private methods
