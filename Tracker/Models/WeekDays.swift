@@ -1,6 +1,6 @@
 import Foundation
 
-enum WeekDay: Int, CaseIterable, Comparable {
+enum WeekDay: Int, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
     static var array: [WeekDay] {
@@ -9,6 +9,11 @@ enum WeekDay: Int, CaseIterable, Comparable {
     
     static var count: Int {
         array.count
+    }
+    
+    static func weekDay(date: Date) -> WeekDay {
+        let number = Date.currentWeekDayNumber(from: date)
+        return .init(rawValue: number) ?? .sunday
     }
     
     static func shortNameFor(_ dayNumber: Int) -> String? {
@@ -27,10 +32,6 @@ enum WeekDay: Int, CaseIterable, Comparable {
         days.count == 7 ? "Каждый день" : days.compactMap { shortNameFor($0) }.joined(separator: ", ")
     }
     
-    static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-    
     var fullDayName: String {
         switch self {
         case .monday: return "Понедельник"
@@ -41,5 +42,11 @@ enum WeekDay: Int, CaseIterable, Comparable {
         case .saturday: return "Суббота"
         case .sunday: return "Воскресенье"
         }
+    }
+}
+
+extension WeekDay: Comparable {
+    static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
+        lhs.rawValue < rhs.rawValue
     }
 }

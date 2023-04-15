@@ -13,8 +13,11 @@ final class TrackersViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    private let placeholderView = PlaceholderView(
-        placeholder: .star, text: "Что будем отслеживать?")
+    private let placeholderView: PlaceholderView = {
+        let placeholderView = PlaceholderView()
+        placeholderView.state = .star
+        return placeholderView
+    }()
     
     // MARK: - UIConstants
     private enum UIConstants {
@@ -210,7 +213,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
 extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
         currentDate = date
-        data.showTrackerForDayOfWeek(currentDate)
+        data.showTrackersForWeekDay(currentDate)
     }
 }
 
@@ -218,7 +221,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
         if searchText.isEmpty {
-            data.showTrackerForDayOfWeek(currentDate)
+            data.showTrackersForWeekDay(currentDate)
         } else {
             data.showTrackerWithName(name: searchText)
         }
@@ -234,11 +237,31 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
 
 // MARK: - DataSourceDelegate
 extension TrackersViewController: DataSourceDelegate {
-    func updateTrackers() {
-        if data.isTrackersPresent {
-            collectionView.reloadData()
-        } else {
-            
-        }
+    func mainCategoriesIsEmpty() {
+        placeholderView.state = .star
+    }
+    
+    func mainCategoriesIsNotEmpty() {
+        placeholderView.state = .invisible
+    }
+        
+    func visibleCategoriesInCalendarEmpty() {
+        placeholderView.state = .noResult
+    }
+    
+    func visibleCategoriesInCalendarIsNotEmpty() {
+        placeholderView.state = .invisible
+    }
+    
+    func visibleCategoriesInSearchEmpty() {
+        placeholderView.state = .noResult
+    }
+    
+    func visibleCategoriesInSearchIsNotEmpty() {
+        placeholderView.state = .invisible
+    }
+    
+    func visibleCategoriesChanged() {
+        collectionView.reloadData()
     }
 }

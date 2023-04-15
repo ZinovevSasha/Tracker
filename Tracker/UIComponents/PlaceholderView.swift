@@ -2,17 +2,14 @@ import UIKit
 
 final class PlaceholderView: UIView {
     // MARK: - Public
-    func hide() {
-        self.isHidden = true
+    var state: PlaceholderState = .star {
+        didSet {
+            updateAppearance()
+        }
     }
     
-    func unhide() {
-        self.isHidden = false
-    }
-    
-    func setImageAndText(placeholder: UIImage.Placeholder, text: String) {
-        placeholderImageView.image = placeholder.image
-        placeholderText.text = text
+    enum PlaceholderState {
+        case invisible, star, noResult, noStatistic, recomendation
     }
     
     // MARK: - UIConstants
@@ -41,9 +38,7 @@ final class PlaceholderView: UIView {
     }()
     
     // MARK: - Init
-    init(placeholder: UIImage.Placeholder, text: String) {
-        placeholderImageView.image = placeholder.image
-        placeholderText.text = text
+    init() {
         super.init(frame: .zero)
         initialise()
     }
@@ -72,5 +67,43 @@ private extension PlaceholderView {
             equalTo: placeholderImageView.bottomAnchor,
             constant: UIConstants.textToImageOffset)
         ])
+    }
+    
+    func updateAppearance() {
+        switch state {
+        case .invisible:
+            setAlphaToZero()
+        case .star:
+            setState(image: .star, text: "Что будем отслеживать?")
+        case .noResult:
+            setState(image: .noResult, text: "Ничего не найдено")
+        case .noStatistic:
+            setState(image: .noStatistic, text: "Анализировать пока нечего")
+        case .recomendation:
+            setState(image: .star, text: "Привычки и события\n можно объединить по смыслу")
+        }
+    }
+    
+    func setState(image: UIImage.Placeholder, text: String) {
+        setAlphaToZero()
+        setImageAndText(placeholder: image, text: text)
+        setAlphaToOne()
+    }
+    
+    func setImageAndText(placeholder: UIImage.Placeholder, text: String) {
+        placeholderImageView.image = placeholder.image
+        placeholderText.text = text
+    }
+    
+    func setAlphaToOne() {
+        UIView.animate(withDuration: 0.3) {
+            self.alpha = 1
+        }
+    }
+    
+    func setAlphaToZero() {
+        UIView.animate(withDuration: 0.3) {
+            self.alpha = .zero
+        }
     }
 }

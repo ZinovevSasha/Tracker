@@ -8,7 +8,13 @@
 import Foundation
 
 protocol DataSourceDelegate: AnyObject {
-    func updateTrackers()
+    func mainCategoriesIsEmpty()
+    func mainCategoriesIsNotEmpty()
+    func visibleCategoriesChanged()
+    func visibleCategoriesInSearchEmpty()
+    func visibleCategoriesInSearchIsNotEmpty()
+    func visibleCategoriesInCalendarEmpty()
+    func visibleCategoriesInCalendarIsNotEmpty()
 }
 
 protocol DataSourceProtocol {
@@ -28,18 +34,20 @@ final class DataSource {
     
     var categories: [TrackerCategory] = [] {
         didSet {
-            let notEmpty = categories.filter { !$0.trackers.isEmpty }
-            visibleCategories = notEmpty
+            visibleCategories = categories
         }
     }
     
     var visibleCategories: [TrackerCategory] = [] {
         didSet {
-            delegate?.updateTrackers()
+            delegate?.visibleCategoriesChanged()
         }
     }
     var completedTrackers: [TrackerRecord] = []
     var completedTrackersId: Set<UUID> = []
+    
+    // Private properties
+    private var indexPath: [IndexPath]?
 }
 
 extension DataSource {
@@ -52,6 +60,7 @@ extension DataSource {
         let header = category.header
         let trackers = category.trackers
         if let tracker = trackers[safe: .zero] {
+            delegate?.mainCategoriesIsNotEmpty()
             addTracker(tracker, toCategoryWithHeader: header)
         } else {
             print("Error adding Tracker")
@@ -60,14 +69,6 @@ extension DataSource {
     
     func getCategories() -> [TrackerCategory] {
         categories
-    }
-    
-    func removeCategory(_ indexPath: IndexPath) {
-        categories.remove(at: indexPath.section)
-    }
-    
-    func removeTracker(_ indexPath: IndexPath) {
-        categories.remove(at: indexPath.section).trackers[indexPath.row]
     }
     
     // Working with Visible trackers
@@ -90,54 +91,82 @@ extension DataSource {
     var isTrackersPresent: Bool {
         visibleCategories.isEmpty
     }
-    
-    //  Functions for search and dataPicker
-    func showTrackerWithName(name: String) {
-        let categories: [TrackerCategory]? = categories.compactMap { category in
-            let trackerForDate = category.trackers.filter { $0.name.lowercased().contains(name.lowercased())
-            }
-            return trackerForDate.isEmpty ? nil :
-            TrackerCategory(header: category.header, trackers: trackerForDate)
-        }
         
-        visibleCategories = categories ?? []
-    }
-    
-    func showTrackerForDayOfWeek(_ selectedDay: Date) {
-        let today = Date.currentWeekDayNumber(from: .init())
-        let selectedDay = Date.currentWeekDayNumber(from: selectedDay)
-        if today != selectedDay {
-            if let categoriesForWeekDay = categoryForWeekDay(selectedDay) {
-                visibleCategories = categoriesForWeekDay
+    func showTrackersForWeekDay(_ selectedWeekDay: Date) {
+        let today = Date.dateString(for: .init())
+        let userDay = Date.dateString(for: selectedWeekDay)
+        
+        // Week day
+        let weekDay = WeekDay.weekDay(date: selectedWeekDay)
+        
+        // check if today != user selected day
+        if today != userDay {
+            let visibleCategories = filterTrackerss(categories, matching: weekDay) {
+                $0.schedule.contains($1)
+            }
+            
+            if let visibleCategories {
+                delegate?.visibleCategoriesInCalendarIsNotEmpty()
+                self.visibleCategories = visibleCategories
+            } else {
+                delegate?.visibleCategoriesInCalendarEmpty()
+                self.visibleCategories = []
             }
         } else {
-            visibleCategories = categories
+            // show all categorie (Because for current day we show all categories)
+            if !self.categories.isEmpty {
+                delegate?.mainCategoriesIsNotEmpty()
+                self.visibleCategories = self.categories
+            } else {
+                delegate?.mainCategoriesIsEmpty()
+                self.categories = []
+            }
         }
     }
     
-    // MARK: - Private
-    private func addTracker(_ newTracker: Tracker, toCategoryWithHeader categoryTitle: String) {
+    func showTrackerWithName(name: String) {
+        let filteredByName = filterTrackerss(categories, matching: name) {
+            $0.name.contains($1)
+        }
+        
+        if let filteredByName {
+            delegate?.visibleCategoriesInSearchIsNotEmpty()
+            self.visibleCategories = filteredByName
+        } else {
+            self.visibleCategories = []
+            delegate?.visibleCategoriesInSearchEmpty()
+        }
+    }
+}
+
+// MARK: - Private methods
+private extension DataSource {
+    func filterTrackerss<T>(_ categories: [TrackerCategory], matching value: T, filterFunction: (Tracker, T) -> Bool) -> [TrackerCategory]? {
+        var filteredCategories: [TrackerCategory] = []
+
+        for category in categories {
+            let filteredTrackers = category.trackers.filter { filterFunction($0, value) }
+
+            if !filteredTrackers.isEmpty {
+                filteredCategories.append(TrackerCategory(header: category.header, trackers: filteredTrackers))
+            }
+        }
+
+        return !filteredCategories.isEmpty ? filteredCategories : nil
+    }
+    
+    func addTracker(_ newTracker: Tracker, toCategoryWithHeader categoryTitle: String) {
         if let index = categories.firstIndex(where: { $0.header == categoryTitle }) {
             let category = categories[index]
             let newTrackers = category.trackers + [newTracker]
             let updatedCategory = TrackerCategory(header: categoryTitle, trackers: newTrackers)
-            categories.remove(at: index)
-            categories.insert(updatedCategory, at: index)
+            
+            self.categories.remove(at: index)
+            self.categories.insert(updatedCategory, at: index)
         } else {
             let category = TrackerCategory(header: categoryTitle, trackers: [newTracker])
-            categories.append(category)
+            
+            self.categories.append(category)
         }
-    }
-    
-    private func categoryForWeekDay(_ day: Int) -> [TrackerCategory]? {
-        let weekday = WeekDay(rawValue: day) ?? .sunday
-        let categories: [TrackerCategory]? = categories.compactMap { category in
-            let trackerForDate = category.trackers.filter {
-                $0.schedule.contains(weekday)
-            }
-            return trackerForDate.isEmpty ? nil :
-            TrackerCategory(header: category.header, trackers: trackerForDate)
-        }
-        return categories
     }
 }
