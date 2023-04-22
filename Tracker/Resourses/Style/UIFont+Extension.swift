@@ -9,5 +9,3 @@ extension UIFont {
     static let medium12 = UIFont.systemFont(ofSize: 12, weight: .medium)
     static let medium10 = UIFont.systemFont(ofSize: 10, weight: .medium)
 }
-
-

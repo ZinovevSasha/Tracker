@@ -34,10 +34,7 @@ extension UIImage {
     }
 }
 
-
-
 extension UIImage {
-    
     // Create a UIImage from a UIColor
     convenience init(color: UIColor) {
         let rect = CGRect(x: 0, y: 0, width: 1, height: 1)
@@ -51,7 +48,6 @@ extension UIImage {
 }
 
 extension UIButton {
-    
     // Set up the appearance of the button for a specific state
     func setUpAppearance(forState state: UIControl.State, backgroundColor: UIColor, titleColor: UIColor, title: String, cornerRadius: CGFloat) {
         self.setBackgroundImage(UIImage(color: backgroundColor), for: state)
@@ -61,4 +57,3 @@ extension UIButton {
         self.clipsToBounds = true
     }
 }
-

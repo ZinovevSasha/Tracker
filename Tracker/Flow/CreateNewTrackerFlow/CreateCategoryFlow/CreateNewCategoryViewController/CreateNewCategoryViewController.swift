@@ -84,7 +84,7 @@ private extension CreateNewCategoryViewController {
             
             textField.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            textField.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle),
+            textField.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle)
         ])
     }
 }
@@ -102,6 +102,8 @@ extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
                 categoryName = text
                 buttonCenter?.colorType = .black
             } else {
+                categoryName = nil
+                buttonCenter?.colorType = .grey
                 mainStackView.addArrangedSubview(warningCharactersLabel)
                 UIView.animate(withDuration: 0.3) {
                     self.warningCharactersLabel.alpha = 1

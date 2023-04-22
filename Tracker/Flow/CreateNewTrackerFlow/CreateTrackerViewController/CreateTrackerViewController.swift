@@ -167,10 +167,10 @@ final class CreateTrackerViewController: UIViewController {
     @objc private func createButtonTapped() {
         if user.isUserGaveEnoughToCreateTracker {
             if let category = trackerMaker.createTrackerFrom(
-                userInputData: user,
-                categories: categories,
+                userInput: user,
                 tableData: dataForTableView.twoRows,
-                collectionData: dataForCollectionView) {
+                collectionData: dataForCollectionView
+            ) {
                 // Give newly created category to delegate
                 delegate?.addTrackerCategory(category)
                 createButton.isEnabled.toggle()
@@ -281,13 +281,11 @@ private extension CreateTrackerViewController {
         switch buttonState {
         case .selected:
             UIView.animate(withDuration: 0.3, delay: 0) {
-                self.createButton.backgroundColor = .myBlack
-                self.createButton.setTitleColor(.myWhite, for: .normal)
+                self.createButton.colorType = .black
             }
         case .unselected:
             UIView.animate(withDuration: 0.3, delay: 0) {
-                self.createButton.backgroundColor = .myGray
-                self.createButton.setTitleColor(.white, for: .normal)
+                self.createButton.colorType = .grey
             }
         }
     }
@@ -480,8 +478,8 @@ extension CreateTrackerViewController: TrackerUITextFieldDelegate {
             self.user.setTitle(text)
         }
         
-        let maxLength = 3
-        let isTextTooLong = newLength > maxLength      
+        let maxLength = 38
+        let isTextTooLong = newLength > maxLength
         
         // Show animation if text more than 38, and shake if continue typing
         forbidEnterTextAnimationWillShowIf(isTextTooLong)

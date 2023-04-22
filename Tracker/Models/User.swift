@@ -8,7 +8,8 @@ struct User {
     var selectedColor: IndexPath?
     
     var isUserGaveEnoughToCreateTracker: Bool {
-        if selectedName != nil,
+        if selectedCategory != nil,
+            selectedName != nil,
             selectedEmoji != nil,
             selectedColor != nil {
             return true

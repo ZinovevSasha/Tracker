@@ -4,16 +4,15 @@ final class TrackerMaker {
     private(set) var category: TrackerCategory?
     
     func createTrackerFrom(
-        userInputData data: User,
-        categories: [TrackerCategory],
+        userInput user: User,       
         tableData: [RowData],
         collectionData: [CollectionViewData]
     ) -> TrackerCategory? {
         guard
-            let categoryName = data.selectedCategory,
-            let name = data.selectedName,
-            let emojiIndexPath = data.selectedEmoji,
-            let colorIndexPath = data.selectedColor
+            let categoryName = user.selectedCategory,
+            let name = user.selectedName,
+            let emojiIndexPath = user.selectedEmoji,
+            let colorIndexPath = user.selectedColor
         else {
             return nil
         }
@@ -36,15 +35,15 @@ final class TrackerMaker {
             break
         }
         
-        
         return TrackerCategory(
             header: categoryName,
             trackers: [
                 Tracker(
+                    id: UUID(),
                     name: name,
                     color: color,
                     emoji: emoji,
-                    schedule: data.selectedWeekDay
+                    schedule: user.selectedWeekDay
                 )
             ]
         )

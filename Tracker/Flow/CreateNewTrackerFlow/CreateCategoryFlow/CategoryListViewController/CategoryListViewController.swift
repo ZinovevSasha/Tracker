@@ -6,7 +6,7 @@ final class CategoryListViewController: FrameViewController {
     var checkForCategoryName: ((String) -> Bool)?
     
     // MARK: - Private properties
-    private let placeholder = PlaceholderView()
+    private let placeholder = PlaceholderView(state: .recomendation)
     
     private let tableView: UITableView = {
         let view = UITableView()
@@ -66,7 +66,6 @@ private extension CategoryListViewController {
         
         container.addSubview(tableView)
         container.addSubview(placeholder)
-        placeholder.state = .recomendation
     }
     
     func setConstraints() {

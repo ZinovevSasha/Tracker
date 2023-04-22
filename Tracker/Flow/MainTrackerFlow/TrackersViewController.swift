@@ -8,17 +8,14 @@ final class TrackersViewController: UIViewController {
         let layout = UICollectionViewFlowLayout()
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .myWhite
+        view.allowsSelection = true
         view.registerHeader(TrackerHeader.self)
         view.register(cellClass: TrackerCollectionViewCell.self)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    private let placeholderView: PlaceholderView = {
-        let placeholderView = PlaceholderView()
-        placeholderView.state = .star
-        return placeholderView
-    }()
-    
+    let placeholderView = PlaceholderView(state: .star)
+  
     // MARK: - UIConstants
     private enum UIConstants {
         static let trackerHeaderHeight: CGFloat = 30
@@ -36,7 +33,9 @@ final class TrackersViewController: UIViewController {
     }
     
     // MARK: - Models
-    private var data = DataSource()
+    private lazy var dataProvider: DataProviderProtocol = {
+        return DataProvider(delegate: self)
+    }()
     private var currentDate = Date()
     
     // Layout of collection helper
@@ -53,13 +52,18 @@ final class TrackersViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         initialise()
+        setDelegates()
         setConstraints()
     }
     
     // MARK: - @objc target action methods
     func handlePlusButtonTap() {
-        let trackerCreationViewController = ChooseTrackerViewController(categories: data.getCategories(), from: self)
+        let trackerCreationViewController = ChooseTrackerViewController(
+            categories: dataProvider.getCategories(),
+            from: self
+        )
         let navVc = UINavigationController(rootViewController: trackerCreationViewController)
         navVc.isNavigationBarHidden = true
         navVc.interactivePopGestureRecognizer?.isEnabled = true
@@ -74,13 +78,6 @@ final class TrackersViewController: UIViewController {
 // MARK: - Private methods
 private extension TrackersViewController {
     func initialise() {
-        searchView.delegate = self
-        headerView.delegate = self
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        data.delegate = self
-        
-        
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
         view.addGestureRecognizer(tapGesture)
         view.backgroundColor = .myWhite
@@ -88,6 +85,13 @@ private extension TrackersViewController {
         placeholderView.translatesAutoresizingMaskIntoConstraints = false
         headerView.translatesAutoresizingMaskIntoConstraints = false
         searchView.translatesAutoresizingMaskIntoConstraints = false
+    }
+    
+    func setDelegates() {
+        searchView.delegate = self
+        headerView.delegate = self
+        collectionView.dataSource = self
+        collectionView.delegate = self
     }
     
     func setConstraints() {
@@ -141,27 +145,28 @@ private extension TrackersViewController {
 // MARK: - UICollectionViewDataSource
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return data.categoriesCount
+        dataProvider.numberOfSections
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return data.getNumberOfTrackersForOneCategory(section)
+        dataProvider.numberOfRowsInSection(section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
-        let tracker = data.getTracker(for: indexPath)
-        let matchingTrackers = data.completedTrackers.filter { $0.id == tracker.id }
-        
-        cell.configure(with: matchingTrackers.count)
+        let tracker = dataProvider.object(at: indexPath)
         cell.configure(with: tracker)
+        cell.configure(with: 1)
         cell.delegate = self
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header: TrackerHeader = collectionView.dequeueHeader(ofKind: UICollectionView.elementKindSectionHeader, for: indexPath)
-        header.configure(with: data.getHeaderOfCategory(indexPath))
+        let header: TrackerHeader = collectionView.dequeueHeader(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            for: indexPath
+        )
+        header.configure(with: dataProvider.header(for: indexPath.section))
         return header
     }
 }
@@ -187,25 +192,22 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+// MARK: - UICollectionViewDelegateFlowLayout
+extension TrackersViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        do {
+            try dataProvider.deleteRecord(at: indexPath)
+        } catch {
+            print("collectionView(didSelectItemAt) failed")
+        }
+    }
+}
+
+
 // MARK: - TrackerCollectionViewCellDelegate
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func plusButtonTapped(for cell: TrackerCollectionViewCell) {
-        guard let indexPath = collectionView.indexPath(for: cell) else {
-            return
-        }
-        let tracker = data.getTracker(for: indexPath)
         
-        if data.completedTrackersId.contains(tracker.id) {
-            data.completedTrackers.remove(at: indexPath.row)
-            data.completedTrackersId.remove(tracker.id)
-        } else {
-            let completedTracker = TrackerRecord(id: tracker.id, date: currentDate)
-            data.completedTrackersId.insert(tracker.id)
-            data.completedTrackers.append(completedTracker)
-        }
-        
-        let matchingTrackers = data.completedTrackers.filter { $0.id == tracker.id }
-        cell.configure(with: matchingTrackers.count)
     }
 }
 
@@ -213,55 +215,43 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
 extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
         currentDate = date
-        data.showTrackersForWeekDay(currentDate)
     }
 }
 
 // MARK: - SearchViewDelegate
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
-        if searchText.isEmpty {
-            data.showTrackersForWeekDay(currentDate)
-        } else {
-            data.showTrackerWithName(name: searchText)
-        }
+        
     }
 }
 
 // MARK: - CreateTrackerViewControllerDelegate
 extension TrackersViewController: CreateTrackerViewControllerDelegate {
     func addTrackerCategory(_ category: TrackerCategory) {
-        data.addCategory(category)
+        do {
+            try dataProvider.addRecord(category)
+        } catch {
+            print("addTrackerCategory failed")
+        }
     }
 }
 
-// MARK: - DataSourceDelegate
-extension TrackersViewController: DataSourceDelegate {
-    func mainCategoriesIsEmpty() {
-        placeholderView.state = .star
-    }
-    
-    func mainCategoriesIsNotEmpty() {
-        placeholderView.state = .invisible
-    }
-        
-    func visibleCategoriesInCalendarEmpty() {
-        placeholderView.state = .noResult
-    }
-    
-    func visibleCategoriesInCalendarIsNotEmpty() {
-        placeholderView.state = .invisible
-    }
-    
-    func visibleCategoriesInSearchEmpty() {
-        placeholderView.state = .noResult
-    }
-    
-    func visibleCategoriesInSearchIsNotEmpty() {
-        placeholderView.state = .invisible
-    }
-    
-    func visibleCategoriesChanged() {
-        collectionView.reloadData()
+// MARK: - DataProviderDelegate
+extension TrackersViewController: DataProviderDelegate {
+    func didUpdate(_ update: DataProviderUpdate) {
+        collectionView.performBatchUpdates {
+            if !update.insertedIndexes.isEmpty {
+                collectionView.insertItems(at: [update.insertedIndexes])
+            }
+            if !update.insertedSection.isEmpty {
+                collectionView.insertSections(update.insertedSection)
+            }
+            if !update.deletedIndexes.isEmpty {
+                collectionView.deleteItems(at: [update.deletedIndexes])
+            }
+            if !update.deletedIndexes.isEmpty {
+                collectionView.deleteSections(update.deletedSection)
+            }
+        }
     }
 }

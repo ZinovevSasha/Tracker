@@ -38,9 +38,12 @@ final class PlaceholderView: UIView {
     }()
     
     // MARK: - Init
-    init() {
+    init(state: PlaceholderState) {
         super.init(frame: .zero)
+        self.state = state
+        
         initialise()
+        updateAppearance()
     }
     
     required init?(coder: NSCoder) {

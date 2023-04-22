@@ -7,7 +7,8 @@ protocol TrackerCollectionViewCellDelegate: AnyObject {
 final class TrackerCollectionViewCell: UICollectionViewCell {
     static let identifier = String(describing: TrackerCollectionViewCell.self)
     // MARK: - Public
-    func configure(with info: Tracker) {
+    func configure(with info: Tracker?) {
+        guard let info = info else { return }
         let color = UIColor(named: info.color)
         emojiLabel.text = info.emoji
         trackerNameLabel.text = info.name

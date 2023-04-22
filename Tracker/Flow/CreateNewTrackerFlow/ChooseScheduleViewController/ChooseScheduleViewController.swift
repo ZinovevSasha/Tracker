@@ -74,7 +74,7 @@ private extension ChooseScheduleViewController {
             tableView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: container.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: UIConstants.bottomInsetInset),
+            tableView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: UIConstants.bottomInsetInset)
         ])
     }
 }
