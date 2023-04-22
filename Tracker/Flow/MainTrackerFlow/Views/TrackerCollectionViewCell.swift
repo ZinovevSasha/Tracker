@@ -16,7 +16,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         addButton.backgroundColor = color
     }
     
-    func configure(with trackedDays: Int) {
+    func configure(with trackedDays: Int?) {
+        guard let trackedDays = trackedDays else { return }
         trackedDaysLabel.text = "\(trackedDays) days"
     }
     

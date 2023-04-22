@@ -33,10 +33,14 @@ final class TrackersViewController: UIViewController {
     }
     
     // MARK: - Models
-    private lazy var dataProvider: DataProviderProtocol = {
-        return DataProvider(delegate: self)
+    private lazy var dataProvider: DataProviderProtocol? = {
+        do {
+            return try DataProvider(delegate: self)
+        } catch {
+            print("Данные недоступны")
+            return nil
+        }
     }()
-    private var currentDate = Date()
     
     // Layout of collection helper
     private let params = GeometryParams(
@@ -58,10 +62,19 @@ final class TrackersViewController: UIViewController {
         setConstraints()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let isEmpty = dataProvider?.isEmpty, isEmpty {
+            placeholderView.state = .star
+        } else {
+            placeholderView.state = .invisible
+        }
+    }
+    
     // MARK: - @objc target action methods
     func handlePlusButtonTap() {
         let trackerCreationViewController = ChooseTrackerViewController(
-            categories: dataProvider.getCategories(),
+            categories: dataProvider?.getCategories() ?? [],
             from: self
         )
         let navVc = UINavigationController(rootViewController: trackerCreationViewController)
@@ -145,18 +158,19 @@ private extension TrackersViewController {
 // MARK: - UICollectionViewDataSource
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        dataProvider.numberOfSections
+        dataProvider?.numberOfSections ?? .zero
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        dataProvider.numberOfRowsInSection(section)
+        dataProvider?.numberOfRowsInSection(section) ?? .zero
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
-        let tracker = dataProvider.object(at: indexPath)
+        let tracker = dataProvider?.object(at: indexPath)
+        let daysTracked = dataProvider?.daysTracked(for: indexPath)
         cell.configure(with: tracker)
-        cell.configure(with: 1)
+        cell.configure(with: daysTracked)
         cell.delegate = self
         return cell
     }
@@ -166,7 +180,7 @@ extension TrackersViewController: UICollectionViewDataSource {
             ofKind: UICollectionView.elementKindSectionHeader,
             for: indexPath
         )
-        header.configure(with: dataProvider.header(for: indexPath.section))
+        header.configure(with: dataProvider?.header(for: indexPath.section) ?? "")
         return header
     }
 }
@@ -192,36 +206,46 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout
-extension TrackersViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        do {
-            try dataProvider.deleteRecord(at: indexPath)
-        } catch {
-            print("collectionView(didSelectItemAt) failed")
-        }
-    }
-}
-
-
 // MARK: - TrackerCollectionViewCellDelegate
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func plusButtonTapped(for cell: TrackerCollectionViewCell) {
-        
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        try? dataProvider?.saveTrackerAsCompleted(by: indexPath)
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+extension TrackersViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        do {
+            try dataProvider?.deleteRecord(at: indexPath)
+        } catch {
+            print(error)
+        }
     }
 }
 
 // MARK: - TrackerHeaderViewDelegate
 extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
-        currentDate = date
+        do {
+            try dataProvider?.fetchTrackersBy(date: date)
+            collectionView.reloadData()
+        } catch {
+            print(error)
+        }
     }
 }
 
 // MARK: - SearchViewDelegate
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
-        
+        do {
+            try dataProvider?.fetchTrackersBy(name: searchText)
+            collectionView.reloadData()
+        } catch {
+            print(error)
+        }
     }
 }
 
@@ -229,15 +253,23 @@ extension TrackersViewController: SearchViewDelegate {
 extension TrackersViewController: CreateTrackerViewControllerDelegate {
     func addTrackerCategory(_ category: TrackerCategory) {
         do {
-            try dataProvider.addRecord(category)
+            try dataProvider?.addRecord(category)
         } catch {
-            print("addTrackerCategory failed")
+            print(error)
         }
     }
 }
 
 // MARK: - DataProviderDelegate
 extension TrackersViewController: DataProviderDelegate {
+    func noResultFound() {
+        placeholderView.state = .noResult
+    }
+    
+    func resultFound() {
+        placeholderView.state = .invisible
+    }
+    
     func didUpdate(_ update: DataProviderUpdate) {
         collectionView.performBatchUpdates {
             if !update.insertedIndexes.isEmpty {
@@ -251,6 +283,9 @@ extension TrackersViewController: DataProviderDelegate {
             }
             if !update.deletedIndexes.isEmpty {
                 collectionView.deleteSections(update.deletedSection)
+            }
+            if !update.updatedIndexes.isEmpty {
+                collectionView.reloadItems(at: [update.updatedIndexes])
             }
         }
     }

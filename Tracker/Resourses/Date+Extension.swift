@@ -8,7 +8,7 @@ extension Date {
         return Date.dateFormatter.string(from: date)
     }
     
-    static func  currentWeekDayNumber(from day: Date) -> Int {
+    static func currentWeekDayNumber(from day: Date) -> Int {
         let calendar = Calendar(identifier: .coptic)
         // days will be from 0 to 6 (monday, sunday)
         let weekday = (calendar.component(.weekday, from: day) + 5) % 7

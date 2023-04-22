@@ -50,6 +50,15 @@ final class CategoryListViewController: FrameViewController {
         setConstraints()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if tempCategory.isEmpty {
+            placeholder.state = .recomendation
+        } else {
+            placeholder.state = .invisible
+        }
+    }
+    
     // MARK: - Private @objc target action methods
     override internal func handleButtonCenterTap() {
         let createNewCategoryViewController = CreateNewCategoryViewController()

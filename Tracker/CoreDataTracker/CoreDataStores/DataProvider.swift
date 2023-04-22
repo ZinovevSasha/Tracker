@@ -12,22 +12,29 @@ struct DataProviderUpdate {
     var deletedSection: IndexSet
     var insertedIndexes: IndexPath
     var deletedIndexes: IndexPath
-    var updatedIndexes: IndexSet
+    var updatedIndexes: IndexPath
     let movedIndexes: Set<Move>
 }
 
 protocol DataProviderDelegate: AnyObject {
     func didUpdate(_ update: DataProviderUpdate)
+    func noResultFound()
+    func resultFound()
 }
 
 protocol DataProviderProtocol {
+    var isEmpty: Bool { get }
     var numberOfSections: Int { get }
     func numberOfRowsInSection(_ section: Int) -> Int
     func header(for section: Int) -> String
+    func daysTracked(for indexPath: IndexPath) -> Int
     func object(at indexPath: IndexPath) -> Tracker?
+    func getCategories() -> [TrackerCategory]
     func addRecord(_ record: TrackerCategory) throws
     func deleteRecord(at indexPath: IndexPath) throws
-    func getCategories() -> [TrackerCategory]
+    func fetchTrackersBy(name: String) throws
+    func fetchTrackersBy(date: Date) throws
+    func saveTrackerAsCompleted(by indexPath: IndexPath) throws
 }
 
 final class DataProvider: NSObject {
@@ -36,7 +43,7 @@ final class DataProvider: NSObject {
     private var deletedSection: IndexSet?
     private var insertedIndexes: IndexPath?
     private var deletedIndexes: IndexPath?
-    private var updatedIndexes: IndexSet?
+    private var updatedIndexes: IndexPath?
     private var movedIndexes: Set<DataProviderUpdate.Move>?
     
     // Context -> one for 3 stores
@@ -44,6 +51,7 @@ final class DataProvider: NSObject {
     // Stores
     private let trackerStore: TrackerStoreProtocol
     private let trackerCategoryStore: TrackerCategoryStoreProtocol
+    private let trackerRecordStore: TrackerRecordStore
     // Delegate
     weak var delegate: DataProviderDelegate?
     
@@ -83,22 +91,34 @@ final class DataProvider: NSObject {
     }
     
     // MARK: - Init
-    init(delegate: DataProviderDelegate?) {
-        let context = (UIApplication.shared.delegate as! AppDelegate)
-            .persistentContainer.viewContext
+    init(delegate: DataProviderDelegate?) throws {
+        guard let context = (UIApplication.shared.delegate as? AppDelegate)?
+            .persistentContainer.viewContext else {
+                throw DataProviderError.contextUnavailable
+        }
         
         self.delegate = delegate
         self.context = context
         self.trackerStore = TrackerStore(context: context)
+        self.trackerRecordStore = TrackerRecordStore(context: context)
         self.trackerCategoryStore = TrackerCategoryStore(context: context)
+    }
+
+    enum DataProviderError: Error {
+        case contextUnavailable
     }
 }
 
 // MARK: - DataProviderProtocol
 extension DataProvider: DataProviderProtocol {
+    var isEmpty: Bool {
+        guard let objects = fetchedResultsController.fetchedObjects else { return false }
+        return objects.isEmpty ? true : false
+    }
+    
     var numberOfSections: Int {
         let numberOfSections = fetchedResultsController.sections?.count ?? .zero
-        print("numberOfSections is \(numberOfSections)")
+        print("numberOfSections is \(numberOfSections)")        
         return numberOfSections
     }
     
@@ -114,11 +134,21 @@ extension DataProvider: DataProviderProtocol {
         return header
     }
     
+    func daysTracked(for indexPath: IndexPath) -> Int {
+        let record = fetchedResultsController.object(at: indexPath)
+        do {
+            return try trackerRecordStore.getTrackedDaysNumberForTracker(tracker: record)
+        } catch {
+            print(error)
+            return .zero
+        }
+    }
+    
     func object(at indexPath: IndexPath) -> Tracker? {
         let record = fetchedResultsController.object(at: indexPath)
         return try? tracker(from: record)
     }
-
+    
     func addRecord(_ record: TrackerCategory) throws {
         guard let tracker = record.trackers.first else { return }
         // Create TrackerCoreData
@@ -136,10 +166,50 @@ extension DataProvider: DataProviderProtocol {
         trackerCategoryStore.getAllCategories()
     }
     
+    func fetchTrackersBy(name: String) throws {
+        if !name.isEmpty {
+            fetchedResultsController.fetchRequest.predicate = NSPredicate(
+                // [cd] case-insensitive ignore differences in letter case
+                // [d] diacritic insensitive ignore differences in accent
+                // "resume" but the text contains "résumé", the search will still match
+                format: "name CONTAINS[cd] %@", name
+            )
+        } else {
+            fetchedResultsController.fetchRequest.predicate = nil
+        }
+        try fetchedResultsController.performFetch()
+        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
+    }
+    
+    func fetchTrackersBy(date: Date) throws {
+        let day = String(Date.currentWeekDayNumber(from: date))
+        let userSelectedDay = Date.dateString(for: date)
+        let today = Date.dateString(for: Date())
+        
+        if userSelectedDay != today {
+            fetchedResultsController.fetchRequest.predicate = NSPredicate(
+                //
+                format: "schedule CONTAINS[cd] %@", day
+            )
+        } else {
+            fetchedResultsController.fetchRequest.predicate = nil
+        }
+        try fetchedResultsController.performFetch()
+        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
+    }
+    
+    func saveTrackerAsCompleted(by indexPath: IndexPath) throws {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        try? trackerRecordStore.addTrackerRecord(trackerCoreData)
+    }
+}
+
+// MARK: - Private methods
+private extension DataProvider {
     // Private methods
     func tracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
         guard let idString = trackerCoreData.id,
-              let id = UUID(uuidString: idString) else {
+            let id = UUID(uuidString: idString) else {
             throw TrackerStoreError.decodingErrorInvalidId
         }
         guard let name = trackerCoreData.name else {
@@ -157,7 +227,7 @@ extension DataProvider: DataProviderProtocol {
         let shceduleArray = schedule
             .split(separator: ",")
             .map { Int($0.trimmingCharacters(in: .whitespaces)) }
-            .compactMap { WeekDay(rawValue: $0 ?? .max) }
+            .compactMap { WeekDay(rawValue: $0 ?? .bitWidth) }
         
         return Tracker(id: id, name: name, color: color, emoji: emoji, schedule: shceduleArray)
     }
@@ -170,29 +240,30 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
         deletedSection = IndexSet()
         insertedIndexes = IndexPath()
         deletedIndexes = IndexPath()
-        updatedIndexes = IndexSet()
+        updatedIndexes = IndexPath()
         movedIndexes = Set<DataProviderUpdate.Move>()
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         guard let insertedSectionIndexSet = insertedSection,
-              let deletedSectionIndexSet = deletedSection,
-              let insertedItem = insertedIndexes,
-              let deletedItem = deletedIndexes,
-              let updatedItem = updatedIndexes,
-              let movedItem = movedIndexes else {
+            let deletedSectionIndexSet = deletedSection,
+            let insertedItem = insertedIndexes,
+            let deletedItem = deletedIndexes,
+            let updatedItem = updatedIndexes,
+            let movedItem = movedIndexes else {
             return
         }
         
-        // Update delegate with indexes
-        delegate?.didUpdate(DataProviderUpdate(
+        let update = DataProviderUpdate(
             insertedSection: insertedSectionIndexSet,
             deletedSection: deletedSectionIndexSet,
             insertedIndexes: insertedItem,
             deletedIndexes: deletedItem,
             updatedIndexes: updatedItem,
             movedIndexes: movedItem)
-        )
+
+        // Update delegate with indexes
+        delegate?.didUpdate(update)
         
         insertedSection = nil
         deletedSection = nil
@@ -234,7 +305,7 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
             deletedIndexes = indexPath
         case .update:
             guard let indexPath = indexPath else { return }
-            updatedIndexes?.insert(indexPath.item)
+            updatedIndexes = indexPath
         case .move:
             guard let oldIndexPath = indexPath, let newIndexPath = newIndexPath else { return }
             movedIndexes?.insert(.init(oldIndexPath: oldIndexPath, newIndexPath: newIndexPath))
@@ -246,11 +317,11 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
 
 /*
 class Tracker: NSManagedObject {
-    @NSManaged var id: UUID
+    @NSManaged var id: String
     @NSManaged var name: String
     @NSManaged var color: String
     @NSManaged var emoji: String
-    @NSManaged var schedule: [WeekDay]
+    @NSManaged var schedule: String
     @NSManaged var category: TrackerCategory?
     @NSManaged var records: Set<TrackerRecord>?
 }
@@ -261,7 +332,7 @@ class TrackerCategory: NSManagedObject {
 }
 
 class TrackerRecord: NSManagedObject {
-    @NSManaged var id: UUID
+    @NSManaged var id: String
     @NSManaged var date: Date
     @NSManaged var tracker: Tracker?
 }

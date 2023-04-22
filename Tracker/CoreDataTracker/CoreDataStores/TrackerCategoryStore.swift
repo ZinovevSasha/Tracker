@@ -25,7 +25,7 @@ final class TrackerCategoryStore {
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func addCategory(with name: String, and tracker: TrackerCoreData) throws {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "header == %@", name)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.header), name)
         
         do {
             let results = try context.fetch(fetchRequest)
@@ -61,7 +61,7 @@ private extension TrackerCategoryStore {
     func updateCategories(
         _ trackerCategoriesCoreData: TrackerCategoryCoreData
     ) throws -> TrackerCategory {
-        
+        // Get categories for catefory view controller
         let header = trackerCategoriesCoreData.header
         return TrackerCategory(
             header: header ?? "",
