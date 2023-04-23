@@ -9,12 +9,10 @@ extension WeekDay: Comparable {
 enum WeekDay: Int, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
-    static var array: [WeekDay] {
-        WeekDay.allCases
-    }
+    static let allDaysOfWeek = Set(WeekDay.allCases.map { $0.rawValue })
     
     static var count: Int {
-        array.count
+        allDaysOfWeek.count
     }
     
     var abbreviationLong: String {
@@ -42,31 +40,31 @@ enum WeekDay: Int, CaseIterable {
     }
 }
 
-extension Array where Element == WeekDay {
-    // Function to check if an array contains all days of the week
-    func containsAllDaysOfWeek() -> Bool {
-        let allDays: Set<WeekDay> = [.monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
-        return allDays.allSatisfy { day in
-            self.contains(day)
-        }
-    }
-}
-
 extension Set where Element == Int {
-    func sortedWeekdays() -> [WeekDay] {
-        let weekdays = WeekDay.allCases.filter { self.contains($0.rawValue) }
-        return weekdays.sorted { $0.rawValue < $1.rawValue }
-    }
-    
     func weekdayStringShort() -> String {
-        let weekdays = WeekDay.allCases.filter { self.contains($0.rawValue) }
-        if weekdays.containsAllDaysOfWeek() {
+        if self == WeekDay.allDaysOfWeek {
             return "Каждый день"
-        } else if weekdays.isEmpty {
-            return ""
+        } else if self.isEmpty {
+            return "Нет выбранного расписания"
         } else {
-            let weekdayAbbreviations = weekdays.map { $0.abbreviationShort }
+            let weekdayAbbreviations = WeekDay.allCases
+                .filter { self.contains($0.rawValue) }
+                .map { $0.abbreviationShort }
             return weekdayAbbreviations.joined(separator: ", ")
         }
+    }
+
+    func toNumbersString() -> String {
+        let maxElement = 6
+        let elements = Array(self.filter { 0...maxElement ~= $0 }.sorted())
+        return elements.map { String($0) }.joined(separator: ", ")
+    }
+    
+    static func fromString(_ str: String) -> Set<Int>? {
+        let maxElement = 6
+        let elements = str.components(separatedBy: ", ")
+            .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+            .filter { 0...maxElement ~= $0 }
+        return Set(elements)
     }
 }

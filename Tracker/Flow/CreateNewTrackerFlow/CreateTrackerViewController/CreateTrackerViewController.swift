@@ -344,7 +344,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
         scheduleController.weekDaysToShow = { [weak self] weekDays in
             // save data
             self?.weekDays = weekDays
-            self?.user.selectedWeekDay = weekDays.sortedWeekdays()
+            self?.user.selectedWeekDay = weekDays
             // update ui
             self?.dataForTableView.addSchedule(weekDays.weekdayStringShort())
             self?.parametersTableView.reloadData()

@@ -7,13 +7,13 @@ protocol ScheduleTableViewCellDelegate: AnyObject {
 
 final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with set: Set<Int>) {
-        weakDayLabel.text = WeekDay(rawValue: weakDaySwitch.tag)?.abbreviationLong
-        weakDaySwitch.isOn = set.contains(weakDaySwitch.tag)
-    }
-    
-    func setSwitchTagSameAs(_ indexPath: IndexPath) {
+    func configure(with indexPath: IndexPath, for set: Set<Int>) {
+        // set tag same as indexPath
         weakDaySwitch.tag = indexPath.row
+        // set static text
+        weakDayLabel.text = WeekDay(rawValue: weakDaySwitch.tag)?.abbreviationLong
+        // set switch to on or off position
+        weakDaySwitch.isOn = set.contains(weakDaySwitch.tag)
     }
     
     weak var delegate: ScheduleTableViewCellDelegate?

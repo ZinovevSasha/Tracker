@@ -88,11 +88,8 @@ extension ChooseScheduleViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ScheduleTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        // set tag b4 configuring cell
-        cell.setSwitchTagSameAs(indexPath)
         cell.setCorners(in: tableView, at: indexPath)
-        // configuring cell
-        cell.configure(with: selectedWeekDays)
+        cell.configure(with: indexPath, for: selectedWeekDays)
         cell.delegate = self
         return cell
     }

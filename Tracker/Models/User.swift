@@ -3,7 +3,7 @@ import Foundation
 struct User {
     var selectedCategory: String?
     var selectedName: String?
-    var selectedWeekDay: [WeekDay] = []
+    var selectedWeekDay: Set<Int> = []
     var selectedEmoji: IndexPath?
     var selectedColor: IndexPath?
     
@@ -26,7 +26,7 @@ struct User {
         self.selectedName = title
     }
     
-    mutating func setWeekDay(_ weekDay: [WeekDay]) {
+    mutating func setWeekDay(_ weekDay: Set<Int>) {
         self.selectedWeekDay = weekDay
     }
 
