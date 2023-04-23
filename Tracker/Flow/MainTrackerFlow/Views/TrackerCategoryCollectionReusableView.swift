@@ -46,8 +46,7 @@ private extension TrackerHeader {
                 constant: UIConstants.categoryLabelLeadingInset
             ),
             categoryLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
-            categoryLabel.topAnchor.constraint(equalTo: topAnchor),
-           
+            categoryLabel.topAnchor.constraint(equalTo: topAnchor)           
         ])
     }
 }

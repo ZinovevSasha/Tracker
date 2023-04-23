@@ -72,7 +72,7 @@ final class TrackerHeaderView: UIView {
         delegate?.datePickerValueChanged(date: datePicker.date)
     }
     
-    @objc private func handlePlusButtonTap() {        
+    @objc private func handlePlusButtonTap() {       
         delegate?.handlePlusButtonTap()
     }
 }

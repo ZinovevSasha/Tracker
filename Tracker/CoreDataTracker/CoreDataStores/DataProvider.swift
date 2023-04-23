@@ -83,14 +83,6 @@ final class DataProvider: NSObject {
         return fetchedResultsController
     }()
     
-    enum TrackerStoreError: Error {
-        case decodingErrorInvalidId
-        case decodingErrorInvalidName
-        case decodingErrorInvalidColor
-        case decodingErrorInvalidEmoji
-        case decodingErrorInvalidSchedule
-    }
-    
     // MARK: - Init
     init(delegate: DataProviderDelegate?) throws {
         guard let context = (UIApplication.shared.delegate as? AppDelegate)?
@@ -118,7 +110,7 @@ extension DataProvider: DataProviderProtocol {
     }
     
     var numberOfSections: Int {
-        let numberOfSections = fetchedResultsController.sections?.count ?? .zero                
+        let numberOfSections = fetchedResultsController.sections?.count ?? .zero
         return numberOfSections
     }
     
@@ -153,8 +145,7 @@ extension DataProvider: DataProviderProtocol {
     }
     
     func object(at indexPath: IndexPath) -> Tracker? {
-        let record = fetchedResultsController.object(at: indexPath)
-        return try? tracker(from: record)
+        try? fetchedResultsController.object(at: indexPath).tracker()
     }
     
     func addRecord(_ record: TrackerCategory) throws {
@@ -215,35 +206,6 @@ extension DataProvider: DataProviderProtocol {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
         let selectedDay = Date.dateString(for: day)
         try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, with: selectedDay)
-    }
-}
-
-// MARK: - Private methods
-private extension DataProvider {
-    // Private methods
-    func tracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
-        guard let idString = trackerCoreData.id,
-            let id = UUID(uuidString: idString) else {
-            throw TrackerStoreError.decodingErrorInvalidId
-        }
-        guard let name = trackerCoreData.name else {
-            throw TrackerStoreError.decodingErrorInvalidName
-        }
-        guard let color = trackerCoreData.color else {
-            throw TrackerStoreError.decodingErrorInvalidColor
-        }
-        guard let emoji = trackerCoreData.emoji else {
-            throw TrackerStoreError.decodingErrorInvalidEmoji
-        }
-        guard let schedule = trackerCoreData.schedule else {
-            throw TrackerStoreError.decodingErrorInvalidEmoji
-        }
-        let shceduleArray = schedule
-            .split(separator: ",")
-            .map { Int($0.trimmingCharacters(in: .whitespaces)) }
-            .compactMap { WeekDay(rawValue: $0 ?? .bitWidth) }
-        
-        return Tracker(id: id, name: name, color: color, emoji: emoji, schedule: shceduleArray)
     }
 }
 
@@ -351,3 +313,4 @@ class TrackerRecord: NSManagedObject {
     @NSManaged var tracker: Tracker?
 }
 */
+

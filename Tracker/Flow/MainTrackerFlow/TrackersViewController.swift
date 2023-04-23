@@ -6,6 +6,7 @@ final class TrackersViewController: UIViewController {
     private let searchView = SearchView()
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
+        
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .myWhite
         view.allowsSelection = true

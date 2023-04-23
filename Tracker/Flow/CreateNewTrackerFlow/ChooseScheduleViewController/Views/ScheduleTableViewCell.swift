@@ -1,15 +1,19 @@
 import UIKit
 
 protocol ScheduleTableViewCellDelegate: AnyObject {
-    func weekDaySelected(on cell: ScheduleTableViewCell)
-    func weekDayUnselected(on cell: ScheduleTableViewCell)
+    func weekDaySelected(_ weekDay: Int)
+    func weekDayUnselected(_ weekDay: Int)
 }
 
 final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with info: String, isSwitchOn: Bool) {
-        weakDayLabel.text = info
-        weakDaySwitch.isOn = isSwitchOn
+    func configure(with set: Set<Int>) {
+        weakDayLabel.text = WeekDay(rawValue: weakDaySwitch.tag)?.abbreviationLong
+        weakDaySwitch.isOn = set.contains(weakDaySwitch.tag)
+    }
+    
+    func setSwitchTagSameAs(_ indexPath: IndexPath) {
+        weakDaySwitch.tag = indexPath.row
     }
     
     weak var delegate: ScheduleTableViewCellDelegate?
@@ -41,6 +45,7 @@ final class ScheduleTableViewCell: UITableViewCell {
         return view
     }()
     
+    
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -54,9 +59,10 @@ final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Private @objc target action methods
     @objc private func handleWeakDaySwitch(_ sender: UISwitch) {
         if sender.isOn {
-            delegate?.weekDaySelected(on: self)
+            delegate?.weekDaySelected(weakDaySwitch.tag)
         } else {
-            delegate?.weekDayUnselected(on: self)
+            delegate?.weekDayUnselected(weakDaySwitch.tag)
+            
         }
     }
 }

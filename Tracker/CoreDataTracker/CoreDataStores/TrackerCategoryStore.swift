@@ -23,7 +23,6 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             #keyPath(TrackerCategoryCoreData.header),
             name
         )
-        
         do {
             let results = try context.fetch(fetchRequest)
             if let category = results.first {
@@ -44,8 +43,8 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func getAllCategories() -> [TrackerCategory] {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
         do {
-            let categories = try context.fetch(fetchRequest)
-            return try categories.map { try updateCategories($0) }
+            let trackerCategoryCoreData = try context.fetch(fetchRequest)
+            return try trackerCategoryCoreData.map { try convertToTrackerCategory($0) }
         } catch {
             print("Error fetching categories: \(error.localizedDescription)")
             return []
@@ -55,7 +54,7 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
 
 // MARK: - Private
 private extension TrackerCategoryStore {
-    func updateCategories(
+    func convertToTrackerCategory(
         _ trackerCategoriesCoreData: TrackerCategoryCoreData
     ) throws -> TrackerCategory {
         // Get categories for catefory view controller

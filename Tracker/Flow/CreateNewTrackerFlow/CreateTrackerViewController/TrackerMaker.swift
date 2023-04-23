@@ -4,7 +4,7 @@ final class TrackerMaker {
     private(set) var category: TrackerCategory?
     
     func createTrackerFrom(
-        userInput user: User,       
+        userInput user: User,     
         tableData: [RowData],
         collectionData: [CollectionViewData]
     ) -> TrackerCategory? {

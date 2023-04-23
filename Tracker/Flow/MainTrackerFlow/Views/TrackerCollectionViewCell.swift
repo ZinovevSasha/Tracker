@@ -18,10 +18,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     func configure(with trackedDays: Int?, isCompleted: Bool?) {
         guard let trackedDays = trackedDays, let isCompleted = isCompleted else { return }
-        trackedDaysLabel.text = "\(trackedDays) days"
+        trackedDaysLabel.text = "\(trackedDays) \(pluralForm(forNumber: trackedDays))"
         if isCompleted {
             buttonState = .selected
-        }  else {
+        } else {
             buttonState = .unselected
         }
     }
@@ -115,7 +115,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: .zero)
         initialise()
-        setConstraints()        
+        setConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -124,7 +124,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Private @objc target action methods
     @objc private func handleAddButtonTap() {
-        delegate?.plusButtonTapped(for: self)        
+        delegate?.plusButtonTapped(for: self)
     }
 }
 
@@ -202,13 +202,22 @@ private extension TrackerCollectionViewCell {
         case .selected:
             let image = UIImage.done?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite)
             addButton.setImage(image, for: .normal)
-//            addButton.imageView?.layer.transform = CATransform3DMakeScale(1,1,1)
             addButton.alpha = 0.3
+//            addButton.imageView?.layer.transform = CATransform3DMakeScale(1,1,1)
+           
         case .unselected:
             let image = UIImage.plus?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite)
             addButton.setImage(image, for: .normal)
-//            addButton.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)
             addButton.alpha = 1
+//            addButton.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)
+            
         }
+    }
+    
+    func pluralForm(forNumber number: Int) -> String {
+        let cases = [2, 0, 1, 1, 1, 2]
+        let forms = ["день", "дня", "дней"]
+        let index = (number % 100 > 4 && number % 100 < 20) ? 2 : cases[safe: min(number % 10, 5)]
+        return forms[safe: index ?? 0] ?? "день"
     }
 }

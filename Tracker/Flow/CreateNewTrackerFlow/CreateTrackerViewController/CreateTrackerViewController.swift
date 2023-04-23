@@ -10,7 +10,7 @@ final class CreateTrackerViewController: UIViewController {
         case oneRow
         case twoRows
     }
-    
+
     // MARK: - Public
     weak var delegate: CreateTrackerViewControllerDelegate?
     
@@ -100,7 +100,7 @@ final class CreateTrackerViewController: UIViewController {
     private var lastRow: Int?
     
     // Days to pass to ChooseScheduleViewController(weekDays: days) to show them updated
-    private var days: [WeekDay] = []
+    private var weekDays: Set<Int> = []
     
     private var dataForTableView = DataForTableInCreateTrackerController()
     private var dataForCollectionView = DataForCollectionInCreateTrackerController().dataSource
@@ -318,43 +318,12 @@ extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch configuration {
         case .oneRow:
-            let categoryController = CategoryListViewController(tempCategory: categories, lastRow: lastRow)
-            navigationController?.pushViewController(categoryController, animated: true)
-            // call back
-            categoryController.trackerCategories =
-            {  [weak self] categories, header, lastRow in
-                self?.lastRow = lastRow
-                self?.user.selectedCategory = header
-                self?.categories = categories
-                self?.dataForTableView.addCategory(header)
-                tableView.reloadData()
-            }
+            pushCategoryListViewController(categories: categories, lastRow: lastRow)
         case .twoRows:
             if indexPath.row == .zero {
-                let categoryController = CategoryListViewController(tempCategory: categories, lastRow: lastRow)
-                navigationController?.pushViewController(categoryController, animated: true)
-                // call back
-                categoryController.trackerCategories =
-                { [weak self] categories, header, lastRow in
-                    self?.lastRow = lastRow
-                    self?.user.selectedCategory = header
-                    self?.categories = categories
-                    self?.dataForTableView.addCategory(header)
-                    tableView.reloadData()
-                }
+                pushCategoryListViewController(categories: categories, lastRow: lastRow)
             } else {
-                // Presenting controller
-                let scheduleController = ChooseScheduleViewController(weekDays: days)
-                navigationController?.pushViewController(scheduleController, animated: true)
-                // Configuring call back
-                scheduleController.weekDaysToShow = { [weak self] days in
-                    guard let self = self else { return }
-                    
-                    self.days = days
-                    self.user.selectedWeekDay = days
-                    self.dataForTableView.addSchedule(WeekDay.shortNamesFor(days) ?? "Error")
-                    tableView.reloadData()
-                }
+                pushScheduleListViewController(weekDays: weekDays)
             }
         }
     }
@@ -365,6 +334,36 @@ extension CreateTrackerViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.setSeparatorInset(in: tableView, at: indexPath)
+    }
+    
+    // Private
+    func pushScheduleListViewController(weekDays: Set<Int>) {
+        let scheduleController = ChooseScheduleViewController(weekDays: weekDays)
+        navigationController?.pushViewController(scheduleController, animated: true)
+        
+        scheduleController.weekDaysToShow = { [weak self] weekDays in
+            // save data
+            self?.weekDays = weekDays
+            self?.user.selectedWeekDay = weekDays.sortedWeekdays()
+            // update ui
+            self?.dataForTableView.addSchedule(weekDays.weekdayStringShort())
+            self?.parametersTableView.reloadData()
+        }
+    }
+    
+    func pushCategoryListViewController(categories: [TrackerCategory], lastRow: Int?) {
+        let categoryController = CategoryListViewController(tempCategory: categories, lastRow: lastRow)
+        navigationController?.pushViewController(categoryController, animated: true)
+        // Call back
+        categoryController.trackerCategories = { [weak self] categories, header, lastRow in
+            // save data
+            self?.lastRow = lastRow
+            self?.user.selectedCategory = header
+            self?.categories = categories
+            // update ui
+            self?.dataForTableView.addCategory(header)
+            self?.parametersTableView.reloadData()
+        }
     }
 }
 // MARK: - Layout
@@ -511,3 +510,4 @@ extension CreateTrackerViewController: TrackerUITextFieldDelegate {
         }
     }
 }
+

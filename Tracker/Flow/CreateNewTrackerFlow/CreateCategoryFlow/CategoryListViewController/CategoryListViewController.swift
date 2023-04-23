@@ -116,7 +116,7 @@ extension CategoryListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
+        if let _ = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
             let header = tempCategory[indexPath.row].header
             lastRow = indexPath.row
             trackerCategories?(tempCategory, header, lastRow)

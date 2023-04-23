@@ -113,17 +113,26 @@ private extension FrameViewController {
                 constant: UIConstants.nameLabelTopInset),
             screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            container.topAnchor.constraint(equalTo: screenTitle.bottomAnchor, constant: UIConstants.containerToTitleInset),
-            container.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: UIConstants.leading),
-            container.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: UIConstants.trailing),
+            container.topAnchor.constraint(
+                equalTo: screenTitle.bottomAnchor,
+                constant: UIConstants.containerToTitleInset),
+            container.leadingAnchor.constraint(
+                equalTo: view.leadingAnchor,
+                constant: UIConstants.leading),
+            container.trailingAnchor.constraint(
+                equalTo: view.trailingAnchor,
+                constant: UIConstants.trailing),
             container.bottomAnchor.constraint(equalTo: screenButtons.topAnchor),
             
             screenButtons.leadingAnchor.constraint(
-                equalTo: view.leadingAnchor, constant: UIConstants.leading),
+                equalTo: view.leadingAnchor,
+                constant: UIConstants.leading),
             screenButtons.trailingAnchor.constraint(
-                equalTo: view.trailingAnchor, constant: UIConstants.trailing),
+                equalTo: view.trailingAnchor,
+                constant: UIConstants.trailing),
             screenButtons.bottomAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: UIConstants.bottom),            
+                equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                constant: UIConstants.bottom),            
             screenButtons.heightAnchor.constraint(equalToConstant: .buttonsHeight)
         ])
     }

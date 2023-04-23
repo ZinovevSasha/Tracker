@@ -16,7 +16,8 @@ struct DataForTableInCreateTrackerController {
         category.subtitle = subtitle
     }
     
-    mutating func addSchedule(_ subtitle: String) {
+    mutating func addSchedule(_ subtitle: String?) {
+        guard let subtitle = subtitle else { return }
         schedule.subtitle = subtitle
     }
 }

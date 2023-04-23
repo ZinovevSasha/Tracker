@@ -3,7 +3,7 @@ import CoreData
 protocol TrackerRecordStoreProtocol {
     func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int
     func removeTrackerRecordOrAdd(_ record: TrackerCoreData, with day: String) throws
-    func isTrackerSavedAsCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool
+    func isTrackerCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool
     func isTrackerCompletedFor(selectedDay: Date, _ tracker: TrackerCoreData) throws -> Bool
 }
 
@@ -29,7 +29,7 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
         return trackerRecordsCoreData.count
     }
     
-    func isTrackerSavedAsCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool {
+    func isTrackerCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(
             format: "%K == %@ AND %K == %@",
