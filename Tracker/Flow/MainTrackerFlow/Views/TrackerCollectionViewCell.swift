@@ -16,9 +16,14 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         addButton.backgroundColor = color
     }
     
-    func configure(with trackedDays: Int?) {
-        guard let trackedDays = trackedDays else { return }
+    func configure(with trackedDays: Int?, isCompleted: Bool?) {
+        guard let trackedDays = trackedDays, let isCompleted = isCompleted else { return }
         trackedDaysLabel.text = "\(trackedDays) days"
+        if isCompleted {
+            buttonState = .selected
+        }  else {
+            buttonState = .unselected
+        }
     }
     
     // MARK: - Delegate
@@ -110,8 +115,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: .zero)
         initialise()
-        setConstraints()
-        configureButton()
+        setConstraints()        
     }
     
     required init?(coder: NSCoder) {
@@ -120,8 +124,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Private @objc target action methods
     @objc private func handleAddButtonTap() {
-        delegate?.plusButtonTapped(for: self)
-        buttonState.toggle()
+        delegate?.plusButtonTapped(for: self)        
     }
 }
 

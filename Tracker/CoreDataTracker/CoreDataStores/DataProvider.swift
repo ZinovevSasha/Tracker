@@ -34,7 +34,8 @@ protocol DataProviderProtocol {
     func deleteRecord(at indexPath: IndexPath) throws
     func fetchTrackersBy(name: String) throws
     func fetchTrackersBy(date: Date) throws
-    func saveTrackerAsCompleted(by indexPath: IndexPath) throws
+    func saveTrackerAsCompleted(by indexPath: IndexPath, for day: Date) throws
+    func isTrackerCompletedForToday(_ indexPath: IndexPath, date: Date) -> Bool
 }
 
 final class DataProvider: NSObject {
@@ -51,7 +52,7 @@ final class DataProvider: NSObject {
     // Stores
     private let trackerStore: TrackerStoreProtocol
     private let trackerCategoryStore: TrackerCategoryStoreProtocol
-    private let trackerRecordStore: TrackerRecordStore
+    private let trackerRecordStore: TrackerRecordStoreProtocol
     // Delegate
     weak var delegate: DataProviderDelegate?
     
@@ -117,30 +118,37 @@ extension DataProvider: DataProviderProtocol {
     }
     
     var numberOfSections: Int {
-        let numberOfSections = fetchedResultsController.sections?.count ?? .zero
-        print("numberOfSections is \(numberOfSections)")        
+        let numberOfSections = fetchedResultsController.sections?.count ?? .zero                
         return numberOfSections
     }
     
     func numberOfRowsInSection(_ section: Int) -> Int {
         let number = fetchedResultsController.sections?[section].numberOfObjects ?? .zero
-        print("numberOfRowsInSection \(section) = \(number)")
         return number
     }
     
     func header(for section: Int) -> String {
         let header = fetchedResultsController.sections?[section].name ?? ""
-        print("header for section \(section) is \(header)")
         return header
     }
     
     func daysTracked(for indexPath: IndexPath) -> Int {
-        let record = fetchedResultsController.object(at: indexPath)
+        let tracker = fetchedResultsController.object(at: indexPath)
         do {
-            return try trackerRecordStore.getTrackedDaysNumberForTracker(tracker: record)
+            return try trackerRecordStore.getTrackedDaysNumberFor(tracker: tracker)
         } catch {
             print(error)
             return .zero
+        }
+    }
+    
+    func isTrackerCompletedForToday(_ indexPath: IndexPath, date: Date) -> Bool {
+        let tracker = fetchedResultsController.object(at: indexPath)
+        do {
+            return try trackerRecordStore.isTrackerCompletedFor(selectedDay: date, tracker)
+        } catch {
+            print(error)
+            return false
         }
     }
     
@@ -182,25 +190,31 @@ extension DataProvider: DataProviderProtocol {
     }
     
     func fetchTrackersBy(date: Date) throws {
-        let day = String(Date.currentWeekDayNumber(from: date))
-        let userSelectedDay = Date.dateString(for: date)
-        let today = Date.dateString(for: Date())
+        let weekdayNumber = String(Date.currentWeekDayNumber(from: date))
+        let selectedDate = Date.dateString(for: date)
+        let currentDate = Date.dateString(for: Date())
         
-        if userSelectedDay != today {
-            fetchedResultsController.fetchRequest.predicate = NSPredicate(
-                //
-                format: "schedule CONTAINS[cd] %@", day
-            )
-        } else {
+        guard selectedDate != currentDate else {
             fetchedResultsController.fetchRequest.predicate = nil
+            try fetchedResultsController.performFetch()
+            isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
+            return
         }
+        
+        fetchedResultsController.fetchRequest.predicate = NSPredicate(
+            format: "%K CONTAINS[cd] %@",
+            #keyPath(TrackerCoreData.schedule),
+            weekdayNumber
+        )
+        
         try fetchedResultsController.performFetch()
         isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
     
-    func saveTrackerAsCompleted(by indexPath: IndexPath) throws {
+    func saveTrackerAsCompleted(by indexPath: IndexPath, for day: Date) throws {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        try? trackerRecordStore.addTrackerRecord(trackerCoreData)
+        let selectedDay = Date.dateString(for: day)
+        try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, with: selectedDay)
     }
 }
 
@@ -333,7 +347,7 @@ class TrackerCategory: NSManagedObject {
 
 class TrackerRecord: NSManagedObject {
     @NSManaged var id: String
-    @NSManaged var date: Date
+    @NSManaged var date: String
     @NSManaged var tracker: Tracker?
 }
 */

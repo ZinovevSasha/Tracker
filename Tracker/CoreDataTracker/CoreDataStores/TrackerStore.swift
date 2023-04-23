@@ -1,5 +1,4 @@
 import CoreData
-import UIKit
 
 protocol TrackerStoreProtocol {
     func delete(_ record: TrackerCoreData) throws
@@ -7,14 +6,6 @@ protocol TrackerStoreProtocol {
 }
 
 final class TrackerStore {
-    enum TrackerStoreError: Error {
-        case decodingErrorInvalidId
-        case decodingErrorInvalidName
-        case decodingErrorInvalidColor
-        case decodingErrorInvalidEmoji
-        case decodingErrorInvalidSchedule
-    }
-    
     private let context: NSManagedObjectContext
     
     init(context: NSManagedObjectContext) {
@@ -37,14 +28,6 @@ extension TrackerStore: TrackerStoreProtocol {
 
 // MARK: - Private
 private extension TrackerStore {
-    func saveContext() {
-        do {
-            try context.save()
-        } catch {
-            print("Error saving context: \(error.localizedDescription)")
-        }
-    }
-    
     func updateExistingTracker(
         with tracker: Tracker
     ) -> TrackerCoreData {
@@ -56,5 +39,13 @@ private extension TrackerStore {
         let shcedule = tracker.schedule.map { String($0.rawValue) }.joined(separator: ", ")
         trackerCoreData.schedule = shcedule
         return trackerCoreData
+    }
+    
+    func saveContext() {
+        do {
+            try context.save()
+        } catch {
+            print("Error saving context: \(error.localizedDescription)")
+        }
     }
 }

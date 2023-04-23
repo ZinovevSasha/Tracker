@@ -41,6 +41,7 @@ final class TrackersViewController: UIViewController {
             return nil
         }
     }()
+    private var currentDay = Date()
     
     // Layout of collection helper
     private let params = GeometryParams(
@@ -169,8 +170,9 @@ extension TrackersViewController: UICollectionViewDataSource {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
         let tracker = dataProvider?.object(at: indexPath)
         let daysTracked = dataProvider?.daysTracked(for: indexPath)
+        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: currentDay)
         cell.configure(with: tracker)
-        cell.configure(with: daysTracked)
+        cell.configure(with: daysTracked, isCompleted: isCompletedForToday)
         cell.delegate = self
         return cell
     }
@@ -206,14 +208,6 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - TrackerCollectionViewCellDelegate
-extension TrackersViewController: TrackerCollectionViewCellDelegate {
-    func plusButtonTapped(for cell: TrackerCollectionViewCell) {
-        guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        try? dataProvider?.saveTrackerAsCompleted(by: indexPath)
-    }
-}
-
 // MARK: - UICollectionViewDelegate
 extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -225,9 +219,22 @@ extension TrackersViewController: UICollectionViewDelegate {
     }
 }
 
+// MARK: - TrackerCollectionViewCellDelegate
+extension TrackersViewController: TrackerCollectionViewCellDelegate {
+    func plusButtonTapped(for cell: TrackerCollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        do {
+            try dataProvider?.saveTrackerAsCompleted(by: indexPath, for: currentDay)
+        } catch {
+            print(error)
+        }
+    }
+}
+
 // MARK: - TrackerHeaderViewDelegate
 extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
+        currentDay = date
         do {
             try dataProvider?.fetchTrackersBy(date: date)
             collectionView.reloadData()

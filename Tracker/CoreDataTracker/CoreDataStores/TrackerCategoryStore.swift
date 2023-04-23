@@ -6,14 +6,6 @@ protocol TrackerCategoryStoreProtocol {
 }
 
 final class TrackerCategoryStore {
-    enum TrackerStoreError: Error {
-        case decodingErrorInvalidId
-        case decodingErrorInvalidName
-        case decodingErrorInvalidColor
-        case decodingErrorInvalidEmoji
-        case decodingErrorInvalidSchedule
-    }
-
     private let context: NSManagedObjectContext
     
     init(context: NSManagedObjectContext) {
@@ -25,7 +17,12 @@ final class TrackerCategoryStore {
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func addCategory(with name: String, and tracker: TrackerCoreData) throws {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.header), name)
+        fetchRequest.predicate = NSPredicate(
+            format: "%K == %@",
+            // search criteria
+            #keyPath(TrackerCategoryCoreData.header),
+            name
+        )
         
         do {
             let results = try context.fetch(fetchRequest)

@@ -3,6 +3,10 @@ import Foundation
 extension Date {
     static let dateFormatter = DateFormatter()
     
+    var weekdayNumber: Int {
+        Date.currentWeekDayNumber(from: Date())
+    }
+    
     static func dateString(for date: Date) -> String {
         Date.dateFormatter.dateFormat = "yyyy-MM-dd"
         return Date.dateFormatter.string(from: date)
