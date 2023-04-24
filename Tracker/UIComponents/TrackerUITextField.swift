@@ -40,7 +40,7 @@ final class TrackerUITextField: UIView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("Unsupported")
     }
     
     func hideKeyBoard() {

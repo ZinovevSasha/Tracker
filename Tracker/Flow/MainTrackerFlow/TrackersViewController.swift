@@ -69,7 +69,7 @@ final class TrackersViewController: UIViewController {
         if let isEmpty = dataProvider?.isEmpty, isEmpty {
             placeholderView.state = .star
         } else {
-            placeholderView.state = .invisible
+            placeholderView.state = .invisible(animate: false)
         }
     }
     
@@ -215,7 +215,7 @@ extension TrackersViewController: UICollectionViewDelegate {
         do {
             try dataProvider?.deleteRecord(at: indexPath)
         } catch {
-            print(error)
+            print("🐳", error)
         }
     }
 }
@@ -225,9 +225,9 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func plusButtonTapped(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         do {
-            try dataProvider?.saveTrackerAsCompleted(by: indexPath, for: currentDay)
+            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: currentDay)
         } catch {
-            print(error)
+            print("⛈️", error)
         }
     }
 }
@@ -240,7 +240,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
             try dataProvider?.fetchTrackersBy(date: date)
             collectionView.reloadData()
         } catch {
-            print(error)
+            print("🏹", error)
         }
     }
 }
@@ -252,7 +252,7 @@ extension TrackersViewController: SearchViewDelegate {
             try dataProvider?.fetchTrackersBy(name: searchText)
             collectionView.reloadData()
         } catch {
-            print(error)
+            print("😎", error)
         }
     }
 }
@@ -263,7 +263,7 @@ extension TrackersViewController: CreateTrackerViewControllerDelegate {
         do {
             try dataProvider?.addRecord(category)
         } catch {
-            print(error)
+            print("🌲", error)
         }
     }
 }
@@ -275,7 +275,7 @@ extension TrackersViewController: DataProviderDelegate {
     }
     
     func resultFound() {
-        placeholderView.state = .invisible
+        placeholderView.state = .invisible(animate: true)
     }
     
     func didUpdate(_ update: DataProviderUpdate) {

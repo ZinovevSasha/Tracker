@@ -3,7 +3,6 @@ import UIKit
 final class CategoryListViewController: FrameViewController {
     // MARK: - Call Back
     var trackerCategories: (([TrackerCategory], String, Int?) -> Void)?
-    var checkForCategoryName: ((String) -> Bool)?
     
     // MARK: - Private properties
     private let placeholder = PlaceholderView(state: .recomendation)
@@ -55,7 +54,7 @@ final class CategoryListViewController: FrameViewController {
         if tempCategory.isEmpty {
             placeholder.state = .recomendation
         } else {
-            placeholder.state = .invisible
+            placeholder.state = .invisible(animate: false)
         }
     }
     
@@ -85,7 +84,10 @@ private extension CategoryListViewController {
             tableView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: container.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: UIConstants.bottomInset)
+            tableView.bottomAnchor.constraint(
+                equalTo: container.bottomAnchor,
+                constant: UIConstants.bottomInset
+            )
         ])
     }
 }

@@ -62,10 +62,10 @@ private extension CategoryTableViewCell {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor,
-                constant: 16),
+                constant: .leadingInset),
             stackView.trailingAnchor.constraint(
                 equalTo: contentView.trailingAnchor,
-                constant: -16),
+                constant: .trailingInset),
             stackView.topAnchor.constraint(
                 equalTo: contentView.topAnchor),
             stackView.bottomAnchor.constraint(

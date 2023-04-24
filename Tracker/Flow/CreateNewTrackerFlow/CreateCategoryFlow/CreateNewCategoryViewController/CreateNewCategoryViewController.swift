@@ -92,33 +92,44 @@ private extension CreateNewCategoryViewController {
 // MARK: - TrackerUITextFieldDelegate
 extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
     func isChangeText(text: String, newLength: Int) -> Bool {
-        if !text.isEmpty {
-            if delegate?.isNameAvailable(name: text) ?? false {
-                mainStackView.removeArrangedSubview(warningCharactersLabel)
-                warningCharactersLabel.removeFromSuperview()
-                UIView.animate(withDuration: 0.3) {
-                    self.warningCharactersLabel.alpha = 0
-                }
-                categoryName = text
-                buttonCenter?.colorType = .black
-            } else {
-                categoryName = nil
-                buttonCenter?.colorType = .grey
-                mainStackView.addArrangedSubview(warningCharactersLabel)
-                UIView.animate(withDuration: 0.3) {
-                    self.warningCharactersLabel.alpha = 1
-                }
-            }
-        } else {
-            mainStackView.removeArrangedSubview(warningCharactersLabel)
-            warningCharactersLabel.removeFromSuperview()
-            UIView.animate(withDuration: 0.3) {
-                self.warningCharactersLabel.alpha = 0
-            }
-            view.layoutIfNeeded()
-            categoryName = nil
+        guard !text.isEmpty else {
+            // if text isEmpty
+            updateCategoryName(nil)
             buttonCenter?.colorType = .grey
+            removeWarningLabel()
+            return true
+        }
+        // if there is no such category name exist
+        if delegate?.isNameAvailable(name: text) ?? false {
+            updateCategoryName(text)
+            buttonCenter?.colorType = .black
+            removeWarningLabel()
+        } else {
+            updateCategoryName(nil)
+            buttonCenter?.colorType = .grey
+            addWarningLabel()
         }
         return true
+    }
+    
+    // Private metods
+    private func addWarningLabel() {
+        mainStackView.addArrangedSubview(warningCharactersLabel)
+        UIView.animate(withDuration: 0.3) {
+            self.warningCharactersLabel.alpha = 1
+        }
+    }
+    
+    private func removeWarningLabel() {
+        mainStackView.removeArrangedSubview(warningCharactersLabel)
+        warningCharactersLabel.removeFromSuperview()
+        UIView.animate(withDuration: 0.3) {
+            self.warningCharactersLabel.alpha = 0
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func updateCategoryName(_ text: String?) {
+        categoryName = text
     }
 }

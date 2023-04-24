@@ -42,7 +42,7 @@ final class ActionButton: UIButton {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("Unsupported")
     }
     
     private func updateAppearance() {

@@ -64,7 +64,7 @@ final class TrackerHeaderView: UIView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("Unsupported")
+        fatalError("")
     }
     
     // MARK: - Private @objc target action methods

@@ -53,7 +53,6 @@ final class CreateTrackerViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
     private lazy var parametersCollectionView: UICollectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         view.delegate = self
@@ -99,14 +98,11 @@ final class CreateTrackerViewController: UIViewController {
     private var categories: [TrackerCategory] = []
     private var lastRow: Int?
     
-    // Days to pass to ChooseScheduleViewController(weekDays: days) to show them updated
-    private var weekDays: Set<Int> = []
-    
     private var dataForTableView = DataForTableInCreateTrackerController()
-    private var dataForCollectionView = DataForCollectionInCreateTrackerController().dataSource
+    private var dataForCollectionView = DataSourceEmojisColor().dataSource
     private let trackerMaker = TrackerMaker()
     
-    // User inputs still need to convert to emoji and color!
+    // User inputs
     private var user = User() {
         didSet {
             if user.isUserGaveEnoughToCreateTracker {
@@ -137,7 +133,7 @@ final class CreateTrackerViewController: UIViewController {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("Unsupported")
     }
     
     private var parametersCollectionViewHeight: NSLayoutConstraint?
@@ -163,23 +159,27 @@ final class CreateTrackerViewController: UIViewController {
     @objc private func cancelButtonTapped() {
         dismiss(animated: true)
     }
-    
+
     @objc private func createButtonTapped() {
-        if user.isUserGaveEnoughToCreateTracker {
-            if let category = trackerMaker.createTrackerFrom(
+        // if all fields are filled
+        guard user.isUserGaveEnoughToCreateTracker,
+              // if category created
+            let category = trackerMaker.createTrackerFrom(
                 userInput: user,
                 tableData: dataForTableView.twoRows,
                 collectionData: dataForCollectionView
-            ) {
-                // Give newly created category to delegate
-                delegate?.addTrackerCategory(category)
-                createButton.isEnabled.toggle()
-                dismiss(animated: false)
-            }
-        } else {
+            )
+        else {
+            // if category cant be created shake button for better user experience
             feedbackGenerator.impactOccurred()
             createButton.shakeSelf()
+            return
         }
+        
+        // Give newly created category to delegate if it available
+        delegate?.addTrackerCategory(category)
+        createButton.isEnabled.toggle()
+        dismiss(animated: false)
     }
 }
 
@@ -323,7 +323,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
             if indexPath.row == .zero {
                 pushCategoryListViewController(categories: categories, lastRow: lastRow)
             } else {
-                pushScheduleListViewController(weekDays: weekDays)
+                pushScheduleListViewController(weekDays: user.selectedWeekDay)
             }
         }
     }
@@ -337,31 +337,30 @@ extension CreateTrackerViewController: UITableViewDelegate {
     }
     
     // Private
-    func pushScheduleListViewController(weekDays: Set<Int>) {
+    private func pushScheduleListViewController(weekDays: Set<Int>) {
         let scheduleController = ChooseScheduleViewController(weekDays: weekDays)
         navigationController?.pushViewController(scheduleController, animated: true)
-        
+        // Call back
         scheduleController.weekDaysToShow = { [weak self] weekDays in
             // save data
-            self?.weekDays = weekDays
-            self?.user.selectedWeekDay = weekDays
+            self?.user.setWeekDay(weekDays)
             // update ui
             self?.dataForTableView.addSchedule(weekDays.weekdayStringShort())
             self?.parametersTableView.reloadData()
         }
     }
     
-    func pushCategoryListViewController(categories: [TrackerCategory], lastRow: Int?) {
+    private func pushCategoryListViewController(categories: [TrackerCategory], lastRow: Int?) {
         let categoryController = CategoryListViewController(tempCategory: categories, lastRow: lastRow)
         navigationController?.pushViewController(categoryController, animated: true)
         // Call back
-        categoryController.trackerCategories = { [weak self] categories, header, lastRow in
+        categoryController.trackerCategories = { [weak self] categories, categoryHeader, lastRow in
             // save data
             self?.lastRow = lastRow
-            self?.user.selectedCategory = header
+            self?.user.setCategory(categoryHeader)
             self?.categories = categories
             // update ui
-            self?.dataForTableView.addCategory(header)
+            self?.dataForTableView.addCategory(categoryHeader)
             self?.parametersTableView.reloadData()
         }
     }
@@ -381,6 +380,7 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return params.spacing
     }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: params.topInset, left: params.leftInset, bottom: params.bottomInset, right: params.rightInset)
     }
@@ -438,30 +438,20 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
         case .emojiSection:
             collectionView.deselectOldSelectNew(user.selectedEmoji) { oldCell in
                 guard let oldCell = oldCell as? TrackerEmojiCollectionViewCell else { return }
-                oldCell.highlightUnhighlight() // old cell
+                oldCell.highlightUnhighlight() // set old cell
             } configureSelectedCell: { [weak self]  newCell, indexPath, isSameCell in
                 guard let newCell = newCell as? TrackerEmojiCollectionViewCell else { return }
-                if isSameCell {
-                    newCell.highlightUnhighlight()
-                    self?.user.selectedEmoji = nil
-                } else {
-                    newCell.highlightUnhighlight()
-                    self?.user.selectedEmoji = indexPath
-                }
+                newCell.highlightUnhighlight() // set new cell
+                isSameCell ? self?.user.setEmojiIndexPath(nil): self?.user.setEmojiIndexPath(indexPath)
             }
         case .colorSection:
             collectionView.deselectOldSelectNew(user.selectedColor) { oldCell in
                 guard let oldCell = oldCell as? TrackerColorCollectionViewCell else { return }
-                oldCell.addOrRemoveBorders() // old cell
+                oldCell.addOrRemoveBorders() // set old cell
             } configureSelectedCell: { [weak self]  newCell, indexPath, isSameCell in
                 guard let newCell = newCell as? TrackerColorCollectionViewCell else { return }
-                if isSameCell {
-                    newCell.addOrRemoveBorders()
-                    self?.user.selectedColor = nil
-                } else {
-                    newCell.addOrRemoveBorders()
-                    self?.user.selectedColor = indexPath
-                }
+                newCell.addOrRemoveBorders() // set new cell
+                isSameCell ? self?.user.setColorIndexPath(nil): self?.user.setColorIndexPath(indexPath)
             }
         }
     }
@@ -485,7 +475,8 @@ extension CreateTrackerViewController: TrackerUITextFieldDelegate {
         return !isTextTooLong
     }
     
-    func forbidEnterTextAnimationWillShowIf(_ isTextTooLong: Bool) {
+    // Private methods
+    private func forbidEnterTextAnimationWillShowIf(_ isTextTooLong: Bool) {
         if isTextTooLong {
             let warningHeight: CGFloat = 20
             // Shake if label fully opened
@@ -493,21 +484,19 @@ extension CreateTrackerViewController: TrackerUITextFieldDelegate {
                 warningCharactersLabel.shakeSelf()
             }
             // Animate constraint to 20
-            UIView.animate(withDuration: 0.3) {
-                if self.warningLabelHeight?.constant != warningHeight {
-                    self.warningLabelHeight?.constant = warningHeight
-                    self.view.layoutIfNeeded()
-                }
-            }
+            animateHeight(warningHeight)
         } else {
             // Animate constraint back to 0
-            UIView.animate(withDuration: 0.3) {
-                if self.warningLabelHeight?.constant != .zero {
-                    self.warningLabelHeight?.constant = .zero
-                    self.view.layoutIfNeeded()
-                }
+            animateHeight(.zero)
+        }
+    }
+    
+    private func animateHeight(_ height: CGFloat) {
+        UIView.animate(withDuration: 0.3) {
+            if self.warningLabelHeight?.constant != height {
+                self.warningLabelHeight?.constant = height
+                self.view.layoutIfNeeded()
             }
         }
     }
 }
-

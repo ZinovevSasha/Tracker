@@ -14,7 +14,7 @@
 		F918018F29CEECCC00767F16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F918018E29CEECCC00767F16 /* Assets.xcassets */; };
 		F918019229CEECCC00767F16 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F918019029CEECCC00767F16 /* LaunchScreen.storyboard */; };
 		F918019B29CEED3C00767F16 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F918019A29CEED3C00767F16 /* UIColor+Extension.swift */; };
-		F967CCC029E08C2F00E3C811 /* DataForCollectionInCreateTrackerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCBF29E08C2F00E3C811 /* DataForCollectionInCreateTrackerController.swift */; };
+		F967CCC029E08C2F00E3C811 /* DataSourceEmojisColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCBF29E08C2F00E3C811 /* DataSourceEmojisColor.swift */; };
 		F967CCC729E0901000E3C811 /* DataForTableInCreateTrackerController.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCC629E0901000E3C811 /* DataForTableInCreateTrackerController.swift.swift */; };
 		F967CCCD29E1604B00E3C811 /* WeekDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCCC29E1604B00E3C811 /* WeekDays.swift */; };
 		F967CCF229E1B5CE00E3C811 /* CategoryListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F967CCF129E1B5CE00E3C811 /* CategoryListViewController.swift */; };
@@ -70,7 +70,7 @@
 		F918019129CEECCC00767F16 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F918019329CEECCC00767F16 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F918019A29CEED3C00767F16 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
-		F967CCBF29E08C2F00E3C811 /* DataForCollectionInCreateTrackerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataForCollectionInCreateTrackerController.swift; sourceTree = "<group>"; };
+		F967CCBF29E08C2F00E3C811 /* DataSourceEmojisColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceEmojisColor.swift; sourceTree = "<group>"; };
 		F967CCC629E0901000E3C811 /* DataForTableInCreateTrackerController.swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataForTableInCreateTrackerController.swift.swift; sourceTree = "<group>"; };
 		F967CCCC29E1604B00E3C811 /* WeekDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekDays.swift; sourceTree = "<group>"; };
 		F967CCF129E1B5CE00E3C811 /* CategoryListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryListViewController.swift; sourceTree = "<group>"; };
@@ -270,7 +270,7 @@
 				F967CCCC29E1604B00E3C811 /* WeekDays.swift */,
 				F9BB8C8F29DDC6CA00F03FF9 /* User.swift */,
 				F967CCC629E0901000E3C811 /* DataForTableInCreateTrackerController.swift.swift */,
-				F967CCBF29E08C2F00E3C811 /* DataForCollectionInCreateTrackerController.swift */,
+				F967CCBF29E08C2F00E3C811 /* DataSourceEmojisColor.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -489,7 +489,7 @@
 				F918018A29CEECCB00767F16 /* TrackersViewController.swift in Sources */,
 				F967CCF529E1B78900E3C811 /* ActionButton.swift in Sources */,
 				F97E8FE229E3FF82002BB0C8 /* CGFloat+Extension.swift in Sources */,
-				F967CCC029E08C2F00E3C811 /* DataForCollectionInCreateTrackerController.swift in Sources */,
+				F967CCC029E08C2F00E3C811 /* DataSourceEmojisColor.swift in Sources */,
 				F97774B929D2EA6C00959E7C /* TrackerHeaderView.swift in Sources */,
 				F97774EB29D377AA00959E7C /* TrackerRecord.swift in Sources */,
 				F9EC69BC29E2C76E00D77C5F /* CategoryTableViewCell.swift in Sources */,

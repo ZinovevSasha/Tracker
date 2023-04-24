@@ -9,7 +9,8 @@ final class PlaceholderView: UIView {
     }
     
     enum PlaceholderState {
-        case invisible, star, noResult, noStatistic, recomendation
+        case star, noResult, noStatistic, recomendation
+        case invisible(animate: Bool)
     }
     
     // MARK: - UIConstants
@@ -47,7 +48,7 @@ final class PlaceholderView: UIView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("Unsupported")
+        fatalError("")
     }
 }
 
@@ -74,8 +75,8 @@ private extension PlaceholderView {
     
     func updateAppearance() {
         switch state {
-        case .invisible:
-            setAlphaToZero()
+        case .invisible(let isAnimate):            
+            isAnimate ? setAlphaToZero() : setAlphaToZero(time: .zero)
         case .star:
             setState(image: .star, text: "Что будем отслеживать?")
         case .noResult:
@@ -104,8 +105,8 @@ private extension PlaceholderView {
         }
     }
     
-    func setAlphaToZero() {
-        UIView.animate(withDuration: 0.3) {
+    func setAlphaToZero(time: Double = 0.3) {
+        UIView.animate(withDuration: time) {
             self.alpha = .zero
         }
     }

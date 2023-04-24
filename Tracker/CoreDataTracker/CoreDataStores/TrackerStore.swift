@@ -34,11 +34,9 @@ private extension TrackerStore {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.name = tracker.name
         trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.id = String(describing: tracker.id)
+        trackerCoreData.id = tracker.stringID
         trackerCoreData.color = tracker.color
-//        let shcedule = tracker.schedule.map { String($0.rawValue) }.joined(separator: ", ")
-//        trackerCoreData.schedule = shcedule
-        trackerCoreData.schedule = tracker.schedule.toNumbersString()
+        trackerCoreData.schedule = tracker.stringSchedule
         return trackerCoreData
     }
     
@@ -60,7 +58,7 @@ enum TrackerStoreError: Error {
 }
 extension TrackerCoreData {
     func tracker() throws -> Tracker {
-        guard let id = self.id?.toUUID() else {
+        guard let id = toUUID(self.id) else {
             throw TrackerStoreError.decodingErrorInvalidId
         }
         guard let name = self.name else {
@@ -76,19 +74,10 @@ extension TrackerCoreData {
             let schedule = Set.fromString(scheduleString) else {
             throw TrackerStoreError.decodingErrorInvalidSchedule
         }
-        // turn array string ["1", "2","4"] to [WeekDay] array
-//        let scheduleArray = scheduleString
-//            .split(separator: ",")
-//            .map { Int($0.trimmingCharacters(in: .whitespaces)) }
-//            .compactMap { WeekDay(rawValue: $0 ?? .bitWidth) }
-        
-        
-        
         return Tracker(id: id, name: name, color: color, emoji: emoji, schedule: schedule)
     }
-}
-extension String {
-    func toUUID() -> UUID? {
-        return UUID(uuidString: self)
+    
+    func toUUID(_ string: String?) -> UUID? {
+        return UUID(uuidString: string ?? "")
     }
 }

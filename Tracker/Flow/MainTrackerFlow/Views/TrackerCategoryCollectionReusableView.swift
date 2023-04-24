@@ -29,7 +29,7 @@ final class TrackerHeader: UICollectionReusableView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("Unsupported")
+        fatalError("")
     }
 }
 

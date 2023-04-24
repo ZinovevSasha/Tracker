@@ -14,7 +14,7 @@ enum CollectionViewData {
     }
 }
 
-struct DataForCollectionInCreateTrackerController {
+struct DataSourceEmojisColor {
     let dataSource: [CollectionViewData] = [
         .emojiSection(items:  [
             "🙂", "😻", "🌺", "🐶", "❤️",

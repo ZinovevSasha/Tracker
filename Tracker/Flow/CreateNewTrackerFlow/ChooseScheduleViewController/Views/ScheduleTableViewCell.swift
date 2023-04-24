@@ -11,11 +11,12 @@ final class ScheduleTableViewCell: UITableViewCell {
         // set tag same as indexPath
         weakDaySwitch.tag = indexPath.row
         // set static text
-        weakDayLabel.text = WeekDay(rawValue: weakDaySwitch.tag)?.abbreviationLong
+        weakDayLabel.text = WeekDay(rawValue: indexPath.row)?.abbreviationLong
         // set switch to on or off position
-        weakDaySwitch.isOn = set.contains(weakDaySwitch.tag)
+        weakDaySwitch.isOn = set.contains(indexPath.row)
     }
     
+    // MARK: - Delegate
     weak var delegate: ScheduleTableViewCellDelegate?
     
     // MARK: - Private properties
@@ -62,7 +63,6 @@ final class ScheduleTableViewCell: UITableViewCell {
             delegate?.weekDaySelected(weakDaySwitch.tag)
         } else {
             delegate?.weekDayUnselected(weakDaySwitch.tag)
-            
         }
     }
 }
@@ -80,10 +80,10 @@ private extension ScheduleTableViewCell {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor,
-                constant: 16),
+                constant: .leadingInset),
             stackView.trailingAnchor.constraint(
                 equalTo: contentView.trailingAnchor,
-                constant: -16),
+                constant: .trailingInset),
             stackView.topAnchor.constraint(
                 equalTo: contentView.topAnchor),
             stackView.bottomAnchor.constraint(

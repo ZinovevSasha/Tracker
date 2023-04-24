@@ -49,7 +49,7 @@ final class MyTableViewCell: UITableViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("Unsupported")
     }
 }
 
@@ -64,7 +64,7 @@ private extension MyTableViewCell {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor,
-                constant: 16),
+                constant: .leadingInset),
             stackView.topAnchor.constraint(
                 equalTo: contentView.topAnchor,
                 constant: 15),

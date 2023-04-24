@@ -34,7 +34,7 @@ protocol DataProviderProtocol {
     func deleteRecord(at indexPath: IndexPath) throws
     func fetchTrackersBy(name: String) throws
     func fetchTrackersBy(date: Date) throws
-    func saveTrackerAsCompleted(by indexPath: IndexPath, for day: Date) throws
+    func saveAsCompletedTracker(with indexPath: IndexPath, for day: Date) throws
     func isTrackerCompletedForToday(_ indexPath: IndexPath, date: Date) -> Bool
 }
 
@@ -202,7 +202,7 @@ extension DataProvider: DataProviderProtocol {
         isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
     
-    func saveTrackerAsCompleted(by indexPath: IndexPath, for day: Date) throws {
+    func saveAsCompletedTracker(with indexPath: IndexPath, for day: Date) throws {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
         let selectedDay = Date.dateString(for: day)
         try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, with: selectedDay)
