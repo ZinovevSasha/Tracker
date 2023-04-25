@@ -54,7 +54,7 @@ final class DataProvider: NSObject {
     private let trackerCategoryStore: TrackerCategoryStoreProtocol
     private let trackerRecordStore: TrackerRecordStoreProtocol
     // PredicateBuilder
-    private let predicate = PredicateBuilder()
+    private let searchLogic = SearchLogicProvider()
     // Delegate
     weak var delegate: DataProviderDelegate?
     
@@ -64,7 +64,6 @@ final class DataProvider: NSObject {
         let fetchRequest = TrackerCoreData.fetchRequest()
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
-        //
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true),
             NSSortDescriptor(key: #keyPath(TrackerCoreData.name), ascending: true)
@@ -72,7 +71,7 @@ final class DataProvider: NSObject {
 
         let weekDay = String(Date().weekDayNumber)
         let date = Date().todayString
-        fetchRequest.predicate = predicate.dateOrWeekDay(date: date, weekDay: weekDay)
+        fetchRequest.predicate = searchLogic.dateOrWeekDay(date: date, weekDay: weekDay)
         
         let sectionKeyPath = #keyPath(TrackerCoreData.category.header)
         
@@ -183,11 +182,11 @@ extension DataProvider: DataProviderProtocol {
         if !name.isEmpty {
             fetchedResultsController
                 .fetchRequest
-                .predicate = predicate.nameAndWeekDayOrNameAndDate(name: name, date: date, weekDay: weekDay)
+                .predicate = searchLogic.nameAndWeekDayOrNameAndDate(name: name, date: date, weekDay: weekDay)
         } else {
             fetchedResultsController
                 .fetchRequest
-                .predicate = predicate.dateOrWeekDay(date: date, weekDay: weekDay)
+                .predicate = searchLogic.dateOrWeekDay(date: date, weekDay: weekDay)
         }
         try fetchedResultsController.performFetch()
         isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
@@ -197,7 +196,7 @@ extension DataProvider: DataProviderProtocol {
     func fetchTrackersBy(date: String, weekDay: String) throws {
         fetchedResultsController
             .fetchRequest
-            .predicate = predicate.dateOrWeekDay(date: date, weekDay: weekDay)
+            .predicate = searchLogic.dateOrWeekDay(date: date, weekDay: weekDay)
         try fetchedResultsController.performFetch()
         isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
