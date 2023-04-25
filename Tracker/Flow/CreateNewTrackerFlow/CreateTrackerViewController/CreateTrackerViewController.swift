@@ -1,7 +1,7 @@
 import UIKit
 
 protocol CreateTrackerViewControllerDelegate: AnyObject {
-    func addTrackerCategory(_ category: TrackerCategory)
+    func addTrackerCategory(category: TrackerCategory)
 }
 
 final class CreateTrackerViewController: UIViewController {
@@ -99,20 +99,30 @@ final class CreateTrackerViewController: UIViewController {
     private var lastRow: Int?
     
     private var dataForTableView = DataForTableInCreateTrackerController()
-    private var dataForCollectionView = DataSourceEmojisColor().dataSource
+    private let dataForCollectionView = DataSourceEmojisColor().dataSource
+    private let date: String
     private let trackerMaker = TrackerMaker()
     
     // User inputs
     private var user = User() {
         didSet {
-            if user.isUserGaveEnoughToCreateTracker {
-                if buttonState == .unselected {
-                    buttonState.toggle()
-                }
-            } else {
-                if buttonState == .selected {
-                    buttonState.toggle()
-                }
+            switch configuration {
+            case .oneRow:
+                changeAppearanceOfTracker(type: .occasional)
+            case .twoRows:
+                changeAppearanceOfTracker(type: .habit)
+            }
+        }
+    }
+    
+    func changeAppearanceOfTracker(type: TrackerType) {
+        if user.isUserGaveEnoughToCreateTracker(of: type) {
+            if buttonState == .unselected {
+                buttonState.toggle()
+            }
+        } else {
+            if buttonState == .selected {
+                buttonState.toggle()
             }
         }
     }
@@ -126,9 +136,14 @@ final class CreateTrackerViewController: UIViewController {
     // MARK: - Init
     private var configuration: Configuration
     
-    init(configuration: Configuration, addCategories categories: [TrackerCategory]) {
+    init(
+        configuration: Configuration,
+        addCategories categories: [TrackerCategory],
+        date: String
+    ) {
         self.categories = categories
         self.configuration = configuration
+        self.date = date
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -160,24 +175,30 @@ final class CreateTrackerViewController: UIViewController {
         dismiss(animated: true)
     }
 
-    @objc private func createButtonTapped() {
+    @objc private func createButtonTapped() {        
         // if all fields are filled
-        guard user.isUserGaveEnoughToCreateTracker,
-              // if category created
-            let category = trackerMaker.createTrackerFrom(
+        switch configuration {
+        case .oneRow:
+            createTracker(of: .occasional)
+        case .twoRows:
+            createTracker(of: .habit)
+        }
+    }
+    
+    func createTracker(of type: TrackerType) {
+        guard user.isUserGaveEnoughToCreateTracker(of: type),
+              let category = trackerMaker.createTrackerFrom(
                 userInput: user,
-                tableData: dataForTableView.twoRows,
-                collectionData: dataForCollectionView
-            )
-        else {
+                collectionData: dataForCollectionView,
+                configuration: configuration,
+                date: date) else {
             // if category cant be created shake button for better user experience
             feedbackGenerator.impactOccurred()
             createButton.shakeSelf()
             return
         }
-        
-        // Give newly created category to delegate if it available
-        delegate?.addTrackerCategory(category)
+        // Give newly created category to delegate
+        delegate?.addTrackerCategory(category: category)
         createButton.isEnabled.toggle()
         dismiss(animated: false)
     }
@@ -251,20 +272,20 @@ private extension CreateTrackerViewController {
             
             mainStackView.widthAnchor.constraint(equalTo: mainScrollView.frameLayoutGuide.widthAnchor),
             
-            titleTextfield.heightAnchor.constraint(equalToConstant: 75),
+            titleTextfield.heightAnchor.constraint(equalToConstant: .cellHeight),
             
             parametersTableView.heightAnchor.constraint(
-                equalToConstant: CGFloat(parametersTableView.numberOfRows(inSection: 0) * 75)
+                equalToConstant: CGFloat(parametersTableView.numberOfRows(inSection: .zero) * 75)
             ),
             
-            cancelButton.heightAnchor.constraint(equalToConstant: 60),
+            cancelButton.heightAnchor.constraint(equalToConstant: .buttonsHeight),
             
             buttonStackView.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor,
-                constant: 16),
+                constant: .leadingInset),
             buttonStackView.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
-                constant: -16),
+                constant: .trailingInset),
             buttonStackView.bottomAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.bottomAnchor,
                 constant: -24)
@@ -323,7 +344,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
             if indexPath.row == .zero {
                 pushCategoryListViewController(categories: categories, lastRow: lastRow)
             } else {
-                pushScheduleListViewController(weekDays: user.selectedWeekDay)
+                pushScheduleListViewController(weekDays: user.selectedWeekDay ?? [])
             }
         }
     }

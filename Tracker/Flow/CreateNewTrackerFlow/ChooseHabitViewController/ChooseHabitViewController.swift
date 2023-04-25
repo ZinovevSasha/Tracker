@@ -34,11 +34,17 @@ final class ChooseTrackerViewController: UIViewController {
     
     private var trackersController: TrackersViewController?
     private var categories: [TrackerCategory] = []
+    private let date: String
     
     // MARK: - Init
-    init(categories: [TrackerCategory], from controller: TrackersViewController) {
-        self.categories = categories
+    init(
+        categories: [TrackerCategory],
+        from controller: TrackersViewController,
+        date: String
+    ) {
         self.trackersController = controller
+        self.categories = categories
+        self.date = date
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -71,13 +77,13 @@ final class ChooseTrackerViewController: UIViewController {
     
     // MARK: - Private @objc target action methods
     @objc private func habitButtonTaped() {
-        let vc = CreateTrackerViewController(configuration: .twoRows, addCategories: categories)
+        let vc = CreateTrackerViewController(configuration: .twoRows, addCategories: categories, date: date)
         vc.delegate = trackersController
         navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc private func irregularEventButtonTapped() {
-        let vc = CreateTrackerViewController(configuration: .oneRow, addCategories: categories)
+        let vc = CreateTrackerViewController(configuration: .oneRow, addCategories: categories, date: date)
         vc.delegate = trackersController
         navigationController?.pushViewController(vc, animated: true)
     }

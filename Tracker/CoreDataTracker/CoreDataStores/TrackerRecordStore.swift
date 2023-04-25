@@ -4,7 +4,7 @@ protocol TrackerRecordStoreProtocol {
     func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int
     func removeTrackerRecordOrAdd(_ record: TrackerCoreData, with day: String) throws
     func isTrackerCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool
-    func isTrackerCompletedFor(selectedDay: Date, _ tracker: TrackerCoreData) throws -> Bool
+    func isTrackerCompletedFor(selectedDay: String, _ tracker: TrackerCoreData) throws -> Bool
 }
 
 final class TrackerRecordStore {
@@ -44,7 +44,7 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
         return trackerRecordsCoreData.first != nil ? true : false
     }
 
-    func isTrackerCompletedFor(selectedDay: Date, _ tracker: TrackerCoreData) throws -> Bool {
+    func isTrackerCompletedFor(selectedDay: String, _ tracker: TrackerCoreData) throws -> Bool {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
         fetchRequest.predicate = NSPredicate(
             format: "%K == %@ AND %K == %@",
@@ -53,7 +53,7 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
             tracker.id ?? "",
             // second search criteria
             #keyPath(TrackerRecordCoreData.date),
-            Date.dateString(for: selectedDay)
+            selectedDay
         )
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.first != nil ? true : false

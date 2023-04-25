@@ -119,7 +119,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("")
+        fatalError("Unsupported")
     }
     
     // MARK: - Private @objc target action methods

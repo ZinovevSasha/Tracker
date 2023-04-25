@@ -9,6 +9,7 @@ extension WeekDay: Comparable {
 enum WeekDay: Int, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
+    // create set of ints 0..<7
     static let allDaysOfWeek = Set(WeekDay.allCases.map { $0.rawValue })
     
     static var count: Int {
@@ -44,27 +45,30 @@ extension Set where Element == Int {
     func weekdayStringShort() -> String {
         if self == WeekDay.allDaysOfWeek {
             return "Каждый день"
-        } else if self.isEmpty {
-            return "Нет выбранного расписания"
         } else {
-            let weekdayAbbreviations = WeekDay.allCases
-                .filter { self.contains($0.rawValue) }
-                .map { $0.abbreviationShort }
-            return weekdayAbbreviations.joined(separator: ", ")
+            return WeekDay
+                .allCases // take all cases  from Mon to Sun
+                .filter { self.contains($0.rawValue) } // check if set has any of weekDays
+                .map { $0.abbreviationShort } // map(transform) to string
+                .joined(separator: ", ") // joing with coma
         }
     }
-
-    func toNumbersString() -> String {
-        let maxElement = 6
-        let elements = Array(self.filter { 0...maxElement ~= $0 }.sorted())
-        return elements.map { String($0) }.joined(separator: ", ")
-    }
     
+    func toNumbersString() -> String {
+        return self
+            .filter { 0..<7 ~= $0 } // take only numbers from 0 to 6
+            .sorted() // sort Comparable
+            .map { String($0) } // map(transform) to string
+            .joined(separator: ", ") // joing with coma
+    }
+
     static func fromString(_ str: String) -> Set<Int>? {
         let maxElement = 6
-        let elements = str.components(separatedBy: ", ")
+        let elements = str
+            .components(separatedBy: ", ") // turn to array of string numbers
             .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
-            .filter { 0...maxElement ~= $0 }
-        return Set(elements)
+            .filter { 0...maxElement ~= $0 } // filter to have only numbers from 0..<7
+        
+        return Set(elements) // turn to set
     }
 }

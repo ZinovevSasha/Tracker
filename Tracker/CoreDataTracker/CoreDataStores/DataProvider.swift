@@ -32,10 +32,10 @@ protocol DataProviderProtocol {
     func getCategories() -> [TrackerCategory]
     func addRecord(_ record: TrackerCategory) throws
     func deleteRecord(at indexPath: IndexPath) throws
-    func fetchTrackersBy(name: String) throws
-    func fetchTrackersBy(date: Date) throws
-    func saveAsCompletedTracker(with indexPath: IndexPath, for day: Date) throws
-    func isTrackerCompletedForToday(_ indexPath: IndexPath, date: Date) -> Bool
+    func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool
+    func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws
+    func fetchTrackersBy(name: String, weekDay: String, date: String) throws
+    func fetchTrackersBy(date: String, weekDay: String) throws
 }
 
 final class DataProvider: NSObject {
@@ -53,17 +53,27 @@ final class DataProvider: NSObject {
     private let trackerStore: TrackerStoreProtocol
     private let trackerCategoryStore: TrackerCategoryStoreProtocol
     private let trackerRecordStore: TrackerRecordStoreProtocol
+    // PredicateBuilder
+    private let predicate = PredicateBuilder()
     // Delegate
     weak var delegate: DataProviderDelegate?
+    
     
     // Fetch controller
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = TrackerCoreData.fetchRequest()
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
+        //
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true)
+            NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true),
+            NSSortDescriptor(key: #keyPath(TrackerCoreData.name), ascending: true)
         ]
+
+        let weekDay = String(Date().weekDayNumber)
+        let date = Date().todayString
+        fetchRequest.predicate = predicate.dateOrWeekDay(date: date, weekDay: weekDay)
+        
         let sectionKeyPath = #keyPath(TrackerCoreData.category.header)
         
         let fetchedResultsController = NSFetchedResultsController(
@@ -134,7 +144,7 @@ extension DataProvider: DataProviderProtocol {
         }
     }
     
-    func isTrackerCompletedForToday(_ indexPath: IndexPath, date: Date) -> Bool {
+    func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool {
         let tracker = fetchedResultsController.object(at: indexPath)
         do {
             return try trackerRecordStore.isTrackerCompletedFor(selectedDay: date, tracker)
@@ -150,10 +160,8 @@ extension DataProvider: DataProviderProtocol {
     
     func addRecord(_ record: TrackerCategory) throws {
         guard let tracker = record.trackers.first else { return }
-        // Create TrackerCoreData
-        let trackersCoreData = try trackerStore.createTrackerCoreData(tracker)
-        // Pass trackersCoreData as parametr to trackerCategoryStore
-        try trackerCategoryStore.addCategory(with: record.header, and: trackersCoreData)
+        let trackerCoreData = try trackerStore.createTrackerCoreData(tracker)
+        try trackerCategoryStore.addCategory(with: record.header, and: trackerCoreData)
     }
     
     func deleteRecord(at indexPath: IndexPath) throws {
@@ -161,51 +169,37 @@ extension DataProvider: DataProviderProtocol {
         try trackerStore.delete(record)
     }
     
+    func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, with: day)
+    }
+    
     func getCategories() -> [TrackerCategory] {
         trackerCategoryStore.getAllCategories()
     }
     
-    func fetchTrackersBy(name: String) throws {
+    // Searching
+    func fetchTrackersBy(name: String, weekDay: String, date: String) throws {
         if !name.isEmpty {
-            fetchedResultsController.fetchRequest.predicate = NSPredicate(
-                // [cd] case-insensitive ignore differences in letter case
-                // [d] diacritic insensitive ignore differences in accent
-                // "resume" but the text contains "résumé", the search will still match
-                format: "name CONTAINS[cd] %@", name
-            )
+            fetchedResultsController
+                .fetchRequest
+                .predicate = predicate.nameAndWeekDayOrNameAndDate(name: name, date: date, weekDay: weekDay)
         } else {
-            fetchedResultsController.fetchRequest.predicate = nil
+            fetchedResultsController
+                .fetchRequest
+                .predicate = predicate.dateOrWeekDay(date: date, weekDay: weekDay)
         }
         try fetchedResultsController.performFetch()
         isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
     
-    func fetchTrackersBy(date: Date) throws {
-        let weekdayNumber = String(Date.currentWeekDayNumber(from: date))
-        let selectedDate = Date.dateString(for: date)
-        let currentDate = Date.dateString(for: Date())
-        
-        guard selectedDate != currentDate else {
-            fetchedResultsController.fetchRequest.predicate = nil
-            try fetchedResultsController.performFetch()
-            isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
-            return
-        }
-        
-        fetchedResultsController.fetchRequest.predicate = NSPredicate(
-            format: "%K CONTAINS[cd] %@",
-            #keyPath(TrackerCoreData.schedule),
-            weekdayNumber
-        )
-        
+    // Searching
+    func fetchTrackersBy(date: String, weekDay: String) throws {
+        fetchedResultsController
+            .fetchRequest
+            .predicate = predicate.dateOrWeekDay(date: date, weekDay: weekDay)
         try fetchedResultsController.performFetch()
         isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
-    }
-    
-    func saveAsCompletedTracker(with indexPath: IndexPath, for day: Date) throws {
-        let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        let selectedDay = Date.dateString(for: day)
-        try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, with: selectedDay)
     }
 }
 
@@ -236,7 +230,8 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
             insertedIndexes: insertedItem,
             deletedIndexes: deletedItem,
             updatedIndexes: updatedItem,
-            movedIndexes: movedItem)
+            movedIndexes: movedItem
+        )
 
         // Update delegate with indexes
         delegate?.didUpdate(update)
@@ -290,27 +285,3 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
         }
     }
 }
-
-/*
-class Tracker: NSManagedObject {
-    @NSManaged var id: String
-    @NSManaged var name: String
-    @NSManaged var color: String
-    @NSManaged var emoji: String
-    @NSManaged var schedule: String
-    @NSManaged var category: TrackerCategory?
-    @NSManaged var records: Set<TrackerRecord>?
-}
-
-class TrackerCategory: NSManagedObject {
-    @NSManaged var header: String
-    @NSManaged var trackers: Set<Tracker>?
-}
-
-class TrackerRecord: NSManagedObject {
-    @NSManaged var id: String
-    @NSManaged var date: String
-    @NSManaged var tracker: Tracker?
-}
-*/
-

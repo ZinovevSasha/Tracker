@@ -47,13 +47,4 @@ extension UIImage {
     }
 }
 
-extension UIButton {
-    // Set up the appearance of the button for a specific state
-    func setUpAppearance(forState state: UIControl.State, backgroundColor: UIColor, titleColor: UIColor, title: String, cornerRadius: CGFloat) {
-        self.setBackgroundImage(UIImage(color: backgroundColor), for: state)
-        self.setTitleColor(titleColor, for: state)
-        self.setTitle(title, for: state)
-        self.layer.cornerRadius = cornerRadius
-        self.clipsToBounds = true
-    }
-}
+

@@ -34,9 +34,10 @@ private extension TrackerStore {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.name = tracker.name
         trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.id = tracker.stringID
+        trackerCoreData.id = tracker.id
         trackerCoreData.color = tracker.color
-        trackerCoreData.schedule = tracker.stringSchedule
+        trackerCoreData.schedule = tracker.schedule
+        trackerCoreData.date = tracker.date
         return trackerCoreData
     }
     
@@ -58,7 +59,7 @@ enum TrackerStoreError: Error {
 }
 extension TrackerCoreData {
     func tracker() throws -> Tracker {
-        guard let id = toUUID(self.id) else {
+        guard let id = self.id else {
             throw TrackerStoreError.decodingErrorInvalidId
         }
         guard let name = self.name else {
@@ -70,14 +71,6 @@ extension TrackerCoreData {
         guard let emoji = self.emoji else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
-        guard let scheduleString = self.schedule,
-            let schedule = Set.fromString(scheduleString) else {
-            throw TrackerStoreError.decodingErrorInvalidSchedule
-        }
-        return Tracker(id: id, name: name, color: color, emoji: emoji, schedule: schedule)
-    }
-    
-    func toUUID(_ string: String?) -> UUID? {
-        return UUID(uuidString: string ?? "")
+        return Tracker(id: id, name: name, color: color, emoji: emoji)
     }
 }

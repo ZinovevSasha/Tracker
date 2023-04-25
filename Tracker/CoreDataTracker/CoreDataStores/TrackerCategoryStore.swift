@@ -23,22 +23,19 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             #keyPath(TrackerCategoryCoreData.header),
             name
         )
-        do {
-            let results = try context.fetch(fetchRequest)
-            if let category = results.first {
-                // Category already exists
-                category.addToTrackers(tracker)
-            } else {
-                // Category does not exist, create new category
-                let category = TrackerCategoryCoreData(context: context)
-                category.header = name
-                category.addToTrackers(tracker)
-            }
-            saveContext()
-        } catch {
-            print("Error adding tracker to category: \(error.localizedDescription)")
+        
+        let results = try context.fetch(fetchRequest)
+        if let category = results.first {
+            // Category already exists
+            category.addToTrackers(tracker)
+        } else {
+            // Category does not exist, create new category
+            let category = TrackerCategoryCoreData(context: context)
+            category.header = name
+            category.addToTrackers(tracker)
         }
-    }
+        saveContext()
+}
     
     func getAllCategories() -> [TrackerCategory] {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()

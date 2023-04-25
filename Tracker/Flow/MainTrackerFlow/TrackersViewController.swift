@@ -6,7 +6,6 @@ final class TrackersViewController: UIViewController {
     private let searchView = SearchView()
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .myWhite
         view.allowsSelection = true
@@ -23,7 +22,7 @@ final class TrackersViewController: UIViewController {
         static let inset: CGFloat = 16
         static let trailingInset: CGFloat = -16
         static let topInset: CGFloat = 13
-        static let collectionToStackOffset: CGFloat = 34
+        static let collectionToSearchViewOffset: CGFloat = 10
         static let headerHeight: CGFloat = 72
         static let searchHeight: CGFloat = 36
         static let searchLeading: CGFloat = 8
@@ -43,6 +42,12 @@ final class TrackersViewController: UIViewController {
         }
     }()
     private var currentDay = Date()
+    private var weekDayNumber: String {
+        String(Date.currentWeekDayNumber(from: currentDay))
+    }
+    private var dateString: String {
+        Date.dateString(for: currentDay)
+    }
     
     // Layout of collection helper
     private let params = GeometryParams(
@@ -77,7 +82,8 @@ final class TrackersViewController: UIViewController {
     func handlePlusButtonTap() {
         let trackerCreationViewController = ChooseTrackerViewController(
             categories: dataProvider?.getCategories() ?? [],
-            from: self
+            from: self,
+            date: dateString
         )
         let navVc = UINavigationController(rootViewController: trackerCreationViewController)
         navVc.isNavigationBarHidden = true
@@ -140,7 +146,7 @@ private extension TrackersViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.topAnchor.constraint(
                 equalTo: searchView.bottomAnchor,
-                constant: UIConstants.collectionToStackOffset),
+                constant: UIConstants.collectionToSearchViewOffset),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ]
         let placeholderImageViewConstraints = [
@@ -171,7 +177,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
         let tracker = dataProvider?.object(at: indexPath)
         let daysTracked = dataProvider?.daysTracked(for: indexPath)
-        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: currentDay)
+        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: weekDayNumber)
         cell.configure(with: tracker)
         cell.configure(with: daysTracked, isCompleted: isCompletedForToday)
         cell.delegate = self
@@ -225,7 +231,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func plusButtonTapped(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         do {
-            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: currentDay)
+            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: weekDayNumber)
         } catch {
             print("⛈️", error)
         }
@@ -237,7 +243,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
         currentDay = date
         do {
-            try dataProvider?.fetchTrackersBy(date: date)
+            try dataProvider?.fetchTrackersBy(date: dateString, weekDay: weekDayNumber)
             collectionView.reloadData()
         } catch {
             print("🏹", error)
@@ -249,7 +255,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
         do {
-            try dataProvider?.fetchTrackersBy(name: searchText)
+            try dataProvider?.fetchTrackersBy(name: searchText, weekDay: weekDayNumber, date: dateString)
             collectionView.reloadData()
         } catch {
             print("😎", error)
@@ -259,11 +265,13 @@ extension TrackersViewController: SearchViewDelegate {
 
 // MARK: - CreateTrackerViewControllerDelegate
 extension TrackersViewController: CreateTrackerViewControllerDelegate {
-    func addTrackerCategory(_ category: TrackerCategory) {
+    func addTrackerCategory(category: TrackerCategory) {
         do {
             try dataProvider?.addRecord(category)
+            placeholderView.state = .invisible(animate: true)
         } catch {
             print("🌲", error)
+            placeholderView.state = .noResult
         }
     }
 }

@@ -136,6 +136,7 @@ extension CategoryListViewController: CreateNewCategoryViewControllerDelegate {
     
     func categoryNameDidEntered(categoryName name: String) {
         tempCategory.append(TrackerCategory(header: name, trackers: []))
+        placeholder.state = .invisible(animate: false)
         tableView.reloadData()
     }
 }
