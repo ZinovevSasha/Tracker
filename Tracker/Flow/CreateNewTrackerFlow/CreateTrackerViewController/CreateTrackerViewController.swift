@@ -20,14 +20,12 @@ final class CreateTrackerViewController: UIViewController {
         view.text = "Новая привычка"
         view.font = .medium16
         view.textAlignment = .center
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     private let mainStackView: UIStackView = {
         let view = UIStackView()
         view.alignment = .fill
         view.axis = .vertical
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -39,7 +37,6 @@ final class CreateTrackerViewController: UIViewController {
         view.font = .regular17
         view.textColor = .myRed
         view.textAlignment = .center
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     private lazy var parametersTableView: UITableView = {
@@ -50,7 +47,6 @@ final class CreateTrackerViewController: UIViewController {
         view.register(cellClass: MyTableViewCell.self)
         view.delegate = self
         view.dataSource = self
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     private lazy var parametersCollectionView: UICollectionView = {
@@ -60,7 +56,6 @@ final class CreateTrackerViewController: UIViewController {
         view.isScrollEnabled = false
         view.allowsMultipleSelection = false
         view.showsVerticalScrollIndicator = false
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.registerHeader(CollectionReusableView.self)
         view.register(cellClass: TrackerEmojiCollectionViewCell.self)
         view.register(cellClass: TrackerColorCollectionViewCell.self)
@@ -76,7 +71,6 @@ final class CreateTrackerViewController: UIViewController {
         view.spacing = 8
         view.alignment = .fill
         view.distribution = .fillEqually
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     private let container = UIView()
@@ -93,8 +87,6 @@ final class CreateTrackerViewController: UIViewController {
     )
     
     // MARK: - Model
-    
-    // Categories to pass to CategoryListViewController(categories: categories)
     private var categories: [TrackerCategory] = []
     private var lastRow: Int?
     
@@ -208,20 +200,23 @@ final class CreateTrackerViewController: UIViewController {
 private extension CreateTrackerViewController {
     func initialise() {
         titleTextfield.delegate = self
-        cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-        createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
+        cancelButton.addTarget(
+            self, action: #selector(cancelButtonTapped), for: .touchUpInside)
+        createButton.addTarget(
+            self, action: #selector(createButtonTapped), for: .touchUpInside)
         
-        container.translatesAutoresizingMaskIntoConstraints = false
-        mainScrollView.translatesAutoresizingMaskIntoConstraints = false
-        mainScrollView.showsVerticalScrollIndicator = false
-                
-        view.backgroundColor = .myWhite
         view.addSubviews(nameOfScreenLabel, container, buttonStackView)
+        view.backgroundColor = .myWhite
         
-        buttonStackView.addArrangedSubviews(cancelButton, createButton)
-        container.addSubview(mainScrollView)
-        mainScrollView.addSubview(mainStackView)
-        mainStackView.addArrangedSubviews(
+        buttonStackView.addSubviews(cancelButton, createButton)
+        
+        container.addSubviews(mainScrollView)
+        
+        mainScrollView.addSubviews(mainStackView)
+        mainScrollView.showsVerticalScrollIndicator = false
+        
+       
+        mainStackView.addSubviews(
             titleTextfield,
             warningCharactersLabel,
             parametersTableView,
@@ -386,7 +381,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
         }
     }
 }
-// MARK: - Layout
+// MARK: - UICollectionViewDelegateFlowLayout
 extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let availableWidth = collectionView.frame.width - params.emptySpaceWidth

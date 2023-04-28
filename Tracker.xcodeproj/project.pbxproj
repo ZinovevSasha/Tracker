@@ -40,6 +40,7 @@
 		F97E8FDF29E34E2B002BB0C8 /* TrackerUITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E8FDE29E34E2B002BB0C8 /* TrackerUITextField.swift */; };
 		F97E8FE229E3FF82002BB0C8 /* CGFloat+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E8FE129E3FF82002BB0C8 /* CGFloat+Extension.swift */; };
 		F97E8FE429E407E5002BB0C8 /* UICollectionView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E8FE329E407E5002BB0C8 /* UICollectionView+Extension.swift */; };
+		F98235CF29FBD1E700B7CEEC /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98235CE29FBD1E700B7CEEC /* OnboardingViewController.swift */; };
 		F98840D729F1408B00422FD5 /* TrackerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98840D629F1408B00422FD5 /* TrackerStore.swift */; };
 		F98840D929F1409500422FD5 /* TrackerCategoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98840D829F1409500422FD5 /* TrackerCategoryStore.swift */; };
 		F98840DB29F140AC00422FD5 /* TrackerRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98840DA29F140AC00422FD5 /* TrackerRecordStore.swift */; };
@@ -97,6 +98,7 @@
 		F97E8FDE29E34E2B002BB0C8 /* TrackerUITextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerUITextField.swift; sourceTree = "<group>"; };
 		F97E8FE129E3FF82002BB0C8 /* CGFloat+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGFloat+Extension.swift"; sourceTree = "<group>"; };
 		F97E8FE329E407E5002BB0C8 /* UICollectionView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Extension.swift"; sourceTree = "<group>"; };
+		F98235CE29FBD1E700B7CEEC /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		F98840D629F1408B00422FD5 /* TrackerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStore.swift; sourceTree = "<group>"; };
 		F98840D829F1409500422FD5 /* TrackerCategoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStore.swift; sourceTree = "<group>"; };
 		F98840DA29F140AC00422FD5 /* TrackerRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordStore.swift; sourceTree = "<group>"; };
@@ -150,12 +152,12 @@
 		F918018429CEECCB00767F16 /* Tracker */ = {
 			isa = PBXGroup;
 			children = (
-				F96F65EA29F05E0000C72A6A /* CoreDataTracker */,
 				F918019C29CEF35300767F16 /* Application */,
 				F97774E529D3722200959E7C /* Models */,
 				F967CCF329E1B6BE00E3C811 /* UIComponents */,
 				F9E4C6D129D6CF0400F10B02 /* TabBar */,
 				F97774ED29D4441A00959E7C /* Flow */,
+				F96F65EA29F05E0000C72A6A /* CoreDataTracker */,
 				F918019929CEED2600767F16 /* Resourses */,
 			);
 			path = Tracker;
@@ -280,6 +282,7 @@
 		F97774ED29D4441A00959E7C /* Flow */ = {
 			isa = PBXGroup;
 			children = (
+				F98235CD29FBD1CC00B7CEEC /* OnboardingFlow */,
 				F9F1233229D897F40039D1B3 /* MainTrackerFlow */,
 				F977751A29D4BCAB00959E7C /* CreateNewTrackerFlow */,
 				F967CCCB29E093F800E3C811 /* StatisticFlow */,
@@ -325,6 +328,14 @@
 				F9B926E429E85BEB00D98F28 /* Array+Extension.swift */,
 			);
 			path = Style;
+			sourceTree = "<group>";
+		};
+		F98235CD29FBD1CC00B7CEEC /* OnboardingFlow */ = {
+			isa = PBXGroup;
+			children = (
+				F98235CE29FBD1E700B7CEEC /* OnboardingViewController.swift */,
+			);
+			path = OnboardingFlow;
 			sourceTree = "<group>";
 		};
 		F98840D529F13FB800422FD5 /* CoreDataStores */ = {
@@ -519,6 +530,7 @@
 				F97774B329D2D69C00959E7C /* MainTabBarController.swift in Sources */,
 				F967CCF729E1BA8200E3C811 /* UIFont+Extension.swift in Sources */,
 				F967CCF229E1B5CE00E3C811 /* CategoryListViewController.swift in Sources */,
+				F98235CF29FBD1E700B7CEEC /* OnboardingViewController.swift in Sources */,
 				F967CCF929E1C75F00E3C811 /* FrameViewController.swift in Sources */,
 				F967CCC729E0901000E3C811 /* DataForTableInCreateTrackerController.swift.swift in Sources */,
 				F97774B529D2DB5900959E7C /* StatisticViewController.swift in Sources */,

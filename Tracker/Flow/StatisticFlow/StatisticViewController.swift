@@ -6,7 +6,7 @@ final class StatisticViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .myWhite
-        view.addSubview(placeholder)
+        view.addSubviews(placeholder)
         
         placeholder.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         placeholder.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true

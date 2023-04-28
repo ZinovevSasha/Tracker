@@ -25,7 +25,6 @@ final class PlaceholderView: UIView {
     private let placeholderImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .center
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -34,7 +33,6 @@ final class PlaceholderView: UIView {
         label.font = .medium12
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -48,7 +46,7 @@ final class PlaceholderView: UIView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("")
+        fatalError("Unsupported")
     }
 }
 
@@ -56,7 +54,7 @@ final class PlaceholderView: UIView {
 private extension PlaceholderView {
     func initialise() {
         addSubviews(placeholderText, placeholderImageView)
-        translatesAutoresizingMaskIntoConstraints = false
+        
         
         NSLayoutConstraint.activate([
         placeholderImageView.centerXAnchor.constraint(equalTo: centerXAnchor),

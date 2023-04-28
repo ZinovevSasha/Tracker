@@ -14,7 +14,6 @@ final class TrackerHeaderView: UIView {
         let button = ExtendedButton(type: .system)
         button.setImage(.plus, for: .normal)
         button.tintColor = .myBlack
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -22,7 +21,6 @@ final class TrackerHeaderView: UIView {
         let label = UILabel()
         label.text = "Трекеры"
         label.font = .bold34
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -31,7 +29,6 @@ final class TrackerHeaderView: UIView {
         datePicker.datePickerMode = .date
         datePicker.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         datePicker.locale = Locale(identifier: "ru")
-        datePicker.translatesAutoresizingMaskIntoConstraints = false
         datePicker.tintColor = .systemBlue
         datePicker.backgroundColor = .myWhite
         datePicker.layer.cornerRadius = UIConstants.datePickerCornerRadius
@@ -41,7 +38,6 @@ final class TrackerHeaderView: UIView {
     
     private let stackView: UIStackView = {
         let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.axis = .horizontal
         view.alignment = .center
         view.distribution = .fillProportionally

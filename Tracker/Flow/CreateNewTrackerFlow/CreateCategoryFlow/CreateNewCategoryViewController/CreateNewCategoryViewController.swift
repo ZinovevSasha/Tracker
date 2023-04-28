@@ -15,20 +15,18 @@ final class CreateNewCategoryViewController: FrameViewController {
     private var mainStackView: UIStackView = {
         let view = UIStackView()
         view.alignment = .fill
-        view.axis = .vertical
-        view.translatesAutoresizingMaskIntoConstraints = false
+        view.axis = .vertical        
         return view
     }()
     
     private var warningCharactersLabel: UILabel = {
         let view = UILabel()
-        view.text = "Такая категория уже есть 🤯"
+        view.text = "Такая категория уже есть ☹️"
         view.numberOfLines = .zero
         view.font = .regular17
         view.textColor = .myRed
         view.alpha = .zero
         view.textAlignment = .center
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -70,8 +68,8 @@ final class CreateNewCategoryViewController: FrameViewController {
 // MARK: - Private Methods
 private extension CreateNewCategoryViewController {
     func initialise() {
-        container.addSubview(mainStackView)
-        mainStackView.addArrangedSubviews(textField)
+        container.addSubviews(mainStackView)
+        mainStackView.addSubviews(textField)
         mainStackView.setCustomSpacing(8, after: textField)
         textField.delegate = self
     }

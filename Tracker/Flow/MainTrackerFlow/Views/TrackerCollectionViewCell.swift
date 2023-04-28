@@ -35,8 +35,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         view.layer.cornerRadius = UIConstants.trackerCornerRadius
         view.layer.masksToBounds = true
         view.layer.borderWidth = UIConstants.trackerBorderWidth
-        view.layer.borderColor = UIColor.myCellBorderColor.cgColor
-        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.borderColor = UIColor.myCellBorderColor?.cgColor
         view.backgroundColor = .myBlue
         return view
     }()
@@ -47,7 +46,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         label.font = .medium12
         label.numberOfLines = .zero
         label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
         
@@ -56,7 +54,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         label.numberOfLines = .zero
         label.font = .medium16
         label.textAlignment = .left
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -65,14 +62,12 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         view.backgroundColor = .myTranspatent
         view.layer.cornerRadius = UIConstants.emojiContainerSize / 2
         view.layer.masksToBounds = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let trackedDaysLabel: UILabel = {
         let label = UILabel()
         label.textColor = .myBlack
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -80,7 +75,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         let button = UIButton(type: .system)
         button.layer.cornerRadius = UIConstants.buttonSize / 2
         button.layer.masksToBounds = true
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -131,7 +125,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
 // MARK: - Private methods
 private extension TrackerCollectionViewCell {
     func initialise() {
-        emojiContainerView.addSubview(emojiLabel)
+        emojiContainerView.addSubviews(emojiLabel)
         trackerContainerView.addSubviews(emojiContainerView, trackerNameLabel)
         contentView.addSubviews(trackerContainerView, trackedDaysLabel, addButton)
         addButton.addTarget(self, action: #selector(handleAddButtonTap), for: .touchUpInside)
@@ -200,13 +194,13 @@ private extension TrackerCollectionViewCell {
     func configureButton() {
         switch buttonState {
         case .selected:
-            let image = UIImage.done?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite)
+            let image = UIImage.done?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite ?? .white)
             addButton.setImage(image, for: .normal)
             addButton.alpha = 0.3
 //            addButton.imageView?.layer.transform = CATransform3DMakeScale(1,1,1)
            
         case .unselected:
-            let image = UIImage.plus?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite)
+            let image = UIImage.plus?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite ?? .white)
             addButton.setImage(image, for: .normal)
             addButton.alpha = 1
 //            addButton.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)

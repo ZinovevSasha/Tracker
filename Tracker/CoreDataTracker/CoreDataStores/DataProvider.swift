@@ -28,10 +28,10 @@ protocol DataProviderProtocol {
     func numberOfRowsInSection(_ section: Int) -> Int
     func header(for section: Int) -> String
     func daysTracked(for indexPath: IndexPath) -> Int
-    func object(at indexPath: IndexPath) -> Tracker?
     func getCategories() -> [TrackerCategory]
-    func addRecord(_ record: TrackerCategory) throws
-    func deleteRecord(at indexPath: IndexPath) throws
+    func addTrackerCategory(_ record: TrackerCategory) throws
+    func getTracker(at indexPath: IndexPath) -> Tracker?
+    func deleteTracker(at indexPath: IndexPath) throws
     func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws
     func fetchTrackersBy(name: String, weekDay: String, date: String) throws
@@ -153,19 +153,19 @@ extension DataProvider: DataProviderProtocol {
         }
     }
     
-    func object(at indexPath: IndexPath) -> Tracker? {
+    func getTracker(at indexPath: IndexPath) -> Tracker? {
         try? fetchedResultsController.object(at: indexPath).tracker()
     }
     
-    func addRecord(_ record: TrackerCategory) throws {
+    func addTrackerCategory(_ record: TrackerCategory) throws {
         guard let tracker = record.trackers.first else { return }
         let trackerCoreData = try trackerStore.createTrackerCoreData(tracker)
         try trackerCategoryStore.addCategory(with: record.header, and: trackerCoreData)
     }
     
-    func deleteRecord(at indexPath: IndexPath) throws {
-        let record = fetchedResultsController.object(at: indexPath)
-        try trackerStore.delete(record)
+    func deleteTracker(at indexPath: IndexPath) throws {
+        let tracker = fetchedResultsController.object(at: indexPath)
+        try trackerStore.delete(tracker)
     }
     
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws {

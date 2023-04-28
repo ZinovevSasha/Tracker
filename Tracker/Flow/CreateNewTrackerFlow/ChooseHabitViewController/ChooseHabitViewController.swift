@@ -7,13 +7,11 @@ final class ChooseTrackerViewController: UIViewController {
         label.text = "Создание трекера"
         label.font = .medium16
         label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let stackView: UIStackView = {
-        let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
+        let view = UIStackView()        
         view.axis = .vertical
         view.spacing = UIConstants.stackViewSpacing
         return view
@@ -99,7 +97,7 @@ private extension ChooseTrackerViewController {
             self, action: #selector(irregularEventButtonTapped), for: .touchUpInside)
         
         // Add subviews
-        stackView.addArrangedSubviews(habitButton, irregularEventButton)
+        stackView.addSubviews(habitButton, irregularEventButton)
         view.addSubviews(nameOfScreenLabel, stackView)
         view.backgroundColor = .myWhite
     }

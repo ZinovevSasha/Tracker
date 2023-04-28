@@ -20,7 +20,6 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
     // MARK: Private properties
     private let text: UILabel = {
         let view = UILabel()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.font = .bold32
         return view
     }()
@@ -29,13 +28,11 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
         let view = UIView()
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let highlightedImage: UIImageView = {
         let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -53,8 +50,7 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
 // MARK: Private methods
 private extension TrackerColorCollectionViewCell {
     func initialise() {
-        contentView.addSubview(colorView)
-        contentView.addSubview(highlightedImage)
+        contentView.addSubviews(colorView, highlightedImage)
         
         NSLayoutConstraint.activate([
             highlightedImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),

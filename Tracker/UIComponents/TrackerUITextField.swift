@@ -25,9 +25,6 @@ final class TrackerUITextField: UIView {
         view.leftViewMode = .always
         view.rightView = insetView
         view.rightViewMode = .always
-        
-        // constraints
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -51,9 +48,9 @@ final class TrackerUITextField: UIView {
 // MARK: - Private Methods
 private extension TrackerUITextField {
     func initialise() {
-        addSubview(textField)
+        addSubviews(textField)
         textField.delegate = self
-        translatesAutoresizingMaskIntoConstraints = false
+        
     }
     
     func setConstraints() {

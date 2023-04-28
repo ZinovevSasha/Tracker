@@ -13,8 +13,7 @@ final class CategoryListViewController: FrameViewController {
         view.separatorColor = .myGray
         view.backgroundColor = .myWhite
         view.separatorStyle = .singleLine
-        view.showsVerticalScrollIndicator = false
-        view.translatesAutoresizingMaskIntoConstraints = false
+        view.showsVerticalScrollIndicator = false        
         view.register(cellClass: CategoryTableViewCell.self)
         return view
     }()
@@ -72,8 +71,8 @@ private extension CategoryListViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        container.addSubview(tableView)
-        container.addSubview(placeholder)
+        container.addSubviews(tableView)
+        container.addSubviews(placeholder)
     }
     
     func setConstraints() {

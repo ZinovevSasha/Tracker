@@ -1,15 +1,15 @@
-//
-//  UIView.swift
-//  Tracker
-//
-//  Created by Александр Зиновьев on 28.03.2023.
-//
-
 import UIKit
 
 extension UIView {
     func addSubviews(_ views: UIView...) {
-        views.forEach { addSubview($0) }
+        views.forEach {
+            if let stackView = self as? UIStackView {
+                stackView.addArrangedSubview($0)                
+            } else {
+                addSubview($0)
+            }
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
     }
     
     func shakeSelf() {
@@ -25,11 +25,5 @@ extension UIView {
         shakingAnimation.toValue = NSValue(cgPoint: toPoint)
         
         self.layer.add(shakingAnimation, forKey: nil)
-    }
-}
-
-extension UIStackView {
-    func addArrangedSubviews(_ views: UIView...) {
-        views.forEach { addArrangedSubview($0) }
     }
 }

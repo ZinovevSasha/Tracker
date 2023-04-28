@@ -27,14 +27,12 @@ class FrameViewController: UIViewController, FrameViewControllerProtocol {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .medium16
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     /// Buttons at the bottom
     private let screenButtons: UIStackView = {
         let stackView = UIStackView()
-        stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.alignment = .center
@@ -90,10 +88,9 @@ private extension FrameViewController {
         buttonRight?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
         buttonCenter?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
         view.backgroundColor = .myWhite
-        view.addSubview(screenTitle)
-        view.addSubview(container)
-        view.addSubview(screenButtons)
-        container.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubviews(screenTitle)
+        view.addSubviews(container)
+        view.addSubviews(screenButtons)
         
         if let buttonLeft, let buttonRight  {
             screenButtons.addArrangedSubview(buttonLeft)

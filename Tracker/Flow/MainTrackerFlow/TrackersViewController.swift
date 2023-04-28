@@ -11,7 +11,6 @@ final class TrackersViewController: UIViewController {
         view.allowsSelection = true
         view.registerHeader(TrackerHeader.self)
         view.register(cellClass: TrackerCollectionViewCell.self)
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     let placeholderView = PlaceholderView(state: .star)
@@ -103,9 +102,6 @@ private extension TrackersViewController {
         view.addGestureRecognizer(tapGesture)
         view.backgroundColor = .myWhite
         view.addSubviews(headerView, searchView, collectionView, placeholderView)
-        placeholderView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        searchView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func setDelegates() {
@@ -175,7 +171,7 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
-        let tracker = dataProvider?.object(at: indexPath)
+        let tracker = dataProvider?.getTracker(at: indexPath)
         let daysTracked = dataProvider?.daysTracked(for: indexPath)
         let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: weekDayNumber)
         cell.configure(with: tracker)
@@ -219,7 +215,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         do {
-            try dataProvider?.deleteRecord(at: indexPath)
+            try dataProvider?.deleteTracker(at: indexPath)
         } catch {
             print("🐳", error)
         }
@@ -267,7 +263,7 @@ extension TrackersViewController: SearchViewDelegate {
 extension TrackersViewController: CreateTrackerViewControllerDelegate {
     func addTrackerCategory(category: TrackerCategory) {
         do {
-            try dataProvider?.addRecord(category)
+            try dataProvider?.addTrackerCategory(category)
             placeholderView.state = .invisible(animate: true)
         } catch {
             print("🌲", error)

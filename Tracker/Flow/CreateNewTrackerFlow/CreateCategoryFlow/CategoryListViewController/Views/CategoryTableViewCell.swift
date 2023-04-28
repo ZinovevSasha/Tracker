@@ -52,8 +52,8 @@ final class CategoryTableViewCell: UITableViewCell {
 // MARK: - Private methods
 private extension CategoryTableViewCell {
     func initialise() {
-        stackView.addArrangedSubviews(categoryName, selectedCategory)
-        contentView.addSubview(stackView)
+        stackView.addSubviews(categoryName, selectedCategory)
+        contentView.addSubviews(stackView)
         contentView.backgroundColor = .myBackground
         selectionStyle = .none
     }

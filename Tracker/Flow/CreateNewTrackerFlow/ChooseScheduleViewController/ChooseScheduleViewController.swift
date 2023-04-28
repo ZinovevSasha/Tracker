@@ -18,7 +18,6 @@ final class ChooseScheduleViewController: FrameViewController {
         view.allowsSelection = true
         view.separatorStyle = .singleLine
         view.showsVerticalScrollIndicator = false
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.register(cellClass: ScheduleTableViewCell.self)
         return view
     }()
@@ -67,7 +66,7 @@ private extension ChooseScheduleViewController {
         tableView.dataSource = self
         
         // Add all to container and constraint to it
-        container.addSubview(tableView)
+        container.addSubviews(tableView)
     }
     
     func setConstraints() {

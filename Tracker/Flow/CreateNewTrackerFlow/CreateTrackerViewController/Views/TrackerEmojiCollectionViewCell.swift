@@ -20,7 +20,6 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
     // MARK: - Private properties
     private let text: UILabel = {
         let view = UILabel()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.font = .bold32
         view.textAlignment = .center
         return view
@@ -40,7 +39,7 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
 // MARK: Private methods
 private extension TrackerEmojiCollectionViewCell {
     func initialise() {
-        contentView.addSubview(text)
+        contentView.addSubviews(text)
         contentView.layer.cornerRadius = 16
         contentView.layer.masksToBounds = true
         

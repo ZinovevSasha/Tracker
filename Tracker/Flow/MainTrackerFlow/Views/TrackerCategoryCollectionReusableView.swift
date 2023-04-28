@@ -11,7 +11,6 @@ final class TrackerHeader: UICollectionReusableView {
     private let categoryLabel: UILabel = {
         let label = UILabel()
         label.font = .bold19
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -29,14 +28,14 @@ final class TrackerHeader: UICollectionReusableView {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("")
+        fatalError("Unsupported")
     }
 }
 
 // MARK: - Private methods
 private extension TrackerHeader {
     func initialise() {
-        addSubview(categoryLabel)
+        addSubviews(categoryLabel)
     }
     
     func setConstraints() {
