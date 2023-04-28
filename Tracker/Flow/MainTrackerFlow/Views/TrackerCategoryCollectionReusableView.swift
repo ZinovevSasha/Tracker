@@ -1,16 +1,16 @@
 import UIKit
 
-final class TrackerCollectionSectionCategoryHeaderView: UICollectionReusableView {
-    static let identifier = String(describing: TrackerCollectionSectionCategoryHeaderView.self)
+final class TrackerHeader: UICollectionReusableView {
+    static let identifier = String(describing: TrackerHeader.self)
     // MARK: - Public
-    func configure(with info: TrackerCategory) {
-        categoryLabel.text = info.header
+    func configure(with header: String) {
+        categoryLabel.text = header
     }
     
     // MARK: - Private properties
     private let categoryLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 19, weight: .bold)
+        label.font = .bold19
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -29,12 +29,12 @@ final class TrackerCollectionSectionCategoryHeaderView: UICollectionReusableView
     }
     
     required init?(coder: NSCoder) {
-        fatalError("Unsupported")
+        fatalError("")
     }
 }
 
 // MARK: - Private methods
-private extension TrackerCollectionSectionCategoryHeaderView {
+private extension TrackerHeader {
     func initialise() {
         addSubview(categoryLabel)
     }
@@ -46,8 +46,7 @@ private extension TrackerCollectionSectionCategoryHeaderView {
                 constant: UIConstants.categoryLabelLeadingInset
             ),
             categoryLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
-            categoryLabel.topAnchor.constraint(equalTo: topAnchor),
-            categoryLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: UIConstants.categoryLabelBottomInset)
+            categoryLabel.topAnchor.constraint(equalTo: topAnchor)           
         ])
     }
 }

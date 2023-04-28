@@ -10,8 +10,8 @@ final class TrackerHeaderView: UIView {
     weak var delegate: TrackerHeaderViewDelegate?
     
     // MARK: - Private properties
-    private let plusButton: UIButton = {
-        let button = UIButton(type: .system)
+    private let plusButton: ExtendedButton = {
+        let button = ExtendedButton(type: .system)
         button.setImage(.plus, for: .normal)
         button.tintColor = .myBlack
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -21,7 +21,7 @@ final class TrackerHeaderView: UIView {
     private let trackerLabel: UILabel = {
         let label = UILabel()
         label.text = "Трекеры"
-        label.font = UIFont.systemFont(ofSize: UIConstants.trackerLabelFontSize, weight: .bold)
+        label.font = .bold34
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -50,7 +50,6 @@ final class TrackerHeaderView: UIView {
     
     // MARK: - UIConstants
     private enum UIConstants {
-        static let trackerLabelFontSize: CGFloat = 34
         static let trackerToPlusButtonOffset: CGFloat = 13
         static let trackerToDatePickerOffset: CGFloat = -12
         static let datePickerWidth: CGFloat = 100
@@ -73,7 +72,7 @@ final class TrackerHeaderView: UIView {
         delegate?.datePickerValueChanged(date: datePicker.date)
     }
     
-    @objc private func handlePlusButtonTap() {
+    @objc private func handlePlusButtonTap() {       
         delegate?.handlePlusButtonTap()
     }
 }
