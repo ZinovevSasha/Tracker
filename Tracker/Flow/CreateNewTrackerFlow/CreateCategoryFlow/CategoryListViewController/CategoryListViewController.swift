@@ -71,15 +71,15 @@ private extension CategoryListViewController {
         tableView.delegate = self
         tableView.dataSource = self
         
-        container.addSubviews(tableView)
-        container.addSubviews(placeholder)
+        container.addSubviews(tableView, placeholder)
     }
     
     func setConstraints() {
         NSLayoutConstraint.activate([
             placeholder.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             placeholder.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-            
+        ])
+        NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: container.topAnchor),

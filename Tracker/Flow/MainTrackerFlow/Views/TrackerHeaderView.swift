@@ -78,32 +78,23 @@ private extension TrackerHeaderView {
     func initialise() {
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         plusButton.addTarget(self, action: #selector(handlePlusButtonTap), for: .touchUpInside)
-        stackView.addArrangedSubview(trackerLabel)
-        stackView.addArrangedSubview(datePicker)
+        stackView.addSubviews(trackerLabel, datePicker)
         addSubviews(plusButton, stackView)
     }
     
     func setConstraints() {
-        let plusButtonConstraints = [
+        NSLayoutConstraint.activate([
             plusButton.leadingAnchor.constraint(equalTo: leadingAnchor),
             plusButton.topAnchor.constraint(equalTo: topAnchor)
-        ]
-        let datePickerConstraints = [
+        ])
+        NSLayoutConstraint.activate([
             datePicker.widthAnchor.constraint(equalToConstant: UIConstants.datePickerWidth)
-        ]
-        let stackConstraints = [
+        ])
+        NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stackView.topAnchor.constraint(
-                equalTo: plusButton.bottomAnchor,
-                constant: UIConstants.trackerToPlusButtonOffset),
+            stackView.topAnchor.constraint(equalTo: plusButton.bottomAnchor,constant: UIConstants.trackerToPlusButtonOffset),
             stackView.heightAnchor.constraint(equalToConstant: 41)
-        ]
-        
-        NSLayoutConstraint.activate(
-            plusButtonConstraints +
-            datePickerConstraints +
-            stackConstraints
-        )
+        ])
     }
 }

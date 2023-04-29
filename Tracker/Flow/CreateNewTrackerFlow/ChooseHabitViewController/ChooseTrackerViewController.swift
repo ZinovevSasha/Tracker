@@ -104,11 +104,12 @@ private extension ChooseTrackerViewController {
     
     func setConstraints() {
         NSLayoutConstraint.activate([
-            nameOfScreenLabel.topAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.topAnchor,
+            nameOfScreenLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
                 constant: UIConstants.nameLabelTopInset),
-            nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-
+            nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: UIConstants.stackLeadingInset),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: UIConstants.stackTrailingInset),
             stackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),

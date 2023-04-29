@@ -88,9 +88,7 @@ private extension FrameViewController {
         buttonRight?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
         buttonCenter?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
         view.backgroundColor = .myWhite
-        view.addSubviews(screenTitle)
-        view.addSubviews(container)
-        view.addSubviews(screenButtons)
+        view.addSubviews(screenTitle, container, screenButtons)
         
         if let buttonLeft, let buttonRight  {
             screenButtons.addArrangedSubview(buttonLeft)
@@ -105,11 +103,11 @@ private extension FrameViewController {
     
     func setConstraints() {
         NSLayoutConstraint.activate([
-            screenTitle.topAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.topAnchor,
-                constant: UIConstants.nameLabelTopInset),
-            screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
+            screenTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: UIConstants.nameLabelTopInset),
+            screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
             container.topAnchor.constraint(
                 equalTo: screenTitle.bottomAnchor,
                 constant: UIConstants.containerToTitleInset),
@@ -120,7 +118,9 @@ private extension FrameViewController {
                 equalTo: view.trailingAnchor,
                 constant: UIConstants.trailing),
             container.bottomAnchor.constraint(equalTo: screenButtons.topAnchor),
-            
+        ])
+        
+        NSLayoutConstraint.activate([
             screenButtons.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor,
                 constant: UIConstants.leading),
@@ -129,7 +129,7 @@ private extension FrameViewController {
                 constant: UIConstants.trailing),
             screenButtons.bottomAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.bottomAnchor,
-                constant: UIConstants.bottom),            
+                constant: UIConstants.bottom),
             screenButtons.heightAnchor.constraint(equalToConstant: .buttonsHeight)
         ])
     }

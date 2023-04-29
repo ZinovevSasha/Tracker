@@ -54,20 +54,20 @@ final class PlaceholderView: UIView {
 private extension PlaceholderView {
     func initialise() {
         addSubviews(placeholderText, placeholderImageView)
-        
+                
+        NSLayoutConstraint.activate([
+            placeholderImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            placeholderImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            placeholderImageView.heightAnchor.constraint(equalToConstant: UIConstants.imageSize),
+            placeholderImageView.widthAnchor.constraint(equalToConstant: UIConstants.imageSize)
+        ])
         
         NSLayoutConstraint.activate([
-        placeholderImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-        placeholderImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
-        placeholderImageView.heightAnchor.constraint(equalToConstant: UIConstants.imageSize),
-        placeholderImageView.widthAnchor.constraint(equalToConstant: UIConstants.imageSize),
-        
-        placeholderText.centerXAnchor.constraint(equalTo: centerXAnchor),
-        placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-        placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-        placeholderText.topAnchor.constraint(
-            equalTo: placeholderImageView.bottomAnchor,
-            constant: UIConstants.textToImageOffset)
+            placeholderText.centerXAnchor.constraint(equalTo: centerXAnchor),
+            placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            placeholderText.topAnchor.constraint(equalTo: placeholderImageView.bottomAnchor,
+                constant: UIConstants.textToImageOffset)
         ])
     }
     

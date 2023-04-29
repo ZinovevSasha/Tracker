@@ -1,19 +1,33 @@
 import UIKit
 
 final class MainTabBarController: UITabBarController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setAppearance()
+    var router: RouterProtocol?
+    
+    init(
+        trackers: TrackersViewController,
+        statistic: StatisticViewController
+    ) {
+        super.init(nibName: nil, bundle: nil)
+        
         viewControllers = [
             generateViewController(
-                TrackersViewController(),
+                trackers,
                 image: .leftTabBar,
                 title: "Трекеры"),
             generateViewController(
-                StatisticViewController(),
+                statistic,
                 image: .rightTabBar,
                 title: "Статистика")
         ]
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setAppearance()
     }
 }
 

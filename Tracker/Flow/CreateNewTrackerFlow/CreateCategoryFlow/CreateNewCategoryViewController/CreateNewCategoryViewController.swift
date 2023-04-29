@@ -30,7 +30,6 @@ final class CreateNewCategoryViewController: FrameViewController {
         return view
     }()
     
-    
     // MARK: Lifecicle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -79,7 +78,8 @@ private extension CreateNewCategoryViewController {
             mainStackView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             mainStackView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             mainStackView.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle),
-            
+        ])
+        NSLayoutConstraint.activate([
             textField.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             textField.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle)

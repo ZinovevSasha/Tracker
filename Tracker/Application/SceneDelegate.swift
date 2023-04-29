@@ -13,7 +13,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = OnboardingPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
+       
+        let navigationVC = UINavigationController()
+        let router = Router(navigationController: navigationVC, assembly: Assembly())
+        router.initialViewController()
+        
+        window.rootViewController = navigationVC
         self.window = window
         window.makeKeyAndVisible()
     }

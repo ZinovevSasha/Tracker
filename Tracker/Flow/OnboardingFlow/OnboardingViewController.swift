@@ -3,11 +3,11 @@ import UIKit
 final class OnboardingPageViewController: UIPageViewController {
     lazy var pages: [UIViewController] = {
         let onboardingBlue = OnboardingViewController(
-            image: .onboardingBlue,
+            router: router, image: .onboardingBlue,
             greetingText: "Отслеживайте только то, что хотите"
         )
         let onboardingRed = OnboardingViewController(
-            image: .onboardingRed,
+            router: router, image: .onboardingRed,
             greetingText: "Даже если это не литры воды и йога"
         )
         return [onboardingBlue, onboardingRed]
@@ -21,6 +21,17 @@ final class OnboardingPageViewController: UIPageViewController {
         pageControll.pageIndicatorTintColor = .black.withAlphaComponent(0.3)
         return pageControll
     }()
+    
+    private var router: RouterProtocol?
+    
+    init(router: RouterProtocol) {
+        self.router = router
+        super.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,8 +48,9 @@ final class OnboardingPageViewController: UIPageViewController {
     // Private methods
     func setupLayout() {
         view.addSubviews(pageControll)
+        
         NSLayoutConstraint.activate([
-            pageControll.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -134),
+            pageControll.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -134),
             pageControll.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
@@ -60,7 +72,7 @@ extension OnboardingPageViewController: UIPageViewControllerDataSource {
         
         let previousIndex = operation(viewControllerIndex, 1)
         
-        if previousIndex <= 0 {
+        if previousIndex < .zero {
             return viewControllers.last
         }
         
@@ -75,7 +87,7 @@ extension OnboardingPageViewController: UIPageViewControllerDataSource {
 extension OnboardingPageViewController: UIPageViewControllerDelegate {
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if let currentViewController = pageViewController.viewControllers?.first,
-           let currentIndex = pages.firstIndex(of: currentViewController) {
+            let currentIndex = pages.firstIndex(of: currentViewController) {
             pageControll.currentPage = currentIndex
         }
     }
@@ -97,17 +109,19 @@ final class OnboardingViewController: UIViewController {
     private let button = ActionButton(title: "Вот это технологии!")
     
     // MARK: - Init
-    init(image: UIImage?, greetingText: String) {
+    init(router: RouterProtocol?, image: UIImage?, greetingText: String) {
+        self.router = router
         self.imageView.image = image
-        imageView.contentMode = .scaleAspectFill
-        
         self.greetingLabel.text = greetingText
         super.init(nibName: nil, bundle: nil)
+        imageView.contentMode = .scaleAspectFill
     }
     
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
     }
+    
+    var router: RouterProtocol?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -115,10 +129,12 @@ final class OnboardingViewController: UIViewController {
         setupLayout()
     }
     
+    
     @objc func buttonTapped() {
-        let mainVC = MainTabBarController()
-        mainVC.modalPresentationStyle = .fullScreen
-        present(mainVC, animated: true)
+        router?.mainTrackerController()
+//        let mainVC = MainTabBarController(
+//        mainVC.modalPresentationStyle = .fullScreen
+//        present(mainVC, animated: true)
     }
 }
 
@@ -137,7 +153,7 @@ private extension OnboardingViewController {
         NSLayoutConstraint.activate([
             greetingLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .leadingInset),
             greetingLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: .trailingInset),
-            greetingLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 27)
+            greetingLabel.topAnchor.constraint(equalTo: view.centerYAnchor)
         ])
         
         NSLayoutConstraint.activate([

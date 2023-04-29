@@ -14,7 +14,18 @@ final class TrackersViewController: UIViewController {
         return view
     }()
     let placeholderView = PlaceholderView(state: .star)
-  
+    
+    var router: RouterProtocol
+    
+    init(router: RouterProtocol) {
+        self.router = router
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - UIConstants
     private enum UIConstants {
         static let trackerHeaderHeight: CGFloat = 30
@@ -40,6 +51,7 @@ final class TrackersViewController: UIViewController {
             return nil
         }
     }()
+    
     private var currentDay = Date()
     private var weekDayNumber: String {
         String(Date.currentWeekDayNumber(from: currentDay))
@@ -112,7 +124,7 @@ private extension TrackersViewController {
     }
     
     func setConstraints() {
-        let headerViewConstraints = [
+        NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.topAnchor,
                 constant: UIConstants.topInset),
@@ -124,8 +136,9 @@ private extension TrackersViewController {
                 constant: UIConstants.trailingInset),
             headerView.heightAnchor.constraint(
                 equalToConstant: UIConstants.headerHeight)
-        ]
-        let searchViewConstraints = [
+        ])
+        
+        NSLayoutConstraint.activate([
             searchView.topAnchor.constraint(
                 equalTo: headerView.bottomAnchor,
                 constant: UIConstants.topInset),
@@ -136,26 +149,21 @@ private extension TrackersViewController {
             searchView.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
                 constant: UIConstants.searchTrailing)
-        ]
-        let collectionViewConstraints = [
+        ])
+        
+        NSLayoutConstraint.activate([
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.topAnchor.constraint(
                 equalTo: searchView.bottomAnchor,
                 constant: UIConstants.collectionToSearchViewOffset),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        let placeholderImageViewConstraints = [
+        ])
+        
+        NSLayoutConstraint.activate([
             placeholderView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
             placeholderView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(
-            headerViewConstraints +
-            searchViewConstraints +
-            collectionViewConstraints +
-            placeholderImageViewConstraints
-        )
+        ])
     }
 }
 
