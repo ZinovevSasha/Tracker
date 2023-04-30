@@ -23,8 +23,8 @@ final class TrackerHeader: UICollectionReusableView {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -34,11 +34,11 @@ final class TrackerHeader: UICollectionReusableView {
 
 // MARK: - Private methods
 private extension TrackerHeader {
-    func initialise() {
+    func setupUI() {
         addSubviews(categoryLabel)
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             categoryLabel.leadingAnchor.constraint(
                 equalTo: leadingAnchor,

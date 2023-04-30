@@ -94,20 +94,13 @@ final class DataProvider: NSObject {
     
     // MARK: - Init
     init(delegate: DataProviderDelegate?) throws {
-        guard let context = (UIApplication.shared.delegate as? AppDelegate)?
-            .persistentContainer.viewContext else {
-                throw DataProviderError.contextUnavailable
-        }
+        let context = try Context.getContext()
         
         self.delegate = delegate
         self.context = context
         self.trackerStore = TrackerStore(context: context)
         self.trackerRecordStore = TrackerRecordStore(context: context)
         self.trackerCategoryStore = TrackerCategoryStore(context: context)
-    }
-
-    enum DataProviderError: Error {
-        case contextUnavailable
     }
 }
 

@@ -55,8 +55,8 @@ final class TrackerHeaderView: UIView {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -75,14 +75,14 @@ final class TrackerHeaderView: UIView {
 
 // MARK: - Private methods
 private extension TrackerHeaderView {
-    func initialise() {
+    func setupUI() {
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         plusButton.addTarget(self, action: #selector(handlePlusButtonTap), for: .touchUpInside)
         stackView.addSubviews(trackerLabel, datePicker)
         addSubviews(plusButton, stackView)
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             plusButton.leadingAnchor.constraint(equalTo: leadingAnchor),
             plusButton.topAnchor.constraint(equalTo: topAnchor)

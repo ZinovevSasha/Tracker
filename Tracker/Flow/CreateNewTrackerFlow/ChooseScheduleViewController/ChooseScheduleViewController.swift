@@ -47,8 +47,8 @@ final class ChooseScheduleViewController: FrameViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     // MARK: - Private @objc target action methods
@@ -60,7 +60,7 @@ final class ChooseScheduleViewController: FrameViewController {
 
 // MARK: - Private Methods
 private extension ChooseScheduleViewController {
-    func initialise() {
+    func setupUI() {
         // Table in container:
         tableView.delegate = self
         tableView.dataSource = self
@@ -69,7 +69,7 @@ private extension ChooseScheduleViewController {
         container.addSubviews(tableView)
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: container.trailingAnchor),

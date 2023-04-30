@@ -20,7 +20,7 @@ final class SearchView: UIView {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -34,7 +34,7 @@ final class SearchView: UIView {
 
 // MARK: - Private methods
 private extension SearchView {
-    func initialise() {
+    func setupUI() {
         searchBar.delegate = self
     
         addSubviews(searchBar)

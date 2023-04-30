@@ -18,8 +18,8 @@ extension UIView {
         shakingAnimation.repeatCount = 5
         shakingAnimation.autoreverses = true
         
-        let fromPoint = CGPoint(x: self.center.x - 5, y: self.center.y)
-        let toPoint = CGPoint(x: self.center.x + 5, y: self.center.y)
+        let fromPoint = CGPoint(x: self.center.x - 4, y: self.center.y)
+        let toPoint = CGPoint(x: self.center.x + 4, y: self.center.y)
         
         shakingAnimation.fromValue = NSValue(cgPoint: fromPoint)
         shakingAnimation.toValue = NSValue(cgPoint: toPoint)

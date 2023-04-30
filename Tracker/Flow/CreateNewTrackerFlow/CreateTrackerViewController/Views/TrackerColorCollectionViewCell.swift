@@ -39,7 +39,7 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
     // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        initialise()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -49,14 +49,14 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
 
 // MARK: Private methods
 private extension TrackerColorCollectionViewCell {
-    func initialise() {
+    func setupLayout() {
         contentView.addSubviews(colorView, highlightedImage)
         
         NSLayoutConstraint.activate([
             highlightedImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             highlightedImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            
-            
+        ])
+        NSLayoutConstraint.activate([
             colorView.heightAnchor.constraint(equalToConstant: 40),
             colorView.widthAnchor.constraint(equalToConstant: 40),
             colorView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),

@@ -41,7 +41,7 @@ final class MyTableViewCell: UITableViewCell {
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -51,7 +51,7 @@ final class MyTableViewCell: UITableViewCell {
 
 // MARK: - Private methods
 private extension MyTableViewCell {
-    func initialise() {
+    func setupUI() {
         contentView.addSubviews(stackView, accessoryImageView)
         contentView.backgroundColor = .myBackground
         selectionStyle = .none

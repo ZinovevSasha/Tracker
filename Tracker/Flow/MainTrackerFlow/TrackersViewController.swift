@@ -75,9 +75,9 @@ final class TrackersViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        initialise()
+        setupUI()
         setDelegates()
-        setConstraints()
+        setupLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -91,9 +91,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - @objc target action methods
     func handlePlusButtonTap() {
-        let trackerCreationViewController = ChooseTrackerViewController(
-            categories: dataProvider?.getCategories() ?? [],
-            from: self,
+        let trackerCreationViewController = ChooseTrackerViewController(from: self,
             date: dateString
         )
         let navVc = UINavigationController(rootViewController: trackerCreationViewController)
@@ -109,7 +107,7 @@ final class TrackersViewController: UIViewController {
 
 // MARK: - Private methods
 private extension TrackersViewController {
-    func initialise() {
+    func setupUI() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
         view.addGestureRecognizer(tapGesture)
         view.backgroundColor = .myWhite
@@ -123,7 +121,7 @@ private extension TrackersViewController {
         collectionView.delegate = self
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.topAnchor,

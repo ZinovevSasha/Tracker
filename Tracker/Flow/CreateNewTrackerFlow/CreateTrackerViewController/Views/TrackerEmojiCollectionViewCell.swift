@@ -28,7 +28,7 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -38,7 +38,7 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
 
 // MARK: Private methods
 private extension TrackerEmojiCollectionViewCell {
-    func initialise() {
+    func setupUI() {
         contentView.addSubviews(text)
         contentView.layer.cornerRadius = 16
         contentView.layer.masksToBounds = true

@@ -18,15 +18,15 @@ final class Assembly: AssemblyProtocol {
     }
     
     func createChoseTrackerViewController(router: RouterProtocol) -> UIViewController {
-        return ChooseTrackerViewController(categories: [], from: TrackersViewController(router: router), date: "")
+        return ChooseTrackerViewController(from: TrackersViewController(router: router), date: "")
     }
     
     func createTrackerViewControllerBuilder() -> UIViewController {
-        return CreateTrackerViewController(configuration: .oneRow, addCategories: [], date: "")
+        return CreateTrackerViewController(configuration: .oneRow, date: "")
     }
     
     func createCategoryListViewController() -> UIViewController {
-        return CategoryListViewController(tempCategory: [], lastRow: 0)
+        return CategoriesListViewController()
     }
     
     func createNewCategoryViewControllerBuilder() -> UIViewController {

@@ -74,7 +74,7 @@ class FrameViewController: UIViewController, FrameViewControllerProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        setConstraints()
+        setupLayout()
     }
         
     @objc func handleButtonLeftTap() {}
@@ -101,7 +101,7 @@ private extension FrameViewController {
         }
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             screenTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: UIConstants.nameLabelTopInset),
             screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor)

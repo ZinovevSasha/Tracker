@@ -47,7 +47,7 @@ final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -66,7 +66,7 @@ final class ScheduleTableViewCell: UITableViewCell {
 
 // MARK: - Private methods
 private extension ScheduleTableViewCell {
-    func initialise() {
+    func setupUI() {
         weakDaySwitch.addTarget(self, action: #selector(handleWeakDaySwitch), for: .touchUpInside)
         stackView.addSubviews(weakDayLabel, weakDaySwitch)
         contentView.addSubviews(stackView)

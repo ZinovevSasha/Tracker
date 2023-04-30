@@ -1,8 +1,7 @@
 import UIKit
 
 final class MainTabBarController: UITabBarController {
-    var router: RouterProtocol?
-    
+    // MARK: - Init
     init(
         trackers: TrackersViewController,
         statistic: StatisticViewController
@@ -31,6 +30,7 @@ final class MainTabBarController: UITabBarController {
     }
 }
 
+// MARK: - Private methods
 private extension MainTabBarController {
     func generateViewController(_ rootViewController: UIViewController, image: UIImage?, title: String) -> UIViewController {
         let viewController = rootViewController

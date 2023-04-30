@@ -4,16 +4,32 @@ struct DataForTableInCreateTrackerController {
     private var category = RowData(title: "Категория", subtitle: "")
     private var schedule = RowData(title: "Расписание", subtitle: "")
     
+    private let userDafaults = UserDefaults()
+    enum Key: String {
+        case categoryHeader
+    }
+    
+    var categoryName: String {
+        if let header = userDafaults.string(forKey: Key.categoryHeader.rawValue) {
+            return header
+        } else {
+            return ""
+        }
+    }
+    
     var oneRow: [RowData] {
-        [category]
+        [RowData(title: "Категория", subtitle: categoryName)]
     }
     
     var twoRows: [RowData] {
-        [category, schedule]
+        oneRow + [schedule]
     }
+    
+    
     
     mutating func addCategory(_ subtitle: String) {
         category.subtitle = subtitle
+        userDafaults.set(subtitle, forKey: Key.categoryHeader.rawValue)
     }
     
     mutating func addSchedule(_ subtitle: String?) {

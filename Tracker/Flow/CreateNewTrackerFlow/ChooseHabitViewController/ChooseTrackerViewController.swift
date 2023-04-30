@@ -30,18 +30,15 @@ final class ChooseTrackerViewController: UIViewController {
         static let buttonsHeight: CGFloat = 60
     }
     
-    private var trackersController: TrackersViewController?
-    private var categories: [TrackerCategory] = []
+    private weak var trackersController: TrackersViewController?
     private let date: String
     
     // MARK: - Init
     init(
-        categories: [TrackerCategory],
         from controller: TrackersViewController,
         date: String
     ) {
         self.trackersController = controller
-        self.categories = categories
         self.date = date
         super.init(nibName: nil, bundle: nil)
     }
@@ -55,8 +52,8 @@ final class ChooseTrackerViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,13 +72,13 @@ final class ChooseTrackerViewController: UIViewController {
     
     // MARK: - Private @objc target action methods
     @objc private func habitButtonTaped() {
-        let vc = CreateTrackerViewController(configuration: .twoRows, addCategories: categories, date: date)
+        let vc = CreateTrackerViewController(configuration: .twoRows, date: date)
         vc.delegate = trackersController
         navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc private func irregularEventButtonTapped() {
-        let vc = CreateTrackerViewController(configuration: .oneRow, addCategories: categories, date: date)
+        let vc = CreateTrackerViewController(configuration: .oneRow, date: date)
         vc.delegate = trackersController
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -89,7 +86,7 @@ final class ChooseTrackerViewController: UIViewController {
 
 // MARK: - Private methods
 private extension ChooseTrackerViewController {
-    func initialise() {
+    func setupUI() {
         // Add targets
         habitButton.addTarget(
             self, action: #selector(habitButtonTaped), for: .touchUpInside)
@@ -102,10 +99,9 @@ private extension ChooseTrackerViewController {
         view.backgroundColor = .myWhite
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
-            nameOfScreenLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
-                constant: UIConstants.nameLabelTopInset),
+            nameOfScreenLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: UIConstants.nameLabelTopInset),
             nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         

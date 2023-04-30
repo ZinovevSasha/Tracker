@@ -5,15 +5,15 @@ protocol CreateTrackerViewControllerDelegate: AnyObject {
 }
 
 final class CreateTrackerViewController: UIViewController {
+    // MARK: - Public
+    weak var delegate: CreateTrackerViewControllerDelegate?
+    
     // MARK: - Configuration
     enum Configuration {
         case oneRow
         case twoRows
     }
 
-    // MARK: - Public
-    weak var delegate: CreateTrackerViewControllerDelegate?
-    
     // MARK: - Private properties
     private let nameOfScreenLabel: UILabel = {
         let view = UILabel()
@@ -28,9 +28,7 @@ final class CreateTrackerViewController: UIViewController {
         view.axis = .vertical
         return view
     }()
-    
     private let titleTextfield = TrackerUITextField(text: "Ведите название трекера")
-
     private let warningCharactersLabel: UILabel = {
         let view = UILabel()
         view.text = "Ограничение 38 символов"
@@ -39,20 +37,16 @@ final class CreateTrackerViewController: UIViewController {
         view.textAlignment = .center
         return view
     }()
-    private lazy var parametersTableView: UITableView = {
+    private let tableView: UITableView = {
         let view = UITableView()
         view.separatorColor = .myGray
         view.backgroundColor = .myWhite
         view.layer.cornerRadius = .cornerRadius
         view.register(cellClass: MyTableViewCell.self)
-        view.delegate = self
-        view.dataSource = self
         return view
     }()
-    private lazy var parametersCollectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-        view.delegate = self
-        view.dataSource = self
         view.isScrollEnabled = false
         view.allowsMultipleSelection = false
         view.showsVerticalScrollIndicator = false
@@ -61,7 +55,6 @@ final class CreateTrackerViewController: UIViewController {
         view.register(cellClass: TrackerColorCollectionViewCell.self)
         return view
     }()
-    
     private let cancelButton = ActionButton(colorType: .red, title: "Отменить")
     private let createButton = ActionButton(colorType: .grey, title: "Создать")
 
@@ -85,10 +78,6 @@ final class CreateTrackerViewController: UIViewController {
         bottomInset: 24,
         spacing: 0
     )
-    
-    // MARK: - Model
-    private var categories: [TrackerCategory] = []
-    private var lastRow: Int?
     
     private var dataForTableView = DataForTableInCreateTrackerController()
     private let dataForCollectionView = DataSourceEmojisColor().dataSource
@@ -130,10 +119,8 @@ final class CreateTrackerViewController: UIViewController {
     
     init(
         configuration: Configuration,
-        addCategories categories: [TrackerCategory],
         date: String
     ) {
-        self.categories = categories
         self.configuration = configuration
         self.date = date
         super.init(nibName: nil, bundle: nil)
@@ -150,15 +137,17 @@ final class CreateTrackerViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialise()
-        setConstraints()
+        setDelegates()
+        addTargets()
+        setupUI()
+        setupLayout()
         configureButton()
     }
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        if parametersCollectionViewHeight?.constant != parametersCollectionView.contentSize.height {
-            parametersCollectionViewHeight?.constant = parametersCollectionView.contentSize.height
+        if parametersCollectionViewHeight?.constant != collectionView.contentSize.height {
+            parametersCollectionViewHeight?.constant = collectionView.contentSize.height
         }
     }
     
@@ -198,13 +187,22 @@ final class CreateTrackerViewController: UIViewController {
 
 // MARK: - Private methods
 private extension CreateTrackerViewController {
-    func initialise() {
+    func setDelegates() {
+        tableView.delegate = self
+        tableView.dataSource = self
         titleTextfield.delegate = self
+        collectionView.delegate = self
+        collectionView.dataSource = self
+    }
+    
+    func addTargets() {
         cancelButton.addTarget(
             self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         createButton.addTarget(
             self, action: #selector(createButtonTapped), for: .touchUpInside)
-        
+    }
+    
+    func setupUI() {
         view.addSubviews(nameOfScreenLabel, container, buttonStackView)
         view.backgroundColor = .myWhite
         
@@ -215,49 +213,34 @@ private extension CreateTrackerViewController {
         mainScrollView.addSubviews(mainStackView)
         mainScrollView.showsVerticalScrollIndicator = false
         
-       
         mainStackView.addSubviews(
             titleTextfield,
             warningCharactersLabel,
-            parametersTableView,
-            parametersCollectionView
+            tableView,
+            collectionView
         )
         mainStackView.setCustomSpacing(8, after: titleTextfield)
         mainStackView.setCustomSpacing(16, after: warningCharactersLabel)
-        mainStackView.setCustomSpacing(32, after: parametersTableView)
+        mainStackView.setCustomSpacing(32, after: tableView)
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
-            nameOfScreenLabel.topAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.topAnchor,
+            nameOfScreenLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
                 constant: 27),
             nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            container.leadingAnchor.constraint(
-                equalTo: view.leadingAnchor,
-                constant: 16),
-            container.trailingAnchor.constraint(
-                equalTo: view.trailingAnchor,
-                constant: -16),
-            container.topAnchor.constraint(
-                equalTo: nameOfScreenLabel.bottomAnchor,
-                constant: 27),
-            container.bottomAnchor.constraint(
-                equalTo: buttonStackView.topAnchor,
-                constant: -16),
+            container.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            container.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            container.topAnchor.constraint(equalTo: nameOfScreenLabel.bottomAnchor, constant: 27),
+            container.bottomAnchor.constraint(equalTo: buttonStackView.topAnchor, constant: -16),
             
-            mainScrollView.leadingAnchor.constraint(
-                equalTo: container.leadingAnchor),
-            mainScrollView.trailingAnchor.constraint(
-                equalTo: container.trailingAnchor),
-            mainScrollView.topAnchor.constraint(
-                equalTo: container.topAnchor),
-            mainScrollView.bottomAnchor.constraint(
-                equalTo: container.bottomAnchor),
+            mainScrollView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            mainScrollView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            mainScrollView.topAnchor.constraint(equalTo: container.topAnchor),
+            mainScrollView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
                         
-            mainStackView.leadingAnchor.constraint(
-                equalTo: mainScrollView.contentLayoutGuide.leadingAnchor),
+            mainStackView.leadingAnchor.constraint(equalTo: mainScrollView.contentLayoutGuide.leadingAnchor),
             mainStackView.trailingAnchor.constraint(
                 equalTo: mainScrollView.contentLayoutGuide.trailingAnchor),
             mainStackView.topAnchor.constraint(
@@ -269,15 +252,13 @@ private extension CreateTrackerViewController {
             
             titleTextfield.heightAnchor.constraint(equalToConstant: .cellHeight),
             
-            parametersTableView.heightAnchor.constraint(
-                equalToConstant: CGFloat(parametersTableView.numberOfRows(inSection: .zero) * 75)
+            tableView.heightAnchor.constraint(
+                equalToConstant: CGFloat(tableView.numberOfRows(inSection: .zero) * 75)
             ),
             
             cancelButton.heightAnchor.constraint(equalToConstant: .buttonsHeight),
             
-            buttonStackView.leadingAnchor.constraint(
-                equalTo: view.leadingAnchor,
-                constant: .leadingInset),
+            buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .leadingInset),
             buttonStackView.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
                 constant: .trailingInset),
@@ -286,7 +267,7 @@ private extension CreateTrackerViewController {
                 constant: -24)
         ])
         
-        parametersCollectionViewHeight = parametersCollectionView.heightAnchor.constraint(equalToConstant: .zero)
+        parametersCollectionViewHeight = collectionView.heightAnchor.constraint(equalToConstant: .zero)
         parametersCollectionViewHeight?.isActive = true
         
         warningLabelHeight = warningCharactersLabel.heightAnchor.constraint(equalToConstant: .zero)
@@ -334,10 +315,10 @@ extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch configuration {
         case .oneRow:
-            pushCategoryListViewController(categories: categories, lastRow: lastRow)
+            pushCategoryListViewController(withCategoryName: dataForTableView.categoryName)
         case .twoRows:
             if indexPath.row == .zero {
-                pushCategoryListViewController(categories: categories, lastRow: lastRow)
+                pushCategoryListViewController(withCategoryName: dataForTableView.categoryName)
             } else {
                 pushScheduleListViewController(weekDays: user.selectedWeekDay ?? [])
             }
@@ -362,22 +343,21 @@ extension CreateTrackerViewController: UITableViewDelegate {
             self?.user.setWeekDay(weekDays)
             // update ui
             self?.dataForTableView.addSchedule(weekDays.weekdayStringShort())
-            self?.parametersTableView.reloadData()
+            self?.tableView.reloadData()
         }
     }
     
-    private func pushCategoryListViewController(categories: [TrackerCategory], lastRow: Int?) {
-        let categoryController = CategoryListViewController(tempCategory: categories, lastRow: lastRow)
+    private func pushCategoryListViewController(withCategoryName name: String) {
+        let categoryController = CategoriesListViewController()
+        let viewModel = CategoriesListViewModel(categoryName: name)
+        categoryController.set(viewModel: viewModel)
         navigationController?.pushViewController(categoryController, animated: true)
         // Call back
-        categoryController.trackerCategories = { [weak self] categories, categoryHeader, lastRow in
-            // save data
-            self?.lastRow = lastRow
-            self?.user.setCategory(categoryHeader)
-            self?.categories = categories
+        categoryController.getHeaderOfCategory = { [weak self] header in
+            self?.user.setCategory(header)
             // update ui
-            self?.dataForTableView.addCategory(categoryHeader)
-            self?.parametersTableView.reloadData()
+            self?.dataForTableView.addCategory(header)
+            self?.tableView.reloadData()
         }
     }
 }
@@ -475,7 +455,7 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
 
 // MARK: - UITextFieldDelegate
 extension CreateTrackerViewController: TrackerUITextFieldDelegate {
-    func isChangeText(text: String, newLength: Int) -> Bool {
+    func isChangeText(text: String, newLength: Int) -> Bool? {
         // Save text as tracker Name
         if text.isEmpty {
             self.user.setTitle(nil)

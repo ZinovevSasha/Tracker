@@ -1,7 +1,7 @@
 import UIKit
 
 protocol TrackerUITextFieldDelegate: AnyObject {
-    func isChangeText(text: String, newLength: Int) -> Bool
+    func isChangeText(text: String, newLength: Int) -> Bool?
 }
 
 final class TrackerUITextField: UIView {
@@ -32,8 +32,8 @@ final class TrackerUITextField: UIView {
     init(text: String) {
         textField.placeholder = text
         super.init(frame: .zero)
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -47,13 +47,12 @@ final class TrackerUITextField: UIView {
 
 // MARK: - Private Methods
 private extension TrackerUITextField {
-    func initialise() {
+    func setupUI() {
         addSubviews(textField)
         textField.delegate = self
-        
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             textField.leadingAnchor.constraint(equalTo: leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: trailingAnchor),

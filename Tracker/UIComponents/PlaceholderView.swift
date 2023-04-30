@@ -41,7 +41,7 @@ final class PlaceholderView: UIView {
         super.init(frame: .zero)
         self.state = state
         
-        initialise()
+        setupUI()
         updateAppearance()
     }
     
@@ -52,7 +52,7 @@ final class PlaceholderView: UIView {
 
 // MARK: - Private methods
 private extension PlaceholderView {
-    func initialise() {
+    func setupUI() {
         addSubviews(placeholderText, placeholderImageView)
                 
         NSLayoutConstraint.activate([
@@ -64,8 +64,8 @@ private extension PlaceholderView {
         
         NSLayoutConstraint.activate([
             placeholderText.centerXAnchor.constraint(equalTo: centerXAnchor),
-            placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .leadingInset),
+            placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .trailingInset),
             placeholderText.topAnchor.constraint(equalTo: placeholderImageView.bottomAnchor,
                 constant: UIConstants.textToImageOffset)
         ])

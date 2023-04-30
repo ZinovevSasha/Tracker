@@ -108,8 +108,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -124,14 +124,14 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
 
 // MARK: - Private methods
 private extension TrackerCollectionViewCell {
-    func initialise() {
+    func setupUI() {
         emojiContainerView.addSubviews(emojiLabel)
         trackerContainerView.addSubviews(emojiContainerView, trackerNameLabel)
         contentView.addSubviews(trackerContainerView, trackedDaysLabel, addButton)
         addButton.addTarget(self, action: #selector(handleAddButtonTap), for: .touchUpInside)
     }
     
-    func setConstraints() {
+    func setupLayout() {
         let trackerContainerViewConstraints = [
             trackerContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             trackerContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),

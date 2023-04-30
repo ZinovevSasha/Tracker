@@ -16,7 +16,7 @@ final class CollectionReusableView: UICollectionReusableView {
     // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -26,7 +26,7 @@ final class CollectionReusableView: UICollectionReusableView {
 
 // MARK: Private methods
 private extension CollectionReusableView {
-    func initialise() {
+    func setupUI() {
         addSubviews(text)
         
         NSLayoutConstraint.activate([

@@ -2,7 +2,7 @@ import UIKit
 
 protocol CreateNewCategoryViewControllerDelegate: AnyObject {
     func categoryNameDidEntered(categoryName name: String)
-    func isNameAvailable(name: String) -> Bool
+    func isNameAvailable(name: String) -> Bool?
 }
 
 final class CreateNewCategoryViewController: FrameViewController {
@@ -33,8 +33,8 @@ final class CreateNewCategoryViewController: FrameViewController {
     // MARK: Lifecicle
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     // MARK: - Category name
@@ -66,14 +66,14 @@ final class CreateNewCategoryViewController: FrameViewController {
 
 // MARK: - Private Methods
 private extension CreateNewCategoryViewController {
-    func initialise() {
+    func setupUI() {
         container.addSubviews(mainStackView)
         mainStackView.addSubviews(textField)
         mainStackView.setCustomSpacing(8, after: textField)
         textField.delegate = self
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             mainStackView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             mainStackView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
@@ -89,7 +89,7 @@ private extension CreateNewCategoryViewController {
 
 // MARK: - TrackerUITextFieldDelegate
 extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
-    func isChangeText(text: String, newLength: Int) -> Bool {
+    func isChangeText(text: String, newLength: Int) -> Bool? {
         guard !text.isEmpty else {
             // if text isEmpty
             updateCategoryName(nil)

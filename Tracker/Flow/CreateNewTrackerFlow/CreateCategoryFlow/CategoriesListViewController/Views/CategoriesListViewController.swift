@@ -1,8 +1,8 @@
 import UIKit
 
-final class CategoryListViewController: FrameViewController {
+final class CategoriesListViewController: FrameViewController {
     // MARK: - Call Back
-    var trackerCategories: (([TrackerCategory], String, Int?) -> Void)?
+    var getHeaderOfCategory: ((String) -> Void)?
     
     // MARK: - Private properties
     private let placeholder = PlaceholderView(state: .recomendation)
@@ -23,15 +23,27 @@ final class CategoryListViewController: FrameViewController {
         static let topInset: CGFloat = 24
         static let bottomInset: CGFloat = -16
     }
-   
-    // MARK: - Data
-    private var tempCategory: [TrackerCategory] = []
-    private var lastRow: Int?
+    
+    private var viewModel: CategoriesListViewModel?
+    
+    func set(viewModel: CategoriesListViewModel) {
+        self.viewModel = viewModel
+        bind()
+    }
+    
+    func bind() {
+        viewModel?.$categories.bind { [weak self] categories in
+            self?.tableView.reloadData()
+            if !categories.isEmpty {
+                self?.placeholder.state = .invisible(animate: false)
+            } else {
+                self?.placeholder.state = .recomendation
+            }
+        }
+    }
     
     // MARK: - Init
-    init(tempCategory: [TrackerCategory], lastRow: Int?) {
-        self.tempCategory = tempCategory
-        self.lastRow = lastRow
+    init() {
         super.init(
             title: "Категория",
             buttonCenter: ActionButton(colorType: .black, title: "Добавить категорию")
@@ -44,17 +56,9 @@ final class CategoryListViewController: FrameViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialise()
-        setConstraints()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if tempCategory.isEmpty {
-            placeholder.state = .recomendation
-        } else {
-            placeholder.state = .invisible(animate: false)
-        }
+        viewModel?.getAllCategories()
+        setupUI()
+        setupLayout()
     }
     
     // MARK: - Private @objc target action methods
@@ -66,15 +70,15 @@ final class CategoryListViewController: FrameViewController {
 }
 
 // MARK: - Private Methods
-private extension CategoryListViewController {
-    func initialise() {
+private extension CategoriesListViewController {
+    func setupUI() {
         tableView.delegate = self
         tableView.dataSource = self
         
         container.addSubviews(tableView, placeholder)
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             placeholder.centerXAnchor.constraint(equalTo: container.centerXAnchor),
             placeholder.centerYAnchor.constraint(equalTo: container.centerYAnchor),
@@ -83,31 +87,27 @@ private extension CategoryListViewController {
             tableView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: container.topAnchor),
-            tableView.bottomAnchor.constraint(
-                equalTo: container.bottomAnchor,
-                constant: UIConstants.bottomInset
-            )
+            tableView.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: UIConstants.bottomInset)
         ])
     }
 }
 
 // MARK: - UITableViewDataSource
-extension CategoryListViewController: UITableViewDataSource {
+extension CategoriesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tempCategory.count
+        return viewModel?.categories.count ?? .zero
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let isImage = lastRow == indexPath.row
         let cell: CategoryTableViewCell = tableView.dequeueReusableCell(for: indexPath)
         cell.setCorners(in: tableView, at: indexPath)
-        cell.configure(with: tempCategory[indexPath.row].header, setImage: isImage)
+        cell.viewModel = viewModel?.categories[indexPath.row]
         return cell
     }
 }
 
 // MARK: - UITableViewDelegate
-extension CategoryListViewController: UITableViewDelegate {
+extension CategoriesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return .cellHeight
     }
@@ -117,25 +117,23 @@ extension CategoryListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let _ = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
-            let header = tempCategory[indexPath.row].header
-            lastRow = indexPath.row
-            trackerCategories?(tempCategory, header, lastRow)
-            tableView.reloadData()
+        if let cell = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
+            if let header = viewModel?.categories[indexPath.row].header {
+                getHeaderOfCategory?(header)                
+            }
+            viewModel?.categorySelected(at: indexPath)
             navigationController?.popViewController(animated: true)
         }
     }
 }
 
 // MARK: - CreateNewCategoryViewControllerDelegate
-extension CategoryListViewController: CreateNewCategoryViewControllerDelegate {
-    func isNameAvailable(name: String) -> Bool {
-        !tempCategory.contains { $0.header == name }
+extension CategoriesListViewController: CreateNewCategoryViewControllerDelegate {
+    func isNameAvailable(name: String) -> Bool? {
+        viewModel?.isNameAvailable(name: name)
     }
     
     func categoryNameDidEntered(categoryName name: String) {
-        tempCategory.append(TrackerCategory(header: name, trackers: []))
-        placeholder.state = .invisible(animate: false)
-        tableView.reloadData()
+        viewModel?.categoryNameEntered(name: name)
     }
 }

@@ -7,7 +7,8 @@ protocol TrackerCategoryStoreProtocol {
 
 final class TrackerCategoryStore {
     private let context: NSManagedObjectContext
-    
+    private let predicateBuilder = PredecateBuilder<TrackerCategoryCoreData>()
+        
     init(context: NSManagedObjectContext) {
         self.context = context
     }
@@ -17,13 +18,9 @@ final class TrackerCategoryStore {
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func addCategory(with name: String, and tracker: TrackerCoreData) throws {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(
-            format: "%K == %@",
-            // search criteria
-            #keyPath(TrackerCategoryCoreData.header),
-            name
-        )
-        
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.header, value: name)
+            .build()
         let results = try context.fetch(fetchRequest)
         if let category = results.first {
             // Category already exists
@@ -35,7 +32,37 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             category.addToTrackers(tracker)
         }
         saveContext()
-}
+    }
+    
+    func addCategory(with name: String) throws {
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.header, value: name)
+            .build()
+        let results = try context.fetch(fetchRequest)
+        if let category = results.first {
+            // Category already exists
+            return
+        } else {
+            // Category does not exist, create new category
+            let category = TrackerCategoryCoreData(context: context)
+            category.header = name            
+        }
+        saveContext()
+    }
+    
+    func isNameAvailable(name: String) throws -> Bool {
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.header, value: name)
+            .build()
+        let results = try context.fetch(fetchRequest)
+        if let category = results.first {
+            return false
+        } else {
+            return true
+        }
+    }
     
     func getAllCategories() -> [TrackerCategory] {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
