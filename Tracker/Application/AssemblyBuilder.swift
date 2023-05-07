@@ -22,7 +22,7 @@ final class Assembly: AssemblyProtocol {
     }
     
     func createTrackerViewControllerBuilder() -> UIViewController {
-        return CreateTrackerViewController(configuration: .oneRow, date: "")
+        return CreateTrackerViewController()
     }
     
     func createCategoryListViewController() -> UIViewController {

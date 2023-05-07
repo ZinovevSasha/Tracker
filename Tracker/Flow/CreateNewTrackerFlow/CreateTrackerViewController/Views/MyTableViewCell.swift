@@ -2,7 +2,8 @@ import UIKit
 
 final class MyTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with info: RowData) {
+    func configure(with info: RowData?) {
+        guard let info = info else { return }
         myTextLabel.text = info.title
         supplementaryTextLabel.text = info.subtitle
     }

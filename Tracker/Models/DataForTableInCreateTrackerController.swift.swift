@@ -1,6 +1,6 @@
 import Foundation
 
-struct DataForTableInCreateTrackerController {
+struct CategoryAndScheduleData {
     private var category = RowData(title: "Категория", subtitle: "")
     private var schedule = RowData(title: "Расписание", subtitle: "")
     

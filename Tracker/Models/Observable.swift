@@ -17,7 +17,7 @@ final class Observable<Value> {
     }
     
     func bind(_ action: @escaping (Value) -> Void) {
-        action(wrappedValue)
+        
         self.onChange = action
     }
 }

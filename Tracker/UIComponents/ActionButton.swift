@@ -16,7 +16,7 @@ enum State {
 }
 
 final class ActionButton: UIButton {
-    // MARK: - ButtonState
+    // MARK: - ButtonColorType
     enum ColorType {
         case black, red, grey, trueBlack
     }
@@ -24,6 +24,17 @@ final class ActionButton: UIButton {
     var colorType: ColorType = .black {
         didSet {
             updateAppearance()
+        }
+    }
+    
+    // MARK: - ButtonState
+    enum State {
+        case enabled, disabled
+    }
+    
+    var buttonState: State = .disabled {
+        didSet {
+            configureButton()
         }
     }
     
@@ -74,6 +85,19 @@ final class ActionButton: UIButton {
             backgroundColor = .black
             setTitleColor(.white, for: .normal)
             setTitle(title, for: .normal)
+        }
+    }
+    
+    func configureButton() {
+        switch buttonState {
+        case .enabled:
+            UIView.animate(withDuration: 0.3, delay: 0) {
+                self.colorType = .black
+            }
+        case .disabled:
+            UIView.animate(withDuration: 0.3, delay: 0) {
+                self.colorType = .grey
+            }
         }
     }
 }

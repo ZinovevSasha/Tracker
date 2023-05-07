@@ -1,9 +1,13 @@
 import UIKit
 
-final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
+final class EmojiCell: UICollectionViewCell, Highilable {
     // MARK: - Public
-    func configure(with info: String) {
-        text.text = info
+    func configure(with emoji: String) {
+        text.text = emoji
+    }
+    
+    var content: String? {
+        text.text
     }
     
     func highlightUnhighlight() {
@@ -37,7 +41,7 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
 }
 
 // MARK: Private methods
-private extension TrackerEmojiCollectionViewCell {
+private extension EmojiCell {
     func setupUI() {
         contentView.addSubviews(text)
         contentView.layer.cornerRadius = 16

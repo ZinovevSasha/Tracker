@@ -58,7 +58,6 @@ final class DataProvider: NSObject {
     // Delegate
     weak var delegate: DataProviderDelegate?
     
-    
     // Fetch controller
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = TrackerCoreData.fetchRequest()

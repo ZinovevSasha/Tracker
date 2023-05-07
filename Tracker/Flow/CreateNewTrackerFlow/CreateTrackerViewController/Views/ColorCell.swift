@@ -1,12 +1,21 @@
 import UIKit
 
-final class TrackerColorCollectionViewCell: UICollectionViewCell {
+protocol Highilable {
+    var content: String? { get }
+    func highlightUnhighlight()    
+}
+
+final class ColorCell: UICollectionViewCell, Highilable {
     // MARK: Public
-    func configure(with info: String) {
-        colorView.backgroundColor = UIColor(named: info)
+    func configure(with color: String) {
+        colorView.backgroundColor = UIColor(hexString: color)       
     }
     
-    func addOrRemoveBorders() {
+    var content: String? {
+        colorView.backgroundColor?.toHexString()
+    }
+    
+    func highlightUnhighlight() {
         cellState.toggle()
     }
     
@@ -39,7 +48,7 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
     // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        setupLayout()
+        initialise()
     }
     
     required init?(coder: NSCoder) {
@@ -48,15 +57,15 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
 }
 
 // MARK: Private methods
-private extension TrackerColorCollectionViewCell {
-    func setupLayout() {
+private extension ColorCell {
+    func initialise() {
         contentView.addSubviews(colorView, highlightedImage)
         
         NSLayoutConstraint.activate([
             highlightedImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             highlightedImage.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-        ])
-        NSLayoutConstraint.activate([
+            
+            
             colorView.heightAnchor.constraint(equalToConstant: 40),
             colorView.widthAnchor.constraint(equalToConstant: 40),
             colorView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),

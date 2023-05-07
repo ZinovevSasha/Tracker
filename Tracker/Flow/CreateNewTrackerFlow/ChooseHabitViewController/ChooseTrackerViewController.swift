@@ -72,13 +72,21 @@ final class ChooseTrackerViewController: UIViewController {
     
     // MARK: - Private @objc target action methods
     @objc private func habitButtonTaped() {
-        let vc = CreateTrackerViewController(configuration: .twoRows, date: date)
-        vc.delegate = trackersController
-        navigationController?.pushViewController(vc, animated: true)
+        pushCreateTrackerViewController(type: .habit)
     }
     
     @objc private func irregularEventButtonTapped() {
-        let vc = CreateTrackerViewController(configuration: .oneRow, date: date)
+        pushCreateTrackerViewController(type: .ocasional)
+    }
+    
+    // Private
+    private func pushCreateTrackerViewController(type: UserTracker.TrackerType) {
+        let viewModel = CreateTrackerViewModel(
+            trackerType: type,
+            date: date
+        )
+        let vc = CreateTrackerViewController()
+        vc.setViewModel(viewModel: viewModel)
         vc.delegate = trackersController
         navigationController?.pushViewController(vc, animated: true)
     }

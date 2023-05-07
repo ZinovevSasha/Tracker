@@ -71,6 +71,6 @@ extension TrackerCoreData {
         guard let emoji = self.emoji else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
-        return Tracker(id: id, name: name, color: color, emoji: emoji)
+        return Tracker(id: id, name: name, emoji: emoji, color: color)
     }
 }

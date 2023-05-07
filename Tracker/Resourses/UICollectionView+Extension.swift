@@ -73,16 +73,17 @@ extension UICollectionView {
 
 
 extension UICollectionView {
-    func deselectOldSelectNew(
+    func deselectOldSelectNew<T: Highilable>(
+        type: T.Type,
         _ previouslySelectedIndexPath: IndexPath?,
-        configureDeselectedCell: ((UICollectionViewCell) -> Void)? = nil,
-        configureSelectedCell: ((UICollectionViewCell, IndexPath, Bool) -> Void)? = nil
+        configureSelectedCell: ((String?) -> Void)? = nil
     ) {
         // if cell selected first time
         if let newIndexPath = self.indexPathsForSelectedItems?.first {
             guard let previouslySelectedIndexPath = previouslySelectedIndexPath else {
-                if let cell = self.cellForItem(at: newIndexPath) {
-                    configureSelectedCell?(cell, newIndexPath, false)
+                if let cell = self.cellForItem(at: newIndexPath) as? T {
+                    cell.highlightUnhighlight()
+                    configureSelectedCell?(cell.content)
                 }
                 return
             }
@@ -90,16 +91,18 @@ extension UICollectionView {
             if previouslySelectedIndexPath != newIndexPath {
                 deselectItem(at: previouslySelectedIndexPath, animated: true)
                 
-                if let cell = self.cellForItem(at: previouslySelectedIndexPath) {
-                    configureDeselectedCell?(cell)
+                if let cell = self.cellForItem(at: previouslySelectedIndexPath) as? T {
+                    cell.highlightUnhighlight()
                 }
-                if let cell = self.cellForItem(at: newIndexPath) {
-                    configureSelectedCell?(cell, newIndexPath, false)
+                if let cell = self.cellForItem(at: newIndexPath) as? T {
+                    cell.highlightUnhighlight()
+                    configureSelectedCell?(cell.content)
                 }
                 // If new selected cell is same as previous selected
             } else {
-                if let cell = self.cellForItem(at: newIndexPath) {
-                    configureSelectedCell?(cell, previouslySelectedIndexPath, true)
+                if let cell = self.cellForItem(at: newIndexPath) as? T {
+                    cell.highlightUnhighlight()
+                    configureSelectedCell?(nil)                  
                 }
             }
         }

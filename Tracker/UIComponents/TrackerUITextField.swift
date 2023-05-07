@@ -60,14 +60,24 @@ private extension TrackerUITextField {
             textField.bottomAnchor.constraint(equalTo: bottomAnchor),
             textField.heightAnchor.constraint(equalToConstant: .cellHeight)
         ])
+        
+        
+    }
+    
+    func activateKeyboardFromBottom() {
+        self.becomeFirstResponder()
     }
 }
 
 // MARK: - UITextFieldDelegate
 extension TrackerUITextField: UITextFieldDelegate {
-    func textField(
-        _ textField: UITextField,
-        shouldChangeCharactersIn range: NSRange,
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        if let myTextField = textField as? TrackerUITextField {
+            myTextField.activateKeyboardFromBottom()
+        }
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
         replacementString string: String
     ) -> Bool {
         let currentText = textField.text ?? ""
@@ -81,4 +91,18 @@ extension TrackerUITextField: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
+}
+
+extension UIViewController {
+    
+    func hideKeyboardWhenTappedAround() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
 }

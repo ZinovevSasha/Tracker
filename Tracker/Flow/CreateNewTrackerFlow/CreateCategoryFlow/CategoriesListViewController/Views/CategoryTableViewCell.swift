@@ -4,6 +4,12 @@ final class CategoryTableViewCell: UITableViewCell {
     // MARK: - Public
     var viewModel: CategoryViewModel? {
         didSet {
+            categoryName.text = viewModel?.header
+            if let isSelected = viewModel?.isLastSelectedCategory {
+                let image = isSelected ? UIImage.checkmarkBlue : nil
+                selectedCategory.image = image
+            }
+            
             viewModel?.$header.bind { [weak self] header in
                 self?.categoryName.text = header
             }

@@ -2,46 +2,21 @@ import Foundation
 
 struct TrackerMaker {
     func createTrackerFrom(
-        userInput user: User,
-        collectionData: [CollectionViewData],
-        configuration: CreateTrackerViewController.Configuration,
-        date: String
-    ) -> TrackerCategory? {
+        _ userMadeTracker: UserTracker,
+        withDate date: String?
+    ) -> Tracker? {
+        // Check if required fields exist and unwrap them
         guard
-            let categoryName = user.selectedCategory,
-            let name = user.selectedName,
-            let emojiIndexPath = user.selectedEmoji,
-            let colorIndexPath = user.selectedColor,
-            case let .emojiSection(emojiItems) = collectionData[emojiIndexPath.section],
-            case let .colorSection(colorItems) = collectionData[colorIndexPath.section]
+            let name = userMadeTracker.name,
+            let emoji = userMadeTracker.emoji,
+            let color = userMadeTracker.color
         else {
             return nil
         }
+
+        let schedule = userMadeTracker.weekDay?.toNumbersString()
         
-        let emoji = emojiItems[emojiIndexPath.row]
-        let color = colorItems[colorIndexPath.row].rawValue
-        
-        switch configuration {
-        case .oneRow:
-            // Create occasional
-            let occasional = Tracker(
-                id: UUID().uuidString,
-                name: name,
-                color: color,
-                emoji: emoji,
-                date: date
-            )
-            return TrackerCategory(header: categoryName, trackers: [occasional])
-        case .twoRows:
-            // Create habit
-            let habit = Tracker(
-                id: UUID().uuidString,
-                name: name,
-                color: color,
-                emoji: emoji,
-                schedule: user.selectedWeekDay?.toNumbersString()
-            )
-            return (TrackerCategory(header: categoryName, trackers: [habit]))
-        }
+        // Create tracker
+        return Tracker(id: UUID().uuidString, name: name, emoji: emoji, color: color, date: date, schedule: schedule)
     }
 }

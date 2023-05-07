@@ -8,12 +8,6 @@ final class CreateTrackerViewController: UIViewController {
     // MARK: - Public
     weak var delegate: CreateTrackerViewControllerDelegate?
     
-    // MARK: - Configuration
-    enum Configuration {
-        case oneRow
-        case twoRows
-    }
-
     // MARK: - Private properties
     private let nameOfScreenLabel: UILabel = {
         let view = UILabel()
@@ -51,13 +45,15 @@ final class CreateTrackerViewController: UIViewController {
         view.allowsMultipleSelection = false
         view.showsVerticalScrollIndicator = false
         view.registerHeader(CollectionReusableView.self)
-        view.register(cellClass: TrackerEmojiCollectionViewCell.self)
-        view.register(cellClass: TrackerColorCollectionViewCell.self)
+        view.register(cellClass: EmojiCell.self)
+        view.register(cellClass: ColorCell.self)
         return view
     }()
     private let cancelButton = ActionButton(colorType: .red, title: "Отменить")
+    // Button that is changing depending on how the data is filled
     private let createButton = ActionButton(colorType: .grey, title: "Создать")
-
+    
+    
     private let buttonStackView: UIStackView = {
         let view = UIStackView()
         view.axis = .horizontal
@@ -68,7 +64,8 @@ final class CreateTrackerViewController: UIViewController {
     }()
     private let container = UIView()
     private let mainScrollView = UIScrollView()
-    
+        
+    // Collection view setup   
     let params = GeometryParams(
         cellCount: 6,
         cellSize: CGSize(width: 40, height: 40),
@@ -79,59 +76,34 @@ final class CreateTrackerViewController: UIViewController {
         spacing: 0
     )
     
-    private var dataForTableView = DataForTableInCreateTrackerController()
-    private let dataForCollectionView = DataSourceEmojisColor().dataSource
-    private let date: String
-    private let trackerMaker = TrackerMaker()
+    private var viewModel: CreateTrackerViewModel?
     
-    // User inputs
-    private var user = User() {
-        didSet {
-            switch configuration {
-            case .oneRow:
-                changeAppearanceOfTracker(type: .occasional)
-            case .twoRows:
-                changeAppearanceOfTracker(type: .habit)
-            }
+    func setViewModel(viewModel: CreateTrackerViewModel) {
+        self.viewModel = viewModel
+        bind()
+    }
+    
+    func bind() {
+//        viewModel?..bind { [weak self] category in
+//            if let category {
+//
+//            } else {
+//                self?.createButton.shakeSelf()
+//            }
+//        }
+        
+        viewModel?.$onCreateAllowedStateChange.bind { [weak self] isEnabled in
+            self?.setCreateButton(enabled: isEnabled)
         }
     }
     
-    func changeAppearanceOfTracker(type: TrackerType) {
-        if user.isUserGaveEnoughToCreateTracker(of: type) {
-            if buttonState == .unselected {
-                buttonState.toggle()
-            }
-        } else {
-            if buttonState == .selected {
-                buttonState.toggle()
-            }
-        }
-    }
-    
-    private var buttonState = State.unselected {
-        didSet {
-            configureButton()
-        }
-    }
-    
-    // MARK: - Init
-    private var configuration: Configuration
-    
-    init(
-        configuration: Configuration,
-        date: String
-    ) {
-        self.configuration = configuration
-        self.date = date
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("Unsupported")
-    }
-    
+    // IndexPath representing selected item
+    var selectedEmojiIndexPath: IndexPath?
+    var selectedColorIndexPath: IndexPath?
+    // Animatable
     private var parametersCollectionViewHeight: NSLayoutConstraint?
     private var warningLabelHeight: NSLayoutConstraint?
+    // FeedbackGenerator
     private let feedbackGenerator = UIImpactFeedbackGenerator(style: .heavy)
     
     // MARK: - Lifecycle
@@ -141,7 +113,6 @@ final class CreateTrackerViewController: UIViewController {
         addTargets()
         setupUI()
         setupLayout()
-        configureButton()
     }
     
     override func viewWillLayoutSubviews() {
@@ -156,32 +127,8 @@ final class CreateTrackerViewController: UIViewController {
         dismiss(animated: true)
     }
 
-    @objc private func createButtonTapped() {        
-        // if all fields are filled
-        switch configuration {
-        case .oneRow:
-            createTracker(of: .occasional)
-        case .twoRows:
-            createTracker(of: .habit)
-        }
-    }
-    
-    func createTracker(of type: TrackerType) {
-        guard user.isUserGaveEnoughToCreateTracker(of: type),
-              let category = trackerMaker.createTrackerFrom(
-                userInput: user,
-                collectionData: dataForCollectionView,
-                configuration: configuration,
-                date: date) else {
-            // if category cant be created shake button for better user experience
-            feedbackGenerator.impactOccurred()
-            createButton.shakeSelf()
-            return
-        }
-        // Give newly created category to delegate
-        delegate?.addTrackerCategory(category: category)
-        createButton.isEnabled.toggle()
-        dismiss(animated: false)
+    @objc private func createButtonTapped() {
+        viewModel?.createButtonTapped()
     }
 }
 
@@ -203,6 +150,10 @@ private extension CreateTrackerViewController {
     }
     
     func setupUI() {
+        mainScrollView.showsVerticalScrollIndicator = false
+    }
+    
+    func setupLayout() {
         view.addSubviews(nameOfScreenLabel, container, buttonStackView)
         view.backgroundColor = .myWhite
         
@@ -211,7 +162,6 @@ private extension CreateTrackerViewController {
         container.addSubviews(mainScrollView)
         
         mainScrollView.addSubviews(mainStackView)
-        mainScrollView.showsVerticalScrollIndicator = false
         
         mainStackView.addSubviews(
             titleTextfield,
@@ -222,9 +172,7 @@ private extension CreateTrackerViewController {
         mainStackView.setCustomSpacing(8, after: titleTextfield)
         mainStackView.setCustomSpacing(16, after: warningCharactersLabel)
         mainStackView.setCustomSpacing(32, after: tableView)
-    }
-    
-    func setupLayout() {
+        
         NSLayoutConstraint.activate([
             nameOfScreenLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
                 constant: 27),
@@ -274,54 +222,37 @@ private extension CreateTrackerViewController {
         warningLabelHeight?.isActive = true
     }
     
-    func configureButton() {
-        switch buttonState {
-        case .selected:
-            UIView.animate(withDuration: 0.3, delay: 0) {
-                self.createButton.colorType = .black
-            }
-        case .unselected:
-            UIView.animate(withDuration: 0.3, delay: 0) {
-                self.createButton.colorType = .grey
-            }
+    private func setCreateButton(enabled: Bool) {
+        if enabled {
+            createButton.buttonState = .enabled
+        } else {
+            createButton.buttonState = .disabled
         }
+        
     }
 }
 
 // MARK: - UITableViewDataSource
 extension CreateTrackerViewController: UITableViewDataSource{
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch configuration {
-        case .oneRow:
-            return dataForTableView.oneRow.count
-        case .twoRows:
-            return dataForTableView.twoRows.count
-        }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {       
+        viewModel?.numberOfRows ?? .zero
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: MyTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        switch configuration {
-        case .oneRow:
-            cell.configure(with: dataForTableView.oneRow[indexPath.row])
-        case .twoRows:
-            cell.configure(with: dataForTableView.twoRows[indexPath.row])
-        }
+        cell.configure(with: viewModel?.dataForTable[indexPath.row])
         return cell
     }
 }
 // MARK: - UITableViewDelegate
 extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch configuration {
-        case .oneRow:
-            pushCategoryListViewController(withCategoryName: dataForTableView.categoryName)
-        case .twoRows:
-            if indexPath.row == .zero {
-                pushCategoryListViewController(withCategoryName: dataForTableView.categoryName)
-            } else {
-                pushScheduleListViewController(weekDays: user.selectedWeekDay ?? [])
-            }
+        if indexPath.row == .zero {
+            let categoryName = viewModel?.userTracker.name ?? ""
+            pushCategoryListViewController(withCategoryName: categoryName)
+        } else {
+            let selectedWeekDays = viewModel?.userTracker.weekDay ?? []
+            pushScheduleListViewController(weekDays: selectedWeekDays)
         }
     }
     
@@ -339,11 +270,11 @@ extension CreateTrackerViewController: UITableViewDelegate {
         navigationController?.pushViewController(scheduleController, animated: true)
         // Call back
         scheduleController.weekDaysToShow = { [weak self] weekDays in
+            guard let self = self else { return }
             // save data
-            self?.user.setWeekDay(weekDays)
-            // update ui
-            self?.dataForTableView.addSchedule(weekDays.weekdayStringShort())
-            self?.tableView.reloadData()
+            self.viewModel?.userTracker.weekDay = weekDays
+            self.viewModel?.dataForTableView.addSchedule(weekDays.weekdayStringShort())
+            self.tableView.reloadData()
         }
     }
     
@@ -354,10 +285,10 @@ extension CreateTrackerViewController: UITableViewDelegate {
         navigationController?.pushViewController(categoryController, animated: true)
         // Call back
         categoryController.getHeaderOfCategory = { [weak self] header in
-            self?.user.setCategory(header)
-            // update ui
-            self?.dataForTableView.addCategory(header)
-            self?.tableView.reloadData()
+            guard let self = self else { return }
+            self.viewModel?.userTracker.name = header
+            self.viewModel?.dataForTableView.addCategory(header)
+            self.tableView.reloadData()
         }
     }
 }
@@ -388,27 +319,24 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - UICollectionViewDataSource
 extension CreateTrackerViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        dataForCollectionView.count
+        viewModel?.numberOfCollectionSections ?? .zero
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch dataForCollectionView[section] {
-        case .emojiSection(let items):
-            return items.count
-        case .colorSection(let items):
-            return items.count
-        }
+        viewModel?.numberOfItemsInSection(section) ?? .zero
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let section = dataForCollectionView[indexPath.section]
-        switch section {
+        guard let sectionType = viewModel?.getSection(indexPath) else {
+            return UICollectionViewCell()
+        }
+        switch sectionType {
         case .emojiSection(let items):
-            let cell: TrackerEmojiCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
+            let cell: EmojiCell = collectionView.dequeueReusableCell(for: indexPath)
             cell.configure(with: items[indexPath.row])
             return cell
         case .colorSection(let items):
-            let cell: TrackerColorCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
+            let cell: ColorCell = collectionView.dequeueReusableCell(for: indexPath)
             cell.configure(with: items[indexPath.row].rawValue)
             return cell
         }
@@ -418,8 +346,7 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             let header: CollectionReusableView = collectionView.dequeueHeader(ofKind: kind, for: indexPath)
-            let section = dataForCollectionView[indexPath.section]
-            header.configure(with: section.title)
+            header.configure(with: viewModel?.getSection(indexPath).title ?? "")
             return header
         default:
             fatalError("Unexpected element kind")
@@ -429,26 +356,20 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate
 extension CreateTrackerViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let sections = dataForCollectionView[indexPath.section]
-        switch sections {
+        guard let sectionType = viewModel?.getSection(indexPath) else { return }
+        switch sectionType {
         case .emojiSection:
-            collectionView.deselectOldSelectNew(user.selectedEmoji) { oldCell in
-                guard let oldCell = oldCell as? TrackerEmojiCollectionViewCell else { return }
-                oldCell.highlightUnhighlight() // set old cell
-            } configureSelectedCell: { [weak self]  newCell, indexPath, isSameCell in
-                guard let newCell = newCell as? TrackerEmojiCollectionViewCell else { return }
-                newCell.highlightUnhighlight() // set new cell
-                isSameCell ? self?.user.setEmojiIndexPath(nil): self?.user.setEmojiIndexPath(indexPath)
-            }
+            collectionView.deselectOldSelectNew(type: EmojiCell.self,
+                selectedEmojiIndexPath) { [weak self]  emoji in
+                    
+                    self?.viewModel?.userTracker.emoji = emoji
+                }
         case .colorSection:
-            collectionView.deselectOldSelectNew(user.selectedColor) { oldCell in
-                guard let oldCell = oldCell as? TrackerColorCollectionViewCell else { return }
-                oldCell.addOrRemoveBorders() // set old cell
-            } configureSelectedCell: { [weak self]  newCell, indexPath, isSameCell in
-                guard let newCell = newCell as? TrackerColorCollectionViewCell else { return }
-                newCell.addOrRemoveBorders() // set new cell
-                isSameCell ? self?.user.setColorIndexPath(nil): self?.user.setColorIndexPath(indexPath)
-            }
+            collectionView.deselectOldSelectNew(type: ColorCell.self,
+                selectedColorIndexPath) { [weak self]  color in
+                    
+                    self?.viewModel?.userTracker.color = color
+                }
         }
     }
 }
@@ -458,9 +379,9 @@ extension CreateTrackerViewController: TrackerUITextFieldDelegate {
     func isChangeText(text: String, newLength: Int) -> Bool? {
         // Save text as tracker Name
         if text.isEmpty {
-            self.user.setTitle(nil)
+            self.viewModel?.userTracker.name = nil
         } else {
-            self.user.setTitle(text)
+            self.viewModel?.userTracker.name = text
         }
         
         let maxLength = 38
