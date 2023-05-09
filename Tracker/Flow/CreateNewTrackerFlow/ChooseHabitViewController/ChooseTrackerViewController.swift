@@ -11,7 +11,7 @@ final class ChooseTrackerViewController: UIViewController {
     }()
     
     private let stackView: UIStackView = {
-        let view = UIStackView()        
+        let view = UIStackView()
         view.axis = .vertical
         view.spacing = UIConstants.stackViewSpacing
         return view
@@ -29,16 +29,11 @@ final class ChooseTrackerViewController: UIViewController {
         static let stackTrailingInset: CGFloat = -20
         static let buttonsHeight: CGFloat = 60
     }
-    
-    private weak var trackersController: TrackersViewController?
+      
     private let date: String
     
     // MARK: - Init
-    init(
-        from controller: TrackersViewController,
-        date: String
-    ) {
-        self.trackersController = controller
+    init(date: String) {
         self.date = date
         super.init(nibName: nil, bundle: nil)
     }
@@ -87,7 +82,6 @@ final class ChooseTrackerViewController: UIViewController {
         )
         let vc = CreateTrackerViewController()
         vc.setViewModel(viewModel: viewModel)
-        vc.delegate = trackersController
         navigationController?.pushViewController(vc, animated: true)
     }
 }

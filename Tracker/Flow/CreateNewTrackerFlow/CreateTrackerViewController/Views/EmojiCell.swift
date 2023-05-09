@@ -10,8 +10,16 @@ final class EmojiCell: UICollectionViewCell, Highilable {
         text.text
     }
     
-    func highlightUnhighlight() {
+    func toggle() -> Bool {
         cellState.toggle()
+    }
+    
+    func unhighlight() {
+        cellState = .unselected
+    }
+    
+    func highlight() {
+        cellState = .selected
     }
     
     // MARK: - Cell State

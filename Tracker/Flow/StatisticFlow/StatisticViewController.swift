@@ -2,11 +2,8 @@ import UIKit
 
 final class StatisticViewController: UIViewController {
     private let placeholder = PlaceholderView(state: .noStatistic)
-    
-    var router: RouterProtocol?
-    
-    init(router: RouterProtocol? = nil) {
-        self.router = router
+           
+    init() {        
         super.init(nibName: nil, bundle: nil)
     }
     

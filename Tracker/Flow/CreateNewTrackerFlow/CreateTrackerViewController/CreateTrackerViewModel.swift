@@ -1,9 +1,11 @@
 import Foundation
+import CoreData
 
 final class CreateTrackerViewModel {
     // MARK: - Public
-//    @Observable var trackerCatefory: TrackerCategory?
-    @Observable var onCreateAllowedStateChange: Bool = false
+    @Observable var onCreateAllowedStateChange = false
+    @Observable var trackersAddedToCoreData = false
+    @Observable var needToShakeButton = false
         
     // MARK: - Private
     // 1) Configuration
@@ -11,6 +13,13 @@ final class CreateTrackerViewModel {
 
     // 2) Date for ocasional tracker
     private let date: String
+    private lazy var trackerCategoryStore: TrackerCategoryStore? = {
+        do {
+            return try TrackerCategoryStore()
+        } catch {
+            return nil
+        }
+    }()
     
     // MARK: - Public
     // 3) UserInput is public so that controller can store user input there
@@ -30,9 +39,8 @@ final class CreateTrackerViewModel {
     let dataForCollectionView: [CollectionViewData]
     
     var categoryName: String {
-        dataForTableView.categoryName
+        dataForTableView.categoryName     
     }
-    
     
     // MARK: - Init
     init(
@@ -47,32 +55,35 @@ final class CreateTrackerViewModel {
         self.date = date
         self.dataForTableView = dataForTableView
         self.dataForCollectionView = dataForCollectionView
-        
-        // set name as last selected category name
-        
     }
     
     convenience init(trackerType: UserTracker.TrackerType, date: String) {
-        self.init(userTrackerType: trackerType,
-                  userTracker: UserTracker(trackerBuilder: TrackerMaker()),
-                  date: date,
-                  dataForTableView: CategoryAndScheduleData(),
-                  dataForCollectionView: EmojisAndColorData().dataSource)
+        self.init(
+            userTrackerType: trackerType,
+            userTracker: UserTracker(),
+            date: date,
+            dataForTableView: CategoryAndScheduleData(),
+            dataForCollectionView: EmojisAndColorData().dataSource)
     }
     
     func createButtonTapped() {
         switch trackerType {
         case .habit:
             if userTracker.isEnoughForHabit {
-                userTracker.buildTracker()
+                guard let tracker = userTracker.createHabitTracker() else { return }
+                try? trackerCategoryStore?.addTrackerToCategoryWith(name: categoryName, tracker: tracker)
+                self.trackersAddedToCoreData = true
             } else {
-                
+                self.needToShakeButton = true
             }
         case .ocasional:
             if userTracker.isEnoughForOcasion {
-                userTracker.buildTracker()
+                guard let tracker = userTracker.createHabitTracker(forDate: date) else { return
+                }
+                try? trackerCategoryStore?.addTrackerToCategoryWith(name: categoryName, tracker: tracker)
+                self.trackersAddedToCoreData = true
             } else {
-                
+                self.needToShakeButton = true
             }
         }
     }

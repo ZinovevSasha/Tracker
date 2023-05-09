@@ -25,8 +25,6 @@ struct CategoryAndScheduleData {
         oneRow + [schedule]
     }
     
-    
-    
     mutating func addCategory(_ subtitle: String) {
         category.subtitle = subtitle
         userDafaults.set(subtitle, forKey: Key.categoryHeader.rawValue)

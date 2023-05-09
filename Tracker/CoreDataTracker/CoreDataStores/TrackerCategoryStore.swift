@@ -12,6 +12,11 @@ final class TrackerCategoryStore {
     init(context: NSManagedObjectContext) {
         self.context = context
     }
+    
+    convenience init() throws {
+        let context = try Context.getContext()
+        self.init(context: context)
+    }
 }
 
 // MARK: - Public
@@ -30,6 +35,27 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             let category = TrackerCategoryCoreData(context: context)
             category.header = name
             category.addToTrackers(tracker)
+        }
+        saveContext()
+    }
+    
+    func addTrackerToCategoryWith(name: String, tracker: Tracker) throws {
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.header, value: name)
+            .build()
+        let results = try context.fetch(fetchRequest)
+        
+        let trackerCoreData = TrackerCoreData(tracker: tracker, context: context)
+        
+        if let category = results.first {
+            // Category already exists
+            category.addToTrackers(trackerCoreData)
+        } else {
+            // Category does not exist, create new category
+            let category = TrackerCategoryCoreData(context: context)
+            category.header = name
+            category.addToTrackers(trackerCoreData)
         }
         saveContext()
     }

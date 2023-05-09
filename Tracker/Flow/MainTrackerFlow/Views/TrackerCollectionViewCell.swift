@@ -9,7 +9,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     // MARK: - Public
     func configure(with info: Tracker?) {
         guard let info = info else { return }
-        let color = UIColor(named: info.color)
+        let color = UIColor(hexString: info.color)
         emojiLabel.text = info.emoji
         trackerNameLabel.text = info.name
         trackerContainerView.backgroundColor = color
@@ -197,14 +197,10 @@ private extension TrackerCollectionViewCell {
             let image = UIImage.done?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite ?? .white)
             addButton.setImage(image, for: .normal)
             addButton.alpha = 0.3
-//            addButton.imageView?.layer.transform = CATransform3DMakeScale(1,1,1)
-           
         case .unselected:
             let image = UIImage.plus?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite ?? .white)
             addButton.setImage(image, for: .normal)
-            addButton.alpha = 1
-//            addButton.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)
-            
+            addButton.alpha = 1            
         }
     }
     

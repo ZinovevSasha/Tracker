@@ -14,11 +14,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
        
-        let navigationVC = UINavigationController()
-        let router = Router(navigationController: navigationVC, assembly: Assembly())
-        router.initialViewController()
-        
-        window.rootViewController = navigationVC
+              
+        window.rootViewController = SplashViewcontroller()
         self.window = window
         window.makeKeyAndVisible()
     }

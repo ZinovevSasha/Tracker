@@ -13,7 +13,7 @@ final class CategoriesListViewController: FrameViewController {
         view.separatorColor = .myGray
         view.backgroundColor = .myWhite
         view.separatorStyle = .singleLine
-        view.showsVerticalScrollIndicator = false        
+        view.showsVerticalScrollIndicator = false
         view.register(cellClass: CategoryTableViewCell.self)
         return view
     }()
@@ -81,7 +81,7 @@ private extension CategoriesListViewController {
     func setupLayout() {
         NSLayoutConstraint.activate([
             placeholder.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-            placeholder.centerYAnchor.constraint(equalTo: container.centerYAnchor),
+            placeholder.centerYAnchor.constraint(equalTo: container.centerYAnchor)
         ])
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: container.leadingAnchor),

@@ -77,7 +77,7 @@ private extension CreateNewCategoryViewController {
         NSLayoutConstraint.activate([
             mainStackView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             mainStackView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            mainStackView.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle),
+            mainStackView.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle)
         ])
         NSLayoutConstraint.activate([
             textField.leadingAnchor.constraint(equalTo: container.leadingAnchor),

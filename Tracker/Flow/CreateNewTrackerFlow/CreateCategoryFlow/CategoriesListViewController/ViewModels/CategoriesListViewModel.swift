@@ -2,6 +2,7 @@ import CoreData
 
 final class CategoriesListViewModel {
     @Observable var categories: [CategoryViewModel] = []
+    var categoryName: String
     
     // Store
     private var categoryStore: TrackerCategoryStore?
@@ -9,9 +10,7 @@ final class CategoriesListViewModel {
     private var context: NSManagedObjectContext? {
         try? Context.getContext()
     }
-    
-    private var categoryName: String
-    
+            
     init(categoryName: String, categoryStore: TrackerCategoryStore? = nil) {
         self.categoryName = categoryName
         guard let context = context else { return }

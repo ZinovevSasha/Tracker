@@ -14,18 +14,8 @@ final class TrackersViewController: UIViewController {
         return view
     }()
     let placeholderView = PlaceholderView(state: .star)
-    
-    var router: RouterProtocol
-    
-    init(router: RouterProtocol) {
-        self.router = router
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+            
+
     // MARK: - UIConstants
     private enum UIConstants {
         static let trackerHeaderHeight: CGFloat = 30
@@ -74,7 +64,6 @@ final class TrackersViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupUI()
         setDelegates()
         setupLayout()
@@ -91,8 +80,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - @objc target action methods
     func handlePlusButtonTap() {
-        let trackerCreationViewController = ChooseTrackerViewController(from: self,
-            date: dateString
+        let trackerCreationViewController = ChooseTrackerViewController(date: dateString
         )
         let navVc = UINavigationController(rootViewController: trackerCreationViewController)
         navVc.isNavigationBarHidden = true
@@ -265,21 +253,12 @@ extension TrackersViewController: SearchViewDelegate {
     }
 }
 
-// MARK: - CreateTrackerViewControllerDelegate
-extension TrackersViewController: CreateTrackerViewControllerDelegate {
-    func addTrackerCategory(category: TrackerCategory) {
-        do {
-            try dataProvider?.addTrackerCategory(category)
-            placeholderView.state = .invisible(animate: true)
-        } catch {
-            print("🌲", error)
-            placeholderView.state = .noResult
-        }
-    }
-}
-
 // MARK: - DataProviderDelegate
 extension TrackersViewController: DataProviderDelegate {
+    func place() {
+        placeholderView.state = .star
+    }
+    
     func noResultFound() {
         placeholderView.state = .noResult
     }

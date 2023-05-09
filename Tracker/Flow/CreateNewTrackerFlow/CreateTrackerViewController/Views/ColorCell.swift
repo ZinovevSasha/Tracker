@@ -2,21 +2,31 @@ import UIKit
 
 protocol Highilable {
     var content: String? { get }
-    func highlightUnhighlight()    
+    func unhighlight()
+    func highlight()
+    func toggle() -> Bool
 }
 
 final class ColorCell: UICollectionViewCell, Highilable {
     // MARK: Public
     func configure(with color: String) {
-        colorView.backgroundColor = UIColor(hexString: color)       
+        colorView.backgroundColor = UIColor(hexString: color)
     }
     
     var content: String? {
         colorView.backgroundColor?.toHexString()
     }
     
-    func highlightUnhighlight() {
+    func toggle() -> Bool {
         cellState.toggle()
+    }
+    
+    func unhighlight() {
+        cellState = .unselected
+    }
+    
+    func highlight() {
+        cellState = .selected
     }
     
     // MARK: - Cell State
@@ -53,6 +63,11 @@ final class ColorCell: UICollectionViewCell, Highilable {
     
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        highlightedImage.image = nil
     }
 }
 

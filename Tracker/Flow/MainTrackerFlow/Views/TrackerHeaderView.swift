@@ -68,7 +68,7 @@ final class TrackerHeaderView: UIView {
         delegate?.datePickerValueChanged(date: datePicker.date)
     }
     
-    @objc private func handlePlusButtonTap() {       
+    @objc private func handlePlusButtonTap() {    
         delegate?.handlePlusButtonTap()
     }
 }
@@ -93,7 +93,9 @@ private extension TrackerHeaderView {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stackView.topAnchor.constraint(equalTo: plusButton.bottomAnchor,constant: UIConstants.trackerToPlusButtonOffset),
+            stackView.topAnchor.constraint(
+                equalTo: plusButton.bottomAnchor,
+                constant: UIConstants.trackerToPlusButtonOffset),
             stackView.heightAnchor.constraint(equalToConstant: 41)
         ])
     }

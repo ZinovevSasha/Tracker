@@ -2,19 +2,16 @@ import UIKit
 
 final class MainTabBarController: UITabBarController {
     // MARK: - Init
-    init(
-        trackers: TrackersViewController,
-        statistic: StatisticViewController
-    ) {
+    init() {
         super.init(nibName: nil, bundle: nil)
         
         viewControllers = [
             generateViewController(
-                trackers,
+                TrackersViewController(),
                 image: .leftTabBar,
                 title: "Трекеры"),
             generateViewController(
-                statistic,
+                StatisticViewController(),
                 image: .rightTabBar,
                 title: "Статистика")
         ]

@@ -20,6 +20,7 @@ protocol DataProviderDelegate: AnyObject {
     func didUpdate(_ update: DataProviderUpdate)
     func noResultFound()
     func resultFound()
+    func place()
 }
 
 protocol DataProviderProtocol {
@@ -175,13 +176,15 @@ extension DataProvider: DataProviderProtocol {
             fetchedResultsController
                 .fetchRequest
                 .predicate = searchLogic.nameAndWeekDayOrNameAndDate(name: name, date: date, weekDay: weekDay)
+            try fetchedResultsController.performFetch()
+            isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
         } else {
             fetchedResultsController
                 .fetchRequest
                 .predicate = searchLogic.dateOrWeekDay(date: date, weekDay: weekDay)
+            try fetchedResultsController.performFetch()
+            isEmpty ? delegate?.place() : delegate?.resultFound()
         }
-        try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
     
     // Searching
@@ -190,7 +193,7 @@ extension DataProvider: DataProviderProtocol {
             .fetchRequest
             .predicate = searchLogic.dateOrWeekDay(date: date, weekDay: weekDay)
         try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 }
 

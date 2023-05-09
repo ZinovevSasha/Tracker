@@ -58,6 +58,16 @@ enum TrackerStoreError: Error {
     case decodingErrorInvalidSchedule
 }
 extension TrackerCoreData {
+    convenience init(tracker: Tracker, context: NSManagedObjectContext) {
+        self.init(context: context)
+        self.id = tracker.id
+        self.name = tracker.name
+        self.emoji = tracker.emoji
+        self.color = tracker.color
+        self.date = tracker.date
+        self.schedule = tracker.schedule
+    }
+    
     func tracker() throws -> Tracker {
         guard let id = self.id else {
             throw TrackerStoreError.decodingErrorInvalidId

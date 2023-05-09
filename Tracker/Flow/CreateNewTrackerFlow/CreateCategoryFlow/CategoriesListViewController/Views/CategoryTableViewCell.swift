@@ -9,17 +9,6 @@ final class CategoryTableViewCell: UITableViewCell {
                 let image = isSelected ? UIImage.checkmarkBlue : nil
                 selectedCategory.image = image
             }
-            
-            viewModel?.$header.bind { [weak self] header in
-                self?.categoryName.text = header
-            }
-            viewModel?.$isLastSelectedCategory.bind { [weak self] isLastOne in
-                if isLastOne {
-                    self?.selectedCategory.image = .checkmarkBlue
-                } else {
-                    self?.selectedCategory.image = nil
-                }
-            }
         }
     }
     

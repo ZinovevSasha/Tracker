@@ -5,12 +5,14 @@ enum State {
     case selected
     case unselected
     
-    mutating func toggle() {
+    mutating func toggle() -> Bool {
         switch self {
         case .selected:
             self = .unselected
+            return true
         case .unselected:
             self = .selected
+            return false
         }
     }
 }
@@ -52,7 +54,7 @@ final class ActionButton: UIButton {
         updateAppearance()
     }
     
-    convenience init(title: String) {        
+    convenience init(title: String) {       
         self.init(colorType: .trueBlack, title: title)
     }
     

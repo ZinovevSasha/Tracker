@@ -1,13 +1,6 @@
 import UIKit
 
-protocol CreateTrackerViewControllerDelegate: AnyObject {
-    func addTrackerCategory(category: TrackerCategory)
-}
-
 final class CreateTrackerViewController: UIViewController {
-    // MARK: - Public
-    weak var delegate: CreateTrackerViewControllerDelegate?
-    
     // MARK: - Private properties
     private let nameOfScreenLabel: UILabel = {
         let view = UILabel()
@@ -43,6 +36,7 @@ final class CreateTrackerViewController: UIViewController {
         let view = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         view.isScrollEnabled = false
         view.allowsMultipleSelection = false
+        view.isMultipleTouchEnabled = false
         view.showsVerticalScrollIndicator = false
         view.registerHeader(CollectionReusableView.self)
         view.register(cellClass: EmojiCell.self)
@@ -52,8 +46,7 @@ final class CreateTrackerViewController: UIViewController {
     private let cancelButton = ActionButton(colorType: .red, title: "Отменить")
     // Button that is changing depending on how the data is filled
     private let createButton = ActionButton(colorType: .grey, title: "Создать")
-    
-    
+        
     private let buttonStackView: UIStackView = {
         let view = UIStackView()
         view.axis = .horizontal
@@ -84,16 +77,14 @@ final class CreateTrackerViewController: UIViewController {
     }
     
     func bind() {
-//        viewModel?..bind { [weak self] category in
-//            if let category {
-//
-//            } else {
-//                self?.createButton.shakeSelf()
-//            }
-//        }
-        
         viewModel?.$onCreateAllowedStateChange.bind { [weak self] isEnabled in
             self?.setCreateButton(enabled: isEnabled)
+        }
+        viewModel?.$needToShakeButton.bind { [weak self] _ in
+            self?.createButton.shakeSelf()
+        }
+        viewModel?.$trackersAddedToCoreData.bind { [weak self] _ in
+            self?.dismiss(animated: true)
         }
     }
     
@@ -174,7 +165,8 @@ private extension CreateTrackerViewController {
         mainStackView.setCustomSpacing(32, after: tableView)
         
         NSLayoutConstraint.activate([
-            nameOfScreenLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
+            nameOfScreenLabel.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor,
                 constant: 27),
             nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
@@ -228,7 +220,6 @@ private extension CreateTrackerViewController {
         } else {
             createButton.buttonState = .disabled
         }
-        
     }
 }
 
@@ -248,7 +239,7 @@ extension CreateTrackerViewController: UITableViewDataSource{
 extension CreateTrackerViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == .zero {
-            let categoryName = viewModel?.userTracker.name ?? ""
+            let categoryName = viewModel?.categoryName ?? ""
             pushCategoryListViewController(withCategoryName: categoryName)
         } else {
             let selectedWeekDays = viewModel?.userTracker.weekDay ?? []
@@ -286,7 +277,6 @@ extension CreateTrackerViewController: UITableViewDelegate {
         // Call back
         categoryController.getHeaderOfCategory = { [weak self] header in
             guard let self = self else { return }
-            self.viewModel?.userTracker.name = header
             self.viewModel?.dataForTableView.addCategory(header)
             self.tableView.reloadData()
         }
@@ -309,7 +299,8 @@ extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: params.topInset, left: params.leftInset, bottom: params.bottomInset, right: params.rightInset)
+        return UIEdgeInsets(
+            top: params.topInset, left: params.leftInset, bottom: params.bottomInset, right: params.rightInset)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -359,17 +350,17 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
         guard let sectionType = viewModel?.getSection(indexPath) else { return }
         switch sectionType {
         case .emojiSection:
-            collectionView.deselectOldSelectNew(type: EmojiCell.self,
-                selectedEmojiIndexPath) { [weak self]  emoji in
-                    
+            collectionView.deselectOldSelectNew(
+                type: EmojiCell.self, selectedEmojiIndexPath) { [weak self]  emoji in
                     self?.viewModel?.userTracker.emoji = emoji
-                }
+                    self?.selectedEmojiIndexPath = indexPath
+            }
         case .colorSection:
-            collectionView.deselectOldSelectNew(type: ColorCell.self,
-                selectedColorIndexPath) { [weak self]  color in
-                    
-                    self?.viewModel?.userTracker.color = color
-                }
+            collectionView.deselectOldSelectNew(
+                type: ColorCell.self, selectedColorIndexPath) { [weak self]  color in
+                    self?.viewModel?.userTracker.color = color                   
+                    self?.selectedColorIndexPath = indexPath
+            }
         }
     }
 }

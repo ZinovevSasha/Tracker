@@ -66,7 +66,8 @@ private extension PlaceholderView {
             placeholderText.centerXAnchor.constraint(equalTo: centerXAnchor),
             placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .leadingInset),
             placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .trailingInset),
-            placeholderText.topAnchor.constraint(equalTo: placeholderImageView.bottomAnchor,
+            placeholderText.topAnchor.constraint(
+                equalTo: placeholderImageView.bottomAnchor,
                 constant: UIConstants.textToImageOffset)
         ])
     }

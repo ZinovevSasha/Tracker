@@ -3,8 +3,7 @@ import UIKit
 extension UIView {
     func addSubviews(_ views: UIView...) {
         views.forEach {
-            if let stackView = self as? UIStackView {
-                stackView.addArrangedSubview($0)                
+            if let stackView = self as? UIStackView {                stackView.addArrangedSubview($0)                
             } else {
                 addSubview($0)
             }

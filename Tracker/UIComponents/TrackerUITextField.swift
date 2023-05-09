@@ -60,8 +60,6 @@ private extension TrackerUITextField {
             textField.bottomAnchor.constraint(equalTo: bottomAnchor),
             textField.heightAnchor.constraint(equalToConstant: .cellHeight)
         ])
-        
-        
     }
     
     func activateKeyboardFromBottom() {
@@ -77,9 +75,7 @@ extension TrackerUITextField: UITextFieldDelegate {
         }
     }
     
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
-    ) -> Bool {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let currentText = textField.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
@@ -94,7 +90,6 @@ extension TrackerUITextField: UITextFieldDelegate {
 }
 
 extension UIViewController {
-    
     func hideKeyboardWhenTappedAround() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
@@ -104,5 +99,4 @@ extension UIViewController {
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
-    
 }

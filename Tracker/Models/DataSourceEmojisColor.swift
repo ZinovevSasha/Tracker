@@ -16,7 +16,7 @@ enum CollectionViewData {
 
 struct EmojisAndColorData {
     let dataSource: [CollectionViewData] = [
-        .emojiSection(items:  [
+        .emojiSection(items: [
             "🙂", "😻", "🌺", "🐶", "❤️",
             "😱", "😇","😡", "🥶", "🤔",
             "🙌", "🍔", "🥦", "🏓", "🥇",

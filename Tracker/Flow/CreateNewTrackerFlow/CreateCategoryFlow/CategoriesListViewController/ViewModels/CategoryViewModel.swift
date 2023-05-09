@@ -1,6 +1,6 @@
 final class CategoryViewModel {
-    @Observable var header: String
-    @Observable var isLastSelectedCategory: Bool
+    var header: String
+    var isLastSelectedCategory: Bool
     
     init(header: String, isLastSelectedCategory: Bool) {
         self.header = header

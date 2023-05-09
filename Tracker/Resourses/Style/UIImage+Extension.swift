@@ -46,5 +46,3 @@ extension UIImage {
         self.init(ciImage: CIImage(image: image)!)
     }
 }
-
-
