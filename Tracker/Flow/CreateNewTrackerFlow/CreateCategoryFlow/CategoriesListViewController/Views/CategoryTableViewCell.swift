@@ -12,7 +12,6 @@ final class CategoryTableViewCell: UITableViewCell {
         }
     }
     
-    
     // MARK: - Private properties
     private let categoryName: UILabel = {
         let view = UILabel()

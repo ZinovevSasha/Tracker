@@ -165,9 +165,7 @@ private extension CreateTrackerViewController {
         mainStackView.setCustomSpacing(32, after: tableView)
         
         NSLayoutConstraint.activate([
-            nameOfScreenLabel.topAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.topAnchor,
-                constant: 27),
+            nameOfScreenLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 27),
             nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             container.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -181,12 +179,9 @@ private extension CreateTrackerViewController {
             mainScrollView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
                         
             mainStackView.leadingAnchor.constraint(equalTo: mainScrollView.contentLayoutGuide.leadingAnchor),
-            mainStackView.trailingAnchor.constraint(
-                equalTo: mainScrollView.contentLayoutGuide.trailingAnchor),
-            mainStackView.topAnchor.constraint(
-                equalTo: mainScrollView.contentLayoutGuide.topAnchor),
-            mainStackView.bottomAnchor.constraint(
-                equalTo: mainScrollView.contentLayoutGuide.bottomAnchor),
+            mainStackView.trailingAnchor.constraint(equalTo: mainScrollView.contentLayoutGuide.trailingAnchor),
+            mainStackView.topAnchor.constraint(equalTo: mainScrollView.contentLayoutGuide.topAnchor),
+            mainStackView.bottomAnchor.constraint(equalTo: mainScrollView.contentLayoutGuide.bottomAnchor),
             
             mainStackView.widthAnchor.constraint(equalTo: mainScrollView.frameLayoutGuide.widthAnchor),
             
@@ -199,12 +194,8 @@ private extension CreateTrackerViewController {
             cancelButton.heightAnchor.constraint(equalToConstant: .buttonsHeight),
             
             buttonStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .leadingInset),
-            buttonStackView.trailingAnchor.constraint(
-                equalTo: view.trailingAnchor,
-                constant: .trailingInset),
-            buttonStackView.bottomAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.bottomAnchor,
-                constant: -24)
+            buttonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: .trailingInset),
+            buttonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24)
         ])
         
         parametersCollectionViewHeight = collectionView.heightAnchor.constraint(equalToConstant: .zero)
@@ -350,13 +341,13 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
         guard let sectionType = viewModel?.getSection(indexPath) else { return }
         switch sectionType {
         case .emojiSection:
-            collectionView.deselectOldSelectNew(
+            collectionView.deselectOldSelectNewCellOf(
                 type: EmojiCell.self, selectedEmojiIndexPath) { [weak self]  emoji in
                     self?.viewModel?.userTracker.emoji = emoji
                     self?.selectedEmojiIndexPath = indexPath
             }
         case .colorSection:
-            collectionView.deselectOldSelectNew(
+            collectionView.deselectOldSelectNewCellOf(
                 type: ColorCell.self, selectedColorIndexPath) { [weak self]  color in
                     self?.viewModel?.userTracker.color = color                   
                     self?.selectedColorIndexPath = indexPath

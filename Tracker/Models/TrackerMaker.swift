@@ -1,9 +1,7 @@
 import Foundation
 
 struct TrackerMaker {
-    func createHabitTracker(
-        _ userMadeTracker: UserTracker
-    ) -> Tracker? {
+    func createHabitTracker(_ userMadeTracker: UserTracker) -> Tracker? {
         // Check if required fields exist and unwrap them
         guard
             let name = userMadeTracker.name,
@@ -13,26 +11,34 @@ struct TrackerMaker {
         else {
             return nil
         }
-
+        
         // Create tracker
-        return Tracker(id: UUID().uuidString, name: name, emoji: emoji, color: color, date: nil, schedule: schedule)
+        return Tracker(
+            id: UUID().uuidString,
+            name: name,
+            emoji: emoji,
+            color: color,
+            schedule: schedule
+        )
     }
     
-    func createOcasionalTracker(
-        _ userMadeTracker: UserTracker,
-        withDate date: String?
-    ) -> Tracker? {
+    func createOcasionalTracker(_ userMadeTracker: UserTracker) -> Tracker? {
         // Check if required fields exist and unwrap them
         guard
             let name = userMadeTracker.name,
             let emoji = userMadeTracker.emoji,
-            let color = userMadeTracker.color,
-            let date = date
+            let color = userMadeTracker.color
         else {
             return nil
         }
         
         // Create tracker
-        return Tracker(id: UUID().uuidString, name: name, emoji: emoji, color: color, date: date, schedule: nil)
+        return Tracker(
+            id: UUID().uuidString,
+            name: name,
+            emoji: emoji,
+            color: color,
+            schedule: WeekDay.allDaysOfWeek.toNumbersString()
+        )
     }
 }

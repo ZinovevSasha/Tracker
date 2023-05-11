@@ -72,7 +72,7 @@ extension UICollectionView {
 
 
 extension UICollectionView {
-    func deselectOldSelectNew<T: Highilable>(
+    func deselectOldSelectNewCellOf<T: Highilable>(
         type: T.Type,
         _ previouslySelectedIndexPath: IndexPath?,
         configureSelectedCell: ((String?) -> Void)? = nil

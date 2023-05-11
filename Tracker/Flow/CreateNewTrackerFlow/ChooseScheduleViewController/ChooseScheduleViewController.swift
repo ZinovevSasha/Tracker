@@ -8,8 +8,7 @@ final class ChooseScheduleViewController: FrameViewController {
     // MARK: - Call Back
     var weekDaysToShow: ((Set<Int>) -> Void)?
     
-    // MARK: - Private properties
-        
+    // MARK: - Private properties        
     private let tableView: UITableView = {
         let view = UITableView()
         view.contentInset.top = UIConstants.topInset

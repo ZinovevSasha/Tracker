@@ -24,15 +24,15 @@ final class CategoriesListViewController: FrameViewController {
         static let bottomInset: CGFloat = -16
     }
     
-    private var viewModel: CategoriesListViewModel?
+    private var viewModel: CategoriesListViewModelProtocol?
     
-    func set(viewModel: CategoriesListViewModel) {
+    func set(viewModel: CategoriesListViewModelProtocol) {
         self.viewModel = viewModel
         bind()
     }
     
     func bind() {
-        viewModel?.$categories.bind { [weak self] categories in
+        viewModel?.categoryObserver.bind { [weak self] categories in
             self?.tableView.reloadData()
             if !categories.isEmpty {
                 self?.placeholder.state = .invisible(animate: false)

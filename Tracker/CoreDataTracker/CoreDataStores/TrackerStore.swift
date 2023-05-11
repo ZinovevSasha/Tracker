@@ -37,7 +37,6 @@ private extension TrackerStore {
         trackerCoreData.id = tracker.id
         trackerCoreData.color = tracker.color
         trackerCoreData.schedule = tracker.schedule
-        trackerCoreData.date = tracker.date
         return trackerCoreData
     }
     
@@ -64,7 +63,6 @@ extension TrackerCoreData {
         self.name = tracker.name
         self.emoji = tracker.emoji
         self.color = tracker.color
-        self.date = tracker.date
         self.schedule = tracker.schedule
     }
     
@@ -81,6 +79,9 @@ extension TrackerCoreData {
         guard let emoji = self.emoji else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
-        return Tracker(id: id, name: name, emoji: emoji, color: color)
+        guard let schedule = self.schedule else {
+            throw TrackerStoreError.decodingErrorInvalidEmoji
+        }
+        return Tracker(id: id, name: name, emoji: emoji, color: color, schedule: schedule)
     }
 }

@@ -9,8 +9,6 @@ struct Tracker {
     let id: String
     let name: String
     let emoji: String
-    let color: String    
-    
-    var date: String?
-    var schedule: String?
+    let color: String
+    var schedule: String
 }

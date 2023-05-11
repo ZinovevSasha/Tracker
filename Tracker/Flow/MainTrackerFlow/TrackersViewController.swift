@@ -15,7 +15,6 @@ final class TrackersViewController: UIViewController {
     }()
     let placeholderView = PlaceholderView(state: .star)
             
-
     // MARK: - UIConstants
     private enum UIConstants {
         static let trackerHeaderHeight: CGFloat = 30
@@ -80,8 +79,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - @objc target action methods
     func handlePlusButtonTap() {
-        let trackerCreationViewController = ChooseTrackerViewController(date: dateString
-        )
+        let trackerCreationViewController = ChooseTrackerViewController(date: dateString)
         let navVc = UINavigationController(rootViewController: trackerCreationViewController)
         navVc.isNavigationBarHidden = true
         navVc.interactivePopGestureRecognizer?.isEnabled = true
@@ -167,7 +165,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
         let tracker = dataProvider?.getTracker(at: indexPath)
         let daysTracked = dataProvider?.daysTracked(for: indexPath)
-        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: weekDayNumber)
+        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: currentDay.todayString)
         cell.configure(with: tracker)
         cell.configure(with: daysTracked, isCompleted: isCompletedForToday)
         cell.delegate = self
@@ -221,7 +219,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func plusButtonTapped(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         do {
-            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: weekDayNumber)
+            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: dateString)
         } catch {
             print("⛈️", error)
         }
@@ -233,7 +231,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
         currentDay = date
         do {
-            try dataProvider?.fetchTrackersBy(date: dateString, weekDay: weekDayNumber)
+            try dataProvider?.fetchTrackersBy(weekDay: weekDayNumber)
             collectionView.reloadData()
         } catch {
             print("🏹", error)
@@ -245,7 +243,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
         do {
-            try dataProvider?.fetchTrackersBy(name: searchText, weekDay: weekDayNumber, date: dateString)
+            try dataProvider?.fetchTrackersBy(name: searchText, weekDay: weekDayNumber)
             collectionView.reloadData()
         } catch {
             print("😎", error)

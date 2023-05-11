@@ -10,9 +10,12 @@ final class CreateTrackerViewModel {
     // MARK: - Private
     // 1) Configuration
     private let trackerType: UserTracker.TrackerType
-
-    // 2) Date for ocasional tracker
-    private let date: String
+    
+    // 2) Category Name
+    var categoryName: String {
+        dataForTableView.categoryName
+    }
+    
     private lazy var trackerCategoryStore: TrackerCategoryStore? = {
         do {
             return try TrackerCategoryStore()
@@ -20,8 +23,7 @@ final class CreateTrackerViewModel {
             return nil
         }
     }()
-    
-    // MARK: - Public
+        
     // 3) UserInput is public so that controller can store user input there
     var userTracker: UserTracker {
         didSet {
@@ -37,31 +39,24 @@ final class CreateTrackerViewModel {
     var dataForTableView: CategoryAndScheduleData
     // 5) dataForCollectionView
     let dataForCollectionView: [CollectionViewData]
-    
-    var categoryName: String {
-        dataForTableView.categoryName     
-    }
-    
+
     // MARK: - Init
     init(
         userTrackerType: UserTracker.TrackerType,
         userTracker: UserTracker,
-        date: String,
         dataForTableView: CategoryAndScheduleData,
         dataForCollectionView: [CollectionViewData]
     ) {
         self.trackerType = userTrackerType
         self.userTracker = userTracker
-        self.date = date
         self.dataForTableView = dataForTableView
         self.dataForCollectionView = dataForCollectionView
     }
     
-    convenience init(trackerType: UserTracker.TrackerType, date: String) {
+    convenience init(trackerType: UserTracker.TrackerType) {
         self.init(
             userTrackerType: trackerType,
-            userTracker: UserTracker(),
-            date: date,
+            userTracker: UserTracker(),            
             dataForTableView: CategoryAndScheduleData(),
             dataForCollectionView: EmojisAndColorData().dataSource)
     }
@@ -78,7 +73,7 @@ final class CreateTrackerViewModel {
             }
         case .ocasional:
             if userTracker.isEnoughForOcasion {
-                guard let tracker = userTracker.createHabitTracker(forDate: date) else { return
+                guard let tracker = userTracker.createOcasionalTracker() else { return
                 }
                 try? trackerCategoryStore?.addTrackerToCategoryWith(name: categoryName, tracker: tracker)
                 self.trackersAddedToCoreData = true

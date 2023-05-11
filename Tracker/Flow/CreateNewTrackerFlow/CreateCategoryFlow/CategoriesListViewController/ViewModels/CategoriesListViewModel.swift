@@ -1,7 +1,17 @@
 import CoreData
 
+protocol CategoriesListViewModelProtocol {
+    var categories: [CategoryViewModel] { get }
+    var categoryObserver: Observable<[CategoryViewModel]> { get }
+    func getAllCategories()
+    func isNameAvailable(name: String) -> Bool?
+    func categoryNameEntered(name: String)
+    func categorySelected(at indexPath: IndexPath)
+}
+
 final class CategoriesListViewModel {
     @Observable var categories: [CategoryViewModel] = []
+    
     var categoryName: String
     
     // Store
@@ -10,7 +20,8 @@ final class CategoriesListViewModel {
     private var context: NSManagedObjectContext? {
         try? Context.getContext()
     }
-            
+        
+    // MARK: - Init
     init(categoryName: String, categoryStore: TrackerCategoryStore? = nil) {
         self.categoryName = categoryName
         guard let context = context else { return }
@@ -18,7 +29,12 @@ final class CategoriesListViewModel {
     }
 }
 
-extension CategoriesListViewModel {
+// MARK: - Init
+extension CategoriesListViewModel: CategoriesListViewModelProtocol {
+    var categoryObserver: Observable<[CategoryViewModel]> {
+        $categories
+    }
+
     func categoryNameEntered(name: String) {
         do {
             try categoryStore?.addCategory(with: name)

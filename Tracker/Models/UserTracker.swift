@@ -84,7 +84,7 @@ extension UserTracker {
         trackerBuilder.createHabitTracker(self)
     }
     
-    func createHabitTracker(forDate date: String? ) -> Tracker? {
-        trackerBuilder.createOcasionalTracker(self, withDate: date)
+    func createOcasionalTracker() -> Tracker? {
+        trackerBuilder.createOcasionalTracker(self)
     }
 }

@@ -76,10 +76,7 @@ final class ChooseTrackerViewController: UIViewController {
     
     // Private
     private func pushCreateTrackerViewController(type: UserTracker.TrackerType) {
-        let viewModel = CreateTrackerViewModel(
-            trackerType: type,
-            date: date
-        )
+        let viewModel = CreateTrackerViewModel(trackerType: type)
         let vc = CreateTrackerViewController()
         vc.setViewModel(viewModel: viewModel)
         navigationController?.pushViewController(vc, animated: true)
