@@ -39,7 +39,6 @@ opt_in_rules:
   - multiline_literal_brackets
   - multiline_parameters
   - multiline_parameters_brackets
-  - operator_usage_whitespace
   - overridden_super_call
   - pattern_matching_keywords
   - prefer_self_type_over_type_of_self
@@ -100,9 +99,12 @@ multiline_arguments:
 private_over_fileprivate:
   validate_extensions: true
 
+vertical_whitespace:
+  max_empty_lines: 2
+
 trailing_whitespace:
   ignores_empty_lines: true
   ignores_comments: true
-
-vertical_whitespace:
-  max_empty_lines: 2
+excluded:
+  - path/to/file.swift
+  - path/to/directory

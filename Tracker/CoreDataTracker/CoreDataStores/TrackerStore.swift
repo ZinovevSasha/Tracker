@@ -37,7 +37,6 @@ private extension TrackerStore {
         trackerCoreData.id = tracker.id
         trackerCoreData.color = tracker.color
         trackerCoreData.schedule = tracker.schedule
-        trackerCoreData.date = tracker.date
         return trackerCoreData
     }
     
@@ -58,6 +57,15 @@ enum TrackerStoreError: Error {
     case decodingErrorInvalidSchedule
 }
 extension TrackerCoreData {
+    convenience init(tracker: Tracker, context: NSManagedObjectContext) {
+        self.init(context: context)
+        self.id = tracker.id
+        self.name = tracker.name
+        self.emoji = tracker.emoji
+        self.color = tracker.color
+        self.schedule = tracker.schedule
+    }
+    
     func tracker() throws -> Tracker {
         guard let id = self.id else {
             throw TrackerStoreError.decodingErrorInvalidId
@@ -71,6 +79,9 @@ extension TrackerCoreData {
         guard let emoji = self.emoji else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
-        return Tracker(id: id, name: name, color: color, emoji: emoji)
+        guard let schedule = self.schedule else {
+            throw TrackerStoreError.decodingErrorInvalidEmoji
+        }
+        return Tracker(id: id, name: name, emoji: emoji, color: color, schedule: schedule)
     }
 }

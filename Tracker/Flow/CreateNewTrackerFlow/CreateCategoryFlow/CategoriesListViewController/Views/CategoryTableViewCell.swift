@@ -2,15 +2,14 @@ import UIKit
 
 final class CategoryTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with info: String, setImage: Bool) {
-        categoryName.text = info
-        if setImage {
-            selectedCategory.image = .checkmarkBlue
+    var viewModel: CategoryViewModel? {
+        didSet {
+            categoryName.text = viewModel?.header
+            if let isSelected = viewModel?.isLastSelectedCategory {
+                let image = isSelected ? UIImage.checkmarkBlue : nil
+                selectedCategory.image = image
+            }
         }
-    }
-    
-    func configureImage() {
-        selectedCategory.image = .checkmarkBlue
     }
     
     // MARK: - Private properties
@@ -40,8 +39,8 @@ final class CategoryTableViewCell: UITableViewCell {
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -51,14 +50,14 @@ final class CategoryTableViewCell: UITableViewCell {
 
 // MARK: - Private methods
 private extension CategoryTableViewCell {
-    func initialise() {
-        stackView.addArrangedSubviews(categoryName, selectedCategory)
-        contentView.addSubview(stackView)
+    func setupUI() {
+        stackView.addSubviews(categoryName, selectedCategory)
+        contentView.addSubviews(stackView)
         contentView.backgroundColor = .myBackground
         selectionStyle = .none
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor,

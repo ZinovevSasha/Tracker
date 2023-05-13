@@ -6,7 +6,6 @@ extension UIView {
     }
 }
 
-
 extension UICollectionView {
     // MARK: - Dequeue
     func dequeueReusableCell<T: UICollectionViewCell>(for indexPath: IndexPath) -> T {
@@ -73,33 +72,40 @@ extension UICollectionView {
 
 
 extension UICollectionView {
-    func deselectOldSelectNew(
+    func deselectOldSelectNewCellOf<T: Highilable>(
+        type: T.Type,
         _ previouslySelectedIndexPath: IndexPath?,
-        configureDeselectedCell: ((UICollectionViewCell) -> Void)? = nil,
-        configureSelectedCell: ((UICollectionViewCell, IndexPath, Bool) -> Void)? = nil
+        configureSelectedCell: ((String?) -> Void)? = nil
     ) {
         // if cell selected first time
         if let newIndexPath = self.indexPathsForSelectedItems?.first {
             guard let previouslySelectedIndexPath = previouslySelectedIndexPath else {
-                if let cell = self.cellForItem(at: newIndexPath) {
-                    configureSelectedCell?(cell, newIndexPath, false)
+                if let cell = self.cellForItem(at: newIndexPath) as? T {
+                    cell.highlight()
+                    configureSelectedCell?(cell.content)
                 }
                 return
             }
             // If new selected cell is not same as previous selected
             if previouslySelectedIndexPath != newIndexPath {
-                deselectItem(at: previouslySelectedIndexPath, animated: true)
-                
-                if let cell = self.cellForItem(at: previouslySelectedIndexPath) {
-                    configureDeselectedCell?(cell)
+               
+                deselectItem(at: previouslySelectedIndexPath, animated: false)
+                if let cell = self.cellForItem(at: previouslySelectedIndexPath) as? T {
+                    cell.unhighlight()
                 }
-                if let cell = self.cellForItem(at: newIndexPath) {
-                    configureSelectedCell?(cell, newIndexPath, false)
+               
+                if let cell = self.cellForItem(at: newIndexPath) as? T {
+                    cell.highlight()
+                    configureSelectedCell?(cell.content)
                 }
                 // If new selected cell is same as previous selected
             } else {
-                if let cell = self.cellForItem(at: newIndexPath) {
-                    configureSelectedCell?(cell, previouslySelectedIndexPath, true)
+                if let cell = self.cellForItem(at: newIndexPath) as? T {
+                    if cell.toggle() {
+                        configureSelectedCell?(nil)
+                    } else {
+                        configureSelectedCell?(cell.content)
+                    }
                 }
             }
         }

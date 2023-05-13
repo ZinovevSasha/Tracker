@@ -2,7 +2,8 @@ import UIKit
 
 final class MyTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with info: RowData) {
+    func configure(with info: RowData?) {
+        guard let info = info else { return }
         myTextLabel.text = info.title
         supplementaryTextLabel.text = info.subtitle
     }
@@ -11,8 +12,7 @@ final class MyTableViewCell: UITableViewCell {
     private let accessoryImageView: UIImageView = {
         let view = UIImageView()
         view.image = UIImage.chevron?
-            .withTintColor(.myGray, renderingMode: .alwaysOriginal)
-        view.translatesAutoresizingMaskIntoConstraints = false
+            .withTintColor(.myGray ?? .gray, renderingMode: .alwaysOriginal)
         return view
     }()
     
@@ -20,7 +20,6 @@ final class MyTableViewCell: UITableViewCell {
         let view = UILabel()
         view.textColor = .myBlack
         view.font = UIFont.systemFont(ofSize: 17, weight: .regular)
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -28,13 +27,11 @@ final class MyTableViewCell: UITableViewCell {
         let view = UILabel()
         view.textColor = .myGray
         view.font = .regular17
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let stackView: UIStackView = {
         let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.axis = .vertical
         view.alignment = .leading
         view.spacing = 2
@@ -45,7 +42,7 @@ final class MyTableViewCell: UITableViewCell {
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -55,11 +52,11 @@ final class MyTableViewCell: UITableViewCell {
 
 // MARK: - Private methods
 private extension MyTableViewCell {
-    func initialise() {
-        stackView.addArrangedSubviews(myTextLabel, supplementaryTextLabel)
+    func setupUI() {
         contentView.addSubviews(stackView, accessoryImageView)
         contentView.backgroundColor = .myBackground
         selectionStyle = .none
+        stackView.addSubviews(myTextLabel, supplementaryTextLabel)        
         
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(

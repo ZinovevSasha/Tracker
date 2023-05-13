@@ -11,11 +11,10 @@ final class TrackersViewController: UIViewController {
         view.allowsSelection = true
         view.registerHeader(TrackerHeader.self)
         view.register(cellClass: TrackerCollectionViewCell.self)
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     let placeholderView = PlaceholderView(state: .star)
-  
+            
     // MARK: - UIConstants
     private enum UIConstants {
         static let trackerHeaderHeight: CGFloat = 30
@@ -41,6 +40,7 @@ final class TrackersViewController: UIViewController {
             return nil
         }
     }()
+    
     private var currentDay = Date()
     private var weekDayNumber: String {
         String(Date.currentWeekDayNumber(from: currentDay))
@@ -63,10 +63,9 @@ final class TrackersViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        initialise()
+        setupUI()
         setDelegates()
-        setConstraints()
+        setupLayout()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -80,11 +79,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - @objc target action methods
     func handlePlusButtonTap() {
-        let trackerCreationViewController = ChooseTrackerViewController(
-            categories: dataProvider?.getCategories() ?? [],
-            from: self,
-            date: dateString
-        )
+        let trackerCreationViewController = ChooseTrackerViewController(date: dateString)
         let navVc = UINavigationController(rootViewController: trackerCreationViewController)
         navVc.isNavigationBarHidden = true
         navVc.interactivePopGestureRecognizer?.isEnabled = true
@@ -98,14 +93,11 @@ final class TrackersViewController: UIViewController {
 
 // MARK: - Private methods
 private extension TrackersViewController {
-    func initialise() {
+    func setupUI() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
         view.addGestureRecognizer(tapGesture)
         view.backgroundColor = .myWhite
         view.addSubviews(headerView, searchView, collectionView, placeholderView)
-        placeholderView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        searchView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     func setDelegates() {
@@ -115,8 +107,8 @@ private extension TrackersViewController {
         collectionView.delegate = self
     }
     
-    func setConstraints() {
-        let headerViewConstraints = [
+    func setupLayout() {
+        NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.topAnchor,
                 constant: UIConstants.topInset),
@@ -128,8 +120,9 @@ private extension TrackersViewController {
                 constant: UIConstants.trailingInset),
             headerView.heightAnchor.constraint(
                 equalToConstant: UIConstants.headerHeight)
-        ]
-        let searchViewConstraints = [
+        ])
+        
+        NSLayoutConstraint.activate([
             searchView.topAnchor.constraint(
                 equalTo: headerView.bottomAnchor,
                 constant: UIConstants.topInset),
@@ -140,26 +133,21 @@ private extension TrackersViewController {
             searchView.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
                 constant: UIConstants.searchTrailing)
-        ]
-        let collectionViewConstraints = [
+        ])
+        
+        NSLayoutConstraint.activate([
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.topAnchor.constraint(
                 equalTo: searchView.bottomAnchor,
                 constant: UIConstants.collectionToSearchViewOffset),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        let placeholderImageViewConstraints = [
+        ])
+        
+        NSLayoutConstraint.activate([
             placeholderView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
             placeholderView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(
-            headerViewConstraints +
-            searchViewConstraints +
-            collectionViewConstraints +
-            placeholderImageViewConstraints
-        )
+        ])
     }
 }
 
@@ -175,9 +163,9 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
-        let tracker = dataProvider?.object(at: indexPath)
+        let tracker = dataProvider?.getTracker(at: indexPath)
         let daysTracked = dataProvider?.daysTracked(for: indexPath)
-        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: weekDayNumber)
+        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: currentDay.todayString)
         cell.configure(with: tracker)
         cell.configure(with: daysTracked, isCompleted: isCompletedForToday)
         cell.delegate = self
@@ -219,7 +207,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         do {
-            try dataProvider?.deleteRecord(at: indexPath)
+            try dataProvider?.deleteTracker(at: indexPath)
         } catch {
             print("🐳", error)
         }
@@ -231,7 +219,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func plusButtonTapped(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         do {
-            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: weekDayNumber)
+            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: dateString)
         } catch {
             print("⛈️", error)
         }
@@ -243,7 +231,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
         currentDay = date
         do {
-            try dataProvider?.fetchTrackersBy(date: dateString, weekDay: weekDayNumber)
+            try dataProvider?.fetchTrackersBy(weekDay: weekDayNumber)
             collectionView.reloadData()
         } catch {
             print("🏹", error)
@@ -255,7 +243,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
         do {
-            try dataProvider?.fetchTrackersBy(name: searchText, weekDay: weekDayNumber, date: dateString)
+            try dataProvider?.fetchTrackersBy(name: searchText, weekDay: weekDayNumber)
             collectionView.reloadData()
         } catch {
             print("😎", error)
@@ -263,21 +251,12 @@ extension TrackersViewController: SearchViewDelegate {
     }
 }
 
-// MARK: - CreateTrackerViewControllerDelegate
-extension TrackersViewController: CreateTrackerViewControllerDelegate {
-    func addTrackerCategory(category: TrackerCategory) {
-        do {
-            try dataProvider?.addRecord(category)
-            placeholderView.state = .invisible(animate: true)
-        } catch {
-            print("🌲", error)
-            placeholderView.state = .noResult
-        }
-    }
-}
-
 // MARK: - DataProviderDelegate
 extension TrackersViewController: DataProviderDelegate {
+    func place() {
+        placeholderView.state = .star
+    }
+    
     func noResultFound() {
         placeholderView.state = .noResult
     }

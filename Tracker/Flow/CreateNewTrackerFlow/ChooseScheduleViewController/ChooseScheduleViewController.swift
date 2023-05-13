@@ -8,8 +8,7 @@ final class ChooseScheduleViewController: FrameViewController {
     // MARK: - Call Back
     var weekDaysToShow: ((Set<Int>) -> Void)?
     
-    // MARK: - Private properties
-        
+    // MARK: - Private properties        
     private let tableView: UITableView = {
         let view = UITableView()
         view.contentInset.top = UIConstants.topInset
@@ -18,7 +17,6 @@ final class ChooseScheduleViewController: FrameViewController {
         view.allowsSelection = true
         view.separatorStyle = .singleLine
         view.showsVerticalScrollIndicator = false
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.register(cellClass: ScheduleTableViewCell.self)
         return view
     }()
@@ -48,8 +46,8 @@ final class ChooseScheduleViewController: FrameViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     // MARK: - Private @objc target action methods
@@ -61,16 +59,16 @@ final class ChooseScheduleViewController: FrameViewController {
 
 // MARK: - Private Methods
 private extension ChooseScheduleViewController {
-    func initialise() {
+    func setupUI() {
         // Table in container:
         tableView.delegate = self
         tableView.dataSource = self
         
         // Add all to container and constraint to it
-        container.addSubview(tableView)
+        container.addSubviews(tableView)
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: container.trailingAnchor),

@@ -3,9 +3,8 @@ import Foundation
 final class SearchLogicProvider {
     let predicate = PredecateBuilder<TrackerCoreData>()
     
-    func dateOrWeekDay(date: String, weekDay: String) -> NSPredicate {
+    func weekDay(weekDay: String) -> NSPredicate {
         return predicate
-            .addPredicate(.contains, keyPath: \.date, value: date)
             .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
             .build(type: .or)
     }
@@ -17,18 +16,10 @@ final class SearchLogicProvider {
             .build()
     }
     
-    func nameAndDate(name: String, date: String) -> NSPredicate {
+    func onlyName(_ name: String) -> NSPredicate {
         return predicate
             .addPredicate(.contains, keyPath: \.name, value: name)
-            .addPredicate(.equalTo, keyPath: \.date, value: date)
             .build()
-    }
-    
-    func nameAndWeekDayOrNameAndDate(name: String, date: String, weekDay: String) -> NSCompoundPredicate {
-        return NSCompoundPredicate(type: .or, subpredicates: [
-            nameAndWeekDay(name: name, weekDay: weekDay),
-            nameAndDate(name: name, date: date)
-        ])
     }
 }
 

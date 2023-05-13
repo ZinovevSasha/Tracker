@@ -1,7 +1,7 @@
 import UIKit
 
 protocol TrackerUITextFieldDelegate: AnyObject {
-    func isChangeText(text: String, newLength: Int) -> Bool
+    func isChangeText(text: String, newLength: Int) -> Bool?
 }
 
 final class TrackerUITextField: UIView {
@@ -25,9 +25,6 @@ final class TrackerUITextField: UIView {
         view.leftViewMode = .always
         view.rightView = insetView
         view.rightViewMode = .always
-        
-        // constraints
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -35,8 +32,8 @@ final class TrackerUITextField: UIView {
     init(text: String) {
         textField.placeholder = text
         super.init(frame: .zero)
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -50,13 +47,12 @@ final class TrackerUITextField: UIView {
 
 // MARK: - Private Methods
 private extension TrackerUITextField {
-    func initialise() {
-        addSubview(textField)
+    func setupUI() {
+        addSubviews(textField)
         textField.delegate = self
-        translatesAutoresizingMaskIntoConstraints = false
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             textField.leadingAnchor.constraint(equalTo: leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -65,15 +61,21 @@ private extension TrackerUITextField {
             textField.heightAnchor.constraint(equalToConstant: .cellHeight)
         ])
     }
+    
+    func activateKeyboardFromBottom() {
+        self.becomeFirstResponder()
+    }
 }
 
 // MARK: - UITextFieldDelegate
 extension TrackerUITextField: UITextFieldDelegate {
-    func textField(
-        _ textField: UITextField,
-        shouldChangeCharactersIn range: NSRange,
-        replacementString string: String
-    ) -> Bool {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        if let myTextField = textField as? TrackerUITextField {
+            myTextField.activateKeyboardFromBottom()
+        }
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let currentText = textField.text ?? ""
         guard let stringRange = Range(range, in: currentText) else { return false }
         let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
@@ -84,5 +86,17 @@ extension TrackerUITextField: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {       
         textField.resignFirstResponder()
         return true
+    }
+}
+
+extension UIViewController {
+    func hideKeyboardWhenTappedAround() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
 }

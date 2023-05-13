@@ -25,7 +25,6 @@ final class PlaceholderView: UIView {
     private let placeholderImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .center
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -34,7 +33,6 @@ final class PlaceholderView: UIView {
         label.font = .medium12
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -43,33 +41,34 @@ final class PlaceholderView: UIView {
         super.init(frame: .zero)
         self.state = state
         
-        initialise()
+        setupUI()
         updateAppearance()
     }
     
     required init?(coder: NSCoder) {
-        fatalError("")
+        fatalError("Unsupported")
     }
 }
 
 // MARK: - Private methods
 private extension PlaceholderView {
-    func initialise() {
+    func setupUI() {
         addSubviews(placeholderText, placeholderImageView)
-        translatesAutoresizingMaskIntoConstraints = false
+                
+        NSLayoutConstraint.activate([
+            placeholderImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            placeholderImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            placeholderImageView.heightAnchor.constraint(equalToConstant: UIConstants.imageSize),
+            placeholderImageView.widthAnchor.constraint(equalToConstant: UIConstants.imageSize)
+        ])
         
         NSLayoutConstraint.activate([
-        placeholderImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-        placeholderImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
-        placeholderImageView.heightAnchor.constraint(equalToConstant: UIConstants.imageSize),
-        placeholderImageView.widthAnchor.constraint(equalToConstant: UIConstants.imageSize),
-        
-        placeholderText.centerXAnchor.constraint(equalTo: centerXAnchor),
-        placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-        placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-        placeholderText.topAnchor.constraint(
-            equalTo: placeholderImageView.bottomAnchor,
-            constant: UIConstants.textToImageOffset)
+            placeholderText.centerXAnchor.constraint(equalTo: centerXAnchor),
+            placeholderText.leadingAnchor.constraint(equalTo: leadingAnchor, constant: .leadingInset),
+            placeholderText.trailingAnchor.constraint(equalTo: trailingAnchor, constant: .trailingInset),
+            placeholderText.topAnchor.constraint(
+                equalTo: placeholderImageView.bottomAnchor,
+                constant: UIConstants.textToImageOffset)
         ])
     }
     

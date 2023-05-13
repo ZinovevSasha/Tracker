@@ -14,7 +14,6 @@ final class TrackerHeaderView: UIView {
         let button = ExtendedButton(type: .system)
         button.setImage(.plus, for: .normal)
         button.tintColor = .myBlack
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -22,7 +21,6 @@ final class TrackerHeaderView: UIView {
         let label = UILabel()
         label.text = "Трекеры"
         label.font = .bold34
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
@@ -31,7 +29,6 @@ final class TrackerHeaderView: UIView {
         datePicker.datePickerMode = .date
         datePicker.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         datePicker.locale = Locale(identifier: "ru")
-        datePicker.translatesAutoresizingMaskIntoConstraints = false
         datePicker.tintColor = .systemBlue
         datePicker.backgroundColor = .myWhite
         datePicker.layer.cornerRadius = UIConstants.datePickerCornerRadius
@@ -41,7 +38,6 @@ final class TrackerHeaderView: UIView {
     
     private let stackView: UIStackView = {
         let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.axis = .horizontal
         view.alignment = .center
         view.distribution = .fillProportionally
@@ -59,8 +55,8 @@ final class TrackerHeaderView: UIView {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -72,42 +68,35 @@ final class TrackerHeaderView: UIView {
         delegate?.datePickerValueChanged(date: datePicker.date)
     }
     
-    @objc private func handlePlusButtonTap() {       
+    @objc private func handlePlusButtonTap() {    
         delegate?.handlePlusButtonTap()
     }
 }
 
 // MARK: - Private methods
 private extension TrackerHeaderView {
-    func initialise() {
+    func setupUI() {
         datePicker.addTarget(self, action: #selector(datePickerValueChanged), for: .valueChanged)
         plusButton.addTarget(self, action: #selector(handlePlusButtonTap), for: .touchUpInside)
-        stackView.addArrangedSubview(trackerLabel)
-        stackView.addArrangedSubview(datePicker)
+        stackView.addSubviews(trackerLabel, datePicker)
         addSubviews(plusButton, stackView)
     }
     
-    func setConstraints() {
-        let plusButtonConstraints = [
+    func setupLayout() {
+        NSLayoutConstraint.activate([
             plusButton.leadingAnchor.constraint(equalTo: leadingAnchor),
             plusButton.topAnchor.constraint(equalTo: topAnchor)
-        ]
-        let datePickerConstraints = [
+        ])
+        NSLayoutConstraint.activate([
             datePicker.widthAnchor.constraint(equalToConstant: UIConstants.datePickerWidth)
-        ]
-        let stackConstraints = [
+        ])
+        NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
             stackView.topAnchor.constraint(
                 equalTo: plusButton.bottomAnchor,
                 constant: UIConstants.trackerToPlusButtonOffset),
             stackView.heightAnchor.constraint(equalToConstant: 41)
-        ]
-        
-        NSLayoutConstraint.activate(
-            plusButtonConstraints +
-            datePickerConstraints +
-            stackConstraints
-        )
+        ])
     }
 }

@@ -14,14 +14,13 @@ final class SearchView: UIView {
         let view = UISearchBar()
         view.searchBarStyle = .minimal
         view.placeholder = "Поиск"
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -35,10 +34,10 @@ final class SearchView: UIView {
 
 // MARK: - Private methods
 private extension SearchView {
-    func initialise() {
+    func setupUI() {
         searchBar.delegate = self
     
-        addSubview(searchBar)
+        addSubviews(searchBar)
 
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: topAnchor),

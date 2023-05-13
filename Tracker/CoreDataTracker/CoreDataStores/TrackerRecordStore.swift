@@ -9,7 +9,8 @@ protocol TrackerRecordStoreProtocol {
 
 final class TrackerRecordStore {
     private let context: NSManagedObjectContext
-    
+    private let predicate = PredecateBuilder<TrackerRecordCoreData>()
+        
     init(context: NSManagedObjectContext) {
         self.context = context
     }
@@ -19,42 +20,28 @@ final class TrackerRecordStore {
 extension TrackerRecordStore: TrackerRecordStoreProtocol {
     func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(
-            format: "%K == %@",
-            // search criteria
-            #keyPath(TrackerRecordCoreData.recordId),
-            tracker.id ?? ""
-        )
+        fetchRequest.predicate = predicate
+            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "").build()
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.count
     }
     
     func isTrackerCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(
-            format: "%K == %@ AND %K == %@",
-            // first search criteria
-            #keyPath(TrackerRecordCoreData.recordId),
-            tracker.id ?? "",
-            // second search criteria
-            #keyPath(TrackerRecordCoreData.date),
-            Date.dateString(for: Date())
-        )
+        fetchRequest.predicate = predicate
+            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "")
+            .addPredicate(.equalTo, keyPath: \.date, value: Date.dateString(for: Date()))
+            .build(type: .and)
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.first != nil ? true : false
     }
 
     func isTrackerCompletedFor(selectedDay: String, _ tracker: TrackerCoreData) throws -> Bool {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.predicate = NSPredicate(
-            format: "%K == %@ AND %K == %@",
-            // first search criteria
-            #keyPath(TrackerRecordCoreData.recordId),
-            tracker.id ?? "",
-            // second search criteria
-            #keyPath(TrackerRecordCoreData.date),
-            selectedDay
-        )
+        fetchRequest.predicate = predicate
+            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "")
+            .addPredicate(.equalTo, keyPath: \.date, value: selectedDay)
+            .build(type: .and)
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.first != nil ? true : false
     }

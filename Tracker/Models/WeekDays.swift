@@ -1,11 +1,5 @@
 import Foundation
 
-extension WeekDay: Comparable {
-    static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
-        lhs.rawValue < rhs.rawValue
-    }
-}
-
 enum WeekDay: Int, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
@@ -41,7 +35,13 @@ enum WeekDay: Int, CaseIterable {
     }
 }
 
-extension Set where Element == Int {
+extension WeekDay: Comparable {
+    static func < (lhs: WeekDay, rhs: WeekDay) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+}
+
+extension Set<Int> {
     func weekdayStringShort() -> String {
         if self == WeekDay.allDaysOfWeek {
             return "Каждый день"

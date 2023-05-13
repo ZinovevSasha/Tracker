@@ -24,7 +24,6 @@ final class ScheduleTableViewCell: UITableViewCell {
         let view = UILabel()
         view.textColor = .myBlack
         view.font = .regular17
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -34,13 +33,11 @@ final class ScheduleTableViewCell: UITableViewCell {
         weakDaySwitch.backgroundColor = .myLightGrey
         weakDaySwitch.layer.cornerRadius = .cornerRadius
         weakDaySwitch.layer.masksToBounds = true
-        weakDaySwitch.translatesAutoresizingMaskIntoConstraints = false
         return weakDaySwitch
     }()
     
     private let stackView: UIStackView = {
         let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.alignment = .center
         view.distribution = .fill
         return view
@@ -50,7 +47,7 @@ final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -69,10 +66,10 @@ final class ScheduleTableViewCell: UITableViewCell {
 
 // MARK: - Private methods
 private extension ScheduleTableViewCell {
-    func initialise() {
+    func setupUI() {
         weakDaySwitch.addTarget(self, action: #selector(handleWeakDaySwitch), for: .touchUpInside)
-        stackView.addArrangedSubviews(weakDayLabel, weakDaySwitch)
-        contentView.addSubview(stackView)
+        stackView.addSubviews(weakDayLabel, weakDaySwitch)
+        contentView.addSubviews(stackView)
         contentView.backgroundColor = .myBackground
         
         selectionStyle = .none

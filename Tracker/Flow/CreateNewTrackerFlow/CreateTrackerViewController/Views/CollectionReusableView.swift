@@ -10,14 +10,13 @@ final class CollectionReusableView: UICollectionReusableView {
     private let text: UILabel = {
         let view = UILabel()
         view.font = .bold19
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -27,8 +26,8 @@ final class CollectionReusableView: UICollectionReusableView {
 
 // MARK: Private methods
 private extension CollectionReusableView {
-    func initialise() {
-        addSubview(text)
+    func setupUI() {
+        addSubviews(text)
         
         NSLayoutConstraint.activate([
             text.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),

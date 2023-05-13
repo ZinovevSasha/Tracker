@@ -13,12 +13,4 @@ class ExtendedButton: UIButton {
         let extendedBounds = bounds.inset(by: extendedArea)
         return extendedBounds.contains(point) ? self : nil
     }
-    
-    func setUpAppearance(forState state: UIControl.State, backgroundColor: UIColor, titleColor: UIColor, title: String, cornerRadius: CGFloat) {
-        self.setBackgroundImage(UIImage(color: backgroundColor), for: state)
-        self.setTitleColor(titleColor, for: state)
-        self.setTitle(title, for: state)
-        self.layer.cornerRadius = cornerRadius
-        self.clipsToBounds = true
-    }
 }

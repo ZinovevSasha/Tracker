@@ -1,13 +1,25 @@
 import UIKit
 
-final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
+final class EmojiCell: UICollectionViewCell, Highilable {
     // MARK: - Public
-    func configure(with info: String) {
-        text.text = info
+    func configure(with emoji: String) {
+        text.text = emoji
     }
     
-    func highlightUnhighlight() {
+    var content: String? {
+        text.text
+    }
+    
+    func toggle() -> Bool {
         cellState.toggle()
+    }
+    
+    func unhighlight() {
+        cellState = .unselected
+    }
+    
+    func highlight() {
+        cellState = .selected
     }
     
     // MARK: - Cell State
@@ -20,7 +32,6 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
     // MARK: - Private properties
     private let text: UILabel = {
         let view = UILabel()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.font = .bold32
         view.textAlignment = .center
         return view
@@ -29,7 +40,7 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        initialise()
+        setupUI()
     }
     
     required init?(coder: NSCoder) {
@@ -38,9 +49,9 @@ final class TrackerEmojiCollectionViewCell: UICollectionViewCell {
 }
 
 // MARK: Private methods
-private extension TrackerEmojiCollectionViewCell {
-    func initialise() {
-        contentView.addSubview(text)
+private extension EmojiCell {
+    func setupUI() {
+        contentView.addSubviews(text)
         contentView.layer.cornerRadius = 16
         contentView.layer.masksToBounds = true
         

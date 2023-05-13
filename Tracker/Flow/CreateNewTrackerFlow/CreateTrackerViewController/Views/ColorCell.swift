@@ -1,13 +1,32 @@
 import UIKit
 
-final class TrackerColorCollectionViewCell: UICollectionViewCell {
+protocol Highilable {
+    var content: String? { get }
+    func unhighlight()
+    func highlight()
+    func toggle() -> Bool
+}
+
+final class ColorCell: UICollectionViewCell, Highilable {
     // MARK: Public
-    func configure(with info: String) {
-        colorView.backgroundColor = UIColor(named: info)
+    func configure(with color: String) {
+        colorView.backgroundColor = UIColor(hexString: color)
     }
     
-    func addOrRemoveBorders() {
+    var content: String? {
+        colorView.backgroundColor?.toHexString()
+    }
+    
+    func toggle() -> Bool {
         cellState.toggle()
+    }
+    
+    func unhighlight() {
+        cellState = .unselected
+    }
+    
+    func highlight() {
+        cellState = .selected
     }
     
     // MARK: - Cell State
@@ -20,7 +39,6 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
     // MARK: Private properties
     private let text: UILabel = {
         let view = UILabel()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.font = .bold32
         return view
     }()
@@ -29,13 +47,11 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
         let view = UIView()
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let highlightedImage: UIImageView = {
         let view = UIImageView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -48,13 +64,17 @@ final class TrackerColorCollectionViewCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        highlightedImage.image = nil
+    }
 }
 
 // MARK: Private methods
-private extension TrackerColorCollectionViewCell {
+private extension ColorCell {
     func initialise() {
-        contentView.addSubview(colorView)
-        contentView.addSubview(highlightedImage)
+        contentView.addSubviews(colorView, highlightedImage)
         
         NSLayoutConstraint.activate([
             highlightedImage.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),

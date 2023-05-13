@@ -2,7 +2,7 @@ import UIKit
 
 protocol CreateNewCategoryViewControllerDelegate: AnyObject {
     func categoryNameDidEntered(categoryName name: String)
-    func isNameAvailable(name: String) -> Bool
+    func isNameAvailable(name: String) -> Bool?
 }
 
 final class CreateNewCategoryViewController: FrameViewController {
@@ -15,29 +15,26 @@ final class CreateNewCategoryViewController: FrameViewController {
     private var mainStackView: UIStackView = {
         let view = UIStackView()
         view.alignment = .fill
-        view.axis = .vertical
-        view.translatesAutoresizingMaskIntoConstraints = false
+        view.axis = .vertical        
         return view
     }()
     
     private var warningCharactersLabel: UILabel = {
         let view = UILabel()
-        view.text = "Такая категория уже есть 🤯"
+        view.text = "Такая категория уже есть ☹️"
         view.numberOfLines = .zero
         view.font = .regular17
         view.textColor = .myRed
         view.alpha = .zero
         view.textAlignment = .center
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
     
     // MARK: Lifecicle
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialise()
-        setConstraints()
+        setupUI()
+        setupLayout()
     }
     
     // MARK: - Category name
@@ -69,19 +66,20 @@ final class CreateNewCategoryViewController: FrameViewController {
 
 // MARK: - Private Methods
 private extension CreateNewCategoryViewController {
-    func initialise() {
-        container.addSubview(mainStackView)
-        mainStackView.addArrangedSubviews(textField)
+    func setupUI() {
+        container.addSubviews(mainStackView)
+        mainStackView.addSubviews(textField)
         mainStackView.setCustomSpacing(8, after: textField)
         textField.delegate = self
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
             mainStackView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             mainStackView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            mainStackView.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle),
-            
+            mainStackView.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle)
+        ])
+        NSLayoutConstraint.activate([
             textField.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             textField.trailingAnchor.constraint(equalTo: container.trailingAnchor),
             textField.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle)
@@ -91,7 +89,7 @@ private extension CreateNewCategoryViewController {
 
 // MARK: - TrackerUITextFieldDelegate
 extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
-    func isChangeText(text: String, newLength: Int) -> Bool {
+    func isChangeText(text: String, newLength: Int) -> Bool? {
         guard !text.isEmpty else {
             // if text isEmpty
             updateCategoryName(nil)

@@ -27,14 +27,12 @@ class FrameViewController: UIViewController, FrameViewControllerProtocol {
         let label = UILabel()
         label.textAlignment = .center
         label.font = .medium16
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     /// Buttons at the bottom
     private let screenButtons: UIStackView = {
         let stackView = UIStackView()
-        stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.alignment = .center
@@ -76,7 +74,7 @@ class FrameViewController: UIViewController, FrameViewControllerProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        setConstraints()
+        setupLayout()
     }
         
     @objc func handleButtonLeftTap() {}
@@ -90,10 +88,7 @@ private extension FrameViewController {
         buttonRight?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
         buttonCenter?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
         view.backgroundColor = .myWhite
-        view.addSubview(screenTitle)
-        view.addSubview(container)
-        view.addSubview(screenButtons)
-        container.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubviews(screenTitle, container, screenButtons)
         
         if let buttonLeft, let buttonRight  {
             screenButtons.addArrangedSubview(buttonLeft)
@@ -106,13 +101,13 @@ private extension FrameViewController {
         }
     }
     
-    func setConstraints() {
+    func setupLayout() {
         NSLayoutConstraint.activate([
-            screenTitle.topAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.topAnchor,
-                constant: UIConstants.nameLabelTopInset),
-            screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
+            screenTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: UIConstants.nameLabelTopInset),
+            screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
             container.topAnchor.constraint(
                 equalTo: screenTitle.bottomAnchor,
                 constant: UIConstants.containerToTitleInset),
@@ -123,7 +118,9 @@ private extension FrameViewController {
                 equalTo: view.trailingAnchor,
                 constant: UIConstants.trailing),
             container.bottomAnchor.constraint(equalTo: screenButtons.topAnchor),
-            
+        ])
+        
+        NSLayoutConstraint.activate([
             screenButtons.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor,
                 constant: UIConstants.leading),
@@ -132,7 +129,7 @@ private extension FrameViewController {
                 constant: UIConstants.trailing),
             screenButtons.bottomAnchor.constraint(
                 equalTo: view.safeAreaLayoutGuide.bottomAnchor,
-                constant: UIConstants.bottom),            
+                constant: UIConstants.bottom),
             screenButtons.heightAnchor.constraint(equalToConstant: .buttonsHeight)
         ])
     }
