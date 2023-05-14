@@ -1,8 +1,8 @@
 import Foundation
 
 struct CategoryAndScheduleData {
-    private var category = RowData(title: "Категория", subtitle: "")
-    private var schedule = RowData(title: "Расписание", subtitle: "")
+    private var category = RowData(title: Localized.NewHabit.cancel, subtitle: "")
+    private var schedule = RowData(title: Localized.NewHabit.schedule, subtitle: "")
     
     private let userDafaults = UserDefaults()
     enum Key: String {
@@ -18,7 +18,7 @@ struct CategoryAndScheduleData {
     }
     
     var oneRow: [RowData] {
-        [RowData(title: "Категория", subtitle: categoryName)]
+        [RowData(title: Localized.NewHabit.category, subtitle: categoryName)]
     }
     
     var twoRows: [RowData] {

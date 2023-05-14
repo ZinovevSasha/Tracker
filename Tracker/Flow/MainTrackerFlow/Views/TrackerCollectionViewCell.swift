@@ -5,7 +5,6 @@ protocol TrackerCollectionViewCellDelegate: AnyObject {
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
-    static let identifier = String(describing: TrackerCollectionViewCell.self)
     // MARK: - Public
     func configure(with info: Tracker?) {
         guard let info = info else { return }
@@ -18,7 +17,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     func configure(with trackedDays: Int?, isCompleted: Bool?) {
         guard let trackedDays = trackedDays, let isCompleted = isCompleted else { return }
-        trackedDaysLabel.text = "\(trackedDays) \(pluralForm(forNumber: trackedDays))"
+        trackedDaysLabel.text = Localized.Main.numberOf(days: trackedDays)
         if isCompleted {
             buttonState = .selected
         } else {
@@ -202,12 +201,5 @@ private extension TrackerCollectionViewCell {
             addButton.setImage(image, for: .normal)
             addButton.alpha = 1            
         }
-    }
-    
-    func pluralForm(forNumber number: Int) -> String {
-        let cases = [2, 0, 1, 1, 1, 2]
-        let forms = ["день", "дня", "дней"]
-        let index = (number % 100 > 4 && number % 100 < 20) ? 2 : cases[safe: min(number % 10, 5)]
-        return forms[safe: index ?? 0] ?? "день"
     }
 }

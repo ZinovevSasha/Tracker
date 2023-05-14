@@ -4,7 +4,7 @@ final class CreateTrackerViewController: UIViewController {
     // MARK: - Private properties
     private let nameOfScreenLabel: UILabel = {
         let view = UILabel()
-        view.text = "Новая привычка"
+        view.text = Localized.NewHabit.newHabit
         view.font = .medium16
         view.textAlignment = .center
         return view
@@ -15,10 +15,10 @@ final class CreateTrackerViewController: UIViewController {
         view.axis = .vertical
         return view
     }()
-    private let titleTextfield = TrackerUITextField(text: "Ведите название трекера")
+    private let titleTextfield = TrackerUITextField(text: Localized.NewHabit.enterName)
     private let warningCharactersLabel: UILabel = {
         let view = UILabel()
-        view.text = "Ограничение 38 символов"
+        view.text = Localized.NewHabit.restriction
         view.font = .regular17
         view.textColor = .myRed
         view.textAlignment = .center
@@ -43,9 +43,9 @@ final class CreateTrackerViewController: UIViewController {
         view.register(cellClass: ColorCell.self)
         return view
     }()
-    private let cancelButton = ActionButton(colorType: .red, title: "Отменить")
+    private let cancelButton = ActionButton(colorType: .red, title: Localized.NewHabit.cancel)
     // Button that is changing depending on how the data is filled
-    private let createButton = ActionButton(colorType: .grey, title: "Создать")
+    private let createButton = ActionButton(colorType: .grey, title: Localized.NewHabit.create)
         
     private let buttonStackView: UIStackView = {
         let view = UIStackView()

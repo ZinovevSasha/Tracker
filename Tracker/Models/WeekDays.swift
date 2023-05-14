@@ -12,25 +12,25 @@ enum WeekDay: Int, CaseIterable {
     
     var abbreviationLong: String {
         switch self {
-        case .monday: return "Понедельник"
-        case .tuesday: return "Вторник"
-        case .wednesday: return "Среда"
-        case .thursday: return "Четверг"
-        case .friday: return "Пятница"
-        case .saturday: return "Суббота"
-        case .sunday: return "Воскресенье"
+        case .monday: return Localized.NewHabit.monday
+        case .tuesday: return Localized.NewHabit.tuesday
+        case .wednesday: return Localized.NewHabit.wednesday
+        case .thursday: return Localized.NewHabit.thursday
+        case .friday: return Localized.NewHabit.friday
+        case .saturday: return Localized.NewHabit.saturday
+        case .sunday: return Localized.NewHabit.sunday
         }
     }
     
     var abbreviationShort: String {
         switch self {
-        case .sunday: return "Вс"
-        case .monday: return "Пн"
-        case .tuesday: return "Вт"
-        case .wednesday: return "Ср"
-        case .thursday: return "Чт"
-        case .friday: return "Пт"
-        case .saturday: return "Сб"
+        case .sunday: return Localized.NewHabit.sun
+        case .monday: return Localized.NewHabit.mon
+        case .tuesday: return Localized.NewHabit.tue
+        case .wednesday: return Localized.NewHabit.wed
+        case .thursday: return Localized.NewHabit.thu
+        case .friday: return Localized.NewHabit.sat
+        case .saturday: return Localized.NewHabit.sun
         }
     }
 }
@@ -44,7 +44,7 @@ extension WeekDay: Comparable {
 extension Set<Int> {
     func weekdayStringShort() -> String {
         if self == WeekDay.allDaysOfWeek {
-            return "Каждый день"
+            return Localized.NewHabit.everyday
         } else {
             return WeekDay
                 .allCases // take all cases  from Mon to Sun

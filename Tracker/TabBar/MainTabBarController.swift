@@ -9,11 +9,11 @@ final class MainTabBarController: UITabBarController {
             generateViewController(
                 TrackersViewController(),
                 image: .leftTabBar,
-                title: "Трекеры"),
+                title: Localized.TabBar.trackers),
             generateViewController(
                 StatisticViewController(),
                 image: .rightTabBar,
-                title: "Статистика")
+                title: Localized.TabBar.statistics)
         ]
     }
     

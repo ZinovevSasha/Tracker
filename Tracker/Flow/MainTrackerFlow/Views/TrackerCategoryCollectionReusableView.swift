@@ -1,7 +1,6 @@
 import UIKit
 
 final class TrackerHeader: UICollectionReusableView {
-    static let identifier = String(describing: TrackerHeader.self)
     // MARK: - Public
     func configure(with header: String) {
         categoryLabel.text = header
@@ -17,7 +16,6 @@ final class TrackerHeader: UICollectionReusableView {
     // MARK: - UIConstants
     private enum UIConstants {
         static let categoryLabelLeadingInset: CGFloat = 28
-        static let categoryLabelBottomInset: CGFloat = -12
     }
     
     // MARK: - Init
@@ -40,10 +38,7 @@ private extension TrackerHeader {
     
     func setupLayout() {
         NSLayoutConstraint.activate([
-            categoryLabel.leadingAnchor.constraint(
-                equalTo: leadingAnchor,
-                constant: UIConstants.categoryLabelLeadingInset
-            ),
+            categoryLabel.leadingAnchor.constraint(equalTo: leadingAnchor,constant: UIConstants.categoryLabelLeadingInset),
             categoryLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
             categoryLabel.topAnchor.constraint(equalTo: topAnchor)           
         ])

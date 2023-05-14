@@ -4,7 +4,7 @@ final class ChooseTrackerViewController: UIViewController {
     // MARK: Private properties
     private let nameOfScreenLabel: UILabel = {
         let label = UILabel()
-        label.text = "Создание трекера"
+        label.text = Localized.Choosing.title
         label.font = .medium16
         label.textAlignment = .center
         return label
@@ -17,8 +17,10 @@ final class ChooseTrackerViewController: UIViewController {
         return view
     }()
     
-    let habitButton = ActionButton(colorType: .black, title: "Привычка")
-    let irregularEventButton = ActionButton(colorType: .black, title: "Нерегулярные событие")
+    let habitButton = ActionButton(colorType: .black,
+        title: Localized.Choosing.habit)
+    let irregularEventButton = ActionButton(
+        colorType: .black, title: Localized.Choosing.irregular)
     
     // MARK: UIConstants
     private enum UIConstants {
@@ -74,7 +76,6 @@ final class ChooseTrackerViewController: UIViewController {
         pushCreateTrackerViewController(type: .ocasional)
     }
     
-    // Private
     private func pushCreateTrackerViewController(type: UserTracker.TrackerType) {
         let viewModel = CreateTrackerViewModel(trackerType: type)
         let vc = CreateTrackerViewController()

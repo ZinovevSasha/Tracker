@@ -45,8 +45,8 @@ final class CategoriesListViewController: FrameViewController {
     // MARK: - Init
     init() {
         super.init(
-            title: "Категория",
-            buttonCenter: ActionButton(colorType: .black, title: "Добавить категорию")
+            title: Localized.CategoryList.category,
+            buttonCenter: ActionButton(colorType: .black, title: Localized.CategoryList.newCategory)
         )
     }
     

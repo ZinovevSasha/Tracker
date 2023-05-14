@@ -1,0 +1,65 @@
+// Onboarding
+"onboarding.greeting1" = "Track only what you want";
+"onboarding.greeting2" = "Even if it's not liters of water and yoga";
+"onboarding.enter" = "That's technology!";
+
+// ChooseTrackerViewController
+"choosing.tracker" = "Creating a Tracker";
+"choosing.tracker.type1" = "Habit";
+"choosing.tracker.type2" = "Irregular event";
+
+// Placeholder
+"placeholder.question" = "What are we going to track?";
+"placeholder.noResults" = "Nothing found";
+"placeholder.noStatistic" = "There is nothing to analyze yet";
+"placeholder.recomendation" = "Habits and events\n can be combined in meaning";
+
+// TabBar
+"tabBar.trackers" = "Trackers";
+"tabBar.statistics" = "Statistics";
+
+// Main
+"main.search" = "Search";
+"main.trackers" = "Trackers";
+
+// Create Tracker
+"create.new.habit" = "New habit";
+"create.enter.name" = "Enter the name of the tracker";
+"create.restriction" = "38 character limit";
+"create.cancel" = "Cancel";
+"create.create.new" = "Create";
+"create.color" = "Color";
+"create.emoji" = "Emojis";
+"create.category" = "Category";
+"create.schedule" = "Schedule";
+
+// Schedule
+"scheule.monday" = "Monday";
+"scheule.tuesday" = "Tuesday";
+"scheule.wednesday" = "Wednesday";
+"scheule.thursday" = "Thursday";
+"scheule.friday" = "Friday";
+"scheule.saturday" = "Saturday";
+"scheule.sunday" = "Sunday";
+"scheule.mon" = "Mon";
+"scheule.tue" = "Tue";
+"scheule.wed" = "Wed";
+"scheule.thu" = "Thu";
+"scheule.fri" = "Fri";
+"scheule.sat" = "Sat";
+"scheule.sun" = "Sun";
+"scheule.everyday" = "Every day";
+
+// CategoryList
+"category.category" = "Category";
+"category.add.new" = "Add category";
+
+// NewCategory
+"newCategory.enter.name" = "Enter category name";
+"newCategory.already.exist" = "This category already exists ☹️";
+"newCategory.new" = "New category";
+"newCategory.ready" = "Ready";
+
+// Schedule
+"schedule" = "Schedule";
+"schedule.ready" = "Ready";

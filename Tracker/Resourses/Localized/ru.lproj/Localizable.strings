@@ -1,0 +1,65 @@
+// Onboarding
+"onboarding.greeting1" = "Отслеживайте только то, что хотите";
+"onboarding.greeting2" = "Даже если это не литры воды и йога";
+"onboarding.enter" = "Вот это технологии!";
+
+// ChooseTrackerViewController
+"choosing.tracker" = "Создание трекера";
+"choosing.tracker.type1" = "Привычка";
+"choosing.tracker.type2" = "Нерегулярные событие";
+
+// Placeholder
+"placeholder.question" = "Что будем отслеживать?";
+"placeholder.noResults" = "Ничего не найдено";
+"placeholder.noStatistic" = "Анализировать пока нечего";
+"placeholder.recomendation" = "Привычки и события\n можно объединить по смыслу";
+
+// TabBar
+"tabBar.trackers" = "Трекеры";
+"tabBar.statistics" = "Статистика";
+
+// Main
+"main.search" = "Поиск";
+"main.trackers" = "Трекеры";
+
+// Create Tracker
+"create.new.habit" = "Новая привычка";
+"create.enter.name" = "Ведите название трекера";
+"create.restriction" = "Ограничение 38 символов";
+"create.cancel" = "Отменить";
+"create.create.new" = "Создать";
+"create.color" = "Цвет";
+"create.emoji" = "Emojis";
+"create.category" = "Категория";
+"create.schedule" = "Расписание";
+
+// Schedule
+"scheule.monday" = "Понедельник";
+"scheule.tuesday" = "Вторник";
+"scheule.wednesday" = "Среда";
+"scheule.thursday" = "Четверг";
+"scheule.friday" = "Пятница";
+"scheule.saturday" = "Суббота";
+"scheule.sunday" = "Воскресенье";
+"scheule.mon" = "Вс";
+"scheule.tue" = "Пн";
+"scheule.wed" = "Вт";
+"scheule.thu" = "Ср";
+"scheule.fri" = "Чт";
+"scheule.sat" = "Пт";
+"scheule.sun" = "Сб";
+"scheule.everyday" = "Каждый день";
+
+// CategoryList
+"category.category" = "Категория";
+"category.add.new" = "Добавить категорию";
+
+// NewCategory
+"newCategory.enter.name" = "Введите название категории";
+"newCategory.already.exist" = "Такая категория уже есть ☹️";
+"newCategory.new" = "Новая категория";
+"newCategory.ready" = "Готово";
+
+// Schedule
+"schedule" = "Расписание";
+"schedule.ready" = "Готово";
