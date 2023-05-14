@@ -13,7 +13,7 @@ final class TrackersViewController: UIViewController {
         view.register(cellClass: TrackerCollectionViewCell.self)
         return view
     }()
-    let placeholderView = PlaceholderView(state: .star)
+    let placeholderView = PlaceholderView(state: .question)
             
     // MARK: - UIConstants
     private enum UIConstants {
@@ -71,7 +71,7 @@ final class TrackersViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if let isEmpty = dataProvider?.isEmpty, isEmpty {
-            placeholderView.state = .star
+            placeholderView.state = .question
         } else {
             placeholderView.state = .invisible(animate: false)
         }
@@ -254,7 +254,7 @@ extension TrackersViewController: SearchViewDelegate {
 // MARK: - DataProviderDelegate
 extension TrackersViewController: DataProviderDelegate {
     func place() {
-        placeholderView.state = .star
+        placeholderView.state = .question
     }
     
     func noResultFound() {

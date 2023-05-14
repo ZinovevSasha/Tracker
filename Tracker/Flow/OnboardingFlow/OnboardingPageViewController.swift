@@ -8,11 +8,11 @@ final class OnboardingPageViewController: UIPageViewController {
     private var pages: [UIViewController] = {
         let onboardingBlue = OnboardingViewController(
             image: .onboardingBlue,
-            greetingText: "Отслеживайте только то, что хотите"
+            greetingText: Localized.Onboarding.greeting1
         )
         let onboardingRed = OnboardingViewController(
             image: .onboardingRed,
-            greetingText: "Даже если это не литры воды и йога"
+            greetingText: Localized.Onboarding.greeting2
         )
         return [onboardingBlue, onboardingRed]
     }()
@@ -26,7 +26,7 @@ final class OnboardingPageViewController: UIPageViewController {
         return pageControll
     }()
     
-    private let button = ActionButton(title: "Вот это технологии!")
+    private let button = ActionButton(title: Localized.Onboarding.enter)
     
     // MARK: - Init
     private let authService: AuthService?
@@ -70,7 +70,7 @@ final class OnboardingPageViewController: UIPageViewController {
         ])
         
         NSLayoutConstraint.activate([
-            pageControll.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -134),
+            pageControll.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -134),
             pageControll.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }

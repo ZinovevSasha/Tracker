@@ -10,7 +10,7 @@ final class CreateNewCategoryViewController: FrameViewController {
     weak var delegate: CreateNewCategoryViewControllerDelegate?
     
     // MARK: - Private properties
-    private let textField = TrackerUITextField(text: "Введите название категории")
+    private let textField = TrackerUITextField(text: Localized.NewCategory.enterName)
     
     private var mainStackView: UIStackView = {
         let view = UIStackView()
@@ -21,7 +21,7 @@ final class CreateNewCategoryViewController: FrameViewController {
     
     private var warningCharactersLabel: UILabel = {
         let view = UILabel()
-        view.text = "Такая категория уже есть ☹️"
+        view.text = Localized.NewCategory.existAlready
         view.numberOfLines = .zero
         view.font = .regular17
         view.textColor = .myRed
@@ -44,8 +44,8 @@ final class CreateNewCategoryViewController: FrameViewController {
     init() {
         // Super init from base class(with title and buttons at bottom)
         super.init(
-            title: "Новая категория",
-            buttonCenter: ActionButton(colorType: .grey, title: "Готово")
+            title: Localized.NewCategory.new,
+            buttonCenter: ActionButton(colorType: .grey, title: Localized.NewCategory.ready)
         )
     }
     

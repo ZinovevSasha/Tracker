@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 final class AuthService {
     private let userDefaults: UserDefaults
     

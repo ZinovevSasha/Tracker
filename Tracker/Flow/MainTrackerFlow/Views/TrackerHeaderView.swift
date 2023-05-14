@@ -19,7 +19,7 @@ final class TrackerHeaderView: UIView {
     
     private let trackerLabel: UILabel = {
         let label = UILabel()
-        label.text = "Трекеры"
+        label.text = Localized.Main.trackers
         label.font = .bold34
         return label
     }()
@@ -27,12 +27,12 @@ final class TrackerHeaderView: UIView {
     private let datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
-        datePicker.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        datePicker.locale = Locale(identifier: "ru")
+        datePicker.locale = Locale.current        
         datePicker.tintColor = .systemBlue
         datePicker.backgroundColor = .myWhite
         datePicker.layer.cornerRadius = UIConstants.datePickerCornerRadius
         datePicker.layer.masksToBounds = true
+        datePicker.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         return datePicker
     }()
     
@@ -68,7 +68,7 @@ final class TrackerHeaderView: UIView {
         delegate?.datePickerValueChanged(date: datePicker.date)
     }
     
-    @objc private func handlePlusButtonTap() {    
+    @objc private func handlePlusButtonTap() {
         delegate?.handlePlusButtonTap()
     }
 }
@@ -93,9 +93,7 @@ private extension TrackerHeaderView {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stackView.topAnchor.constraint(
-                equalTo: plusButton.bottomAnchor,
-                constant: UIConstants.trackerToPlusButtonOffset),
+            stackView.topAnchor.constraint(equalTo: plusButton.bottomAnchor, constant: UIConstants.trackerToPlusButtonOffset),
             stackView.heightAnchor.constraint(equalToConstant: 41)
         ])
     }

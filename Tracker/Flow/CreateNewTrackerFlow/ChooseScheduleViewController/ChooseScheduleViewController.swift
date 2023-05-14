@@ -34,8 +34,8 @@ final class ChooseScheduleViewController: FrameViewController {
     init(weekDays: Set<Int>) {
         self.selectedWeekDays = weekDays
         super.init(
-            title: "Расписание",
-            buttonCenter: ActionButton(colorType: .black, title: "Готово")
+            title: Localized.Schedule.schedule,
+            buttonCenter: ActionButton(colorType: .black, title: Localized.Schedule.ready)
         )
     }
     

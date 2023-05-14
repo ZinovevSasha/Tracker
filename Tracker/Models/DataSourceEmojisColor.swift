@@ -7,9 +7,9 @@ enum CollectionViewData {
     var title: String {
         switch self {
         case .emojiSection:
-            return "Emojis"
+            return Localized.NewHabit.emoji
         case .colorSection:
-            return "Цвет"
+            return Localized.NewHabit.color
         }
     }
 }
