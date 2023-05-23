@@ -89,7 +89,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
-    
+         
     // MARK: UIConstants
     private enum UIConstants {
         static let trackerCornerRadius: CGFloat = 16
@@ -117,7 +117,13 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    private var isAttached: Bool = false
+    private enum UIContextMenuAction {
+        case attach, unattach, update
+    }
+    
+    private var contextMunuAction: UIContextMenuAction?
+    
+    private var isAttached: Bool = true
     
     // MARK: - Init
     override init(frame: CGRect) {
@@ -234,25 +240,43 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
             guard let self = self else { return }
             if isAttached {
                 isAttached = false
-                self.delegate?.didUnattachTracker(for: self)
+                contextMunuAction = .unattach
             } else {
                 isAttached = true
-                self.delegate?.didAttachTracker(for: self)
+                contextMunuAction = .attach
             }
         }
-        let modifyAction = UIAction(title: "Update") { [weak self] _ in
+        
+        let updateAction = UIAction(title: "Update") { [weak self] _ in
             guard let self = self else { return }
-            self.delegate?.didUpdateTracker(for: self)
+            contextMunuAction = .update
         }
+        
         let deleteAction = UIAction(title: "Delete", attributes: .destructive) { [weak self] _ in
             guard let self = self else { return }
             self.delegate?.didDeleteTracker(for: self)
         }
-        let menu = UIMenu(title: "", children: [attachAction, modifyAction, deleteAction])
+        
+        let menu = UIMenu(title: "", children: [attachAction, updateAction, deleteAction])
         
         return UIContextMenuConfiguration(
             identifier: nil, previewProvider: nil) { _ in
-            return menu
+                return menu
+            }
+    }
+           
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willEndFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+        guard let munuAction = contextMunuAction else { return }
+        
+        animator?.addCompletion {
+            switch munuAction {
+            case .attach:
+                self.delegate?.didAttachTracker(for: self)
+            case .unattach:
+                self.delegate?.didUnattachTracker(for: self)
+            case .update:
+                self.delegate?.didUpdateTracker(for: self)
+            }
         }
     }
 }

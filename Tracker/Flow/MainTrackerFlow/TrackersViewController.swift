@@ -187,7 +187,10 @@ extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
         return false
     }
-   
+    
+    func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
+            return false
+        }   
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -295,7 +298,6 @@ extension TrackersViewController: DataProviderDelegate {
     }
     
     func didUpdate(_ update: DataProviderUpdate) {
-       
         collectionView.performBatchUpdates {
             if !update.insertedIndexes.isEmpty {
                 collectionView.insertItems(at: [update.insertedIndexes])
