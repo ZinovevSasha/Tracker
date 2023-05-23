@@ -8,6 +8,8 @@
         <attribute name="color" attributeType="String"/>
         <attribute name="emoji" attributeType="String"/>
         <attribute name="id" attributeType="String"/>
+        <attribute name="isAttached" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="lastCategory" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="schedule" attributeType="String"/>
         <relationship name="category" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCategoryCoreData" inverseName="trackers" inverseEntity="TrackerCategoryCoreData"/>

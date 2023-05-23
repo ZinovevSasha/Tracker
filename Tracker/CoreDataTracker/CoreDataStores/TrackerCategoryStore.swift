@@ -1,8 +1,10 @@
 import CoreData
 
 protocol TrackerCategoryStoreProtocol {
-    func addCategory(with name: String, and tracker: TrackerCoreData) throws
+    func addTracker(toCategoryWithName name: String, tracker: TrackerCoreData) throws
     func getAllCategories() -> [TrackerCategory]
+    func putToAttachedCategory(tracker: TrackerCoreData)
+    func putBackToOriginalCategory(tracker: TrackerCoreData)
 }
 
 final class TrackerCategoryStore {
@@ -21,98 +23,97 @@ final class TrackerCategoryStore {
 
 // MARK: - Public
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
-    func addCategory(with name: String, and tracker: TrackerCoreData) throws {
-        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = predicateBuilder
-            .addPredicate(.equalTo, keyPath: \.header, value: name)
-            .build()
-        let results = try context.fetch(fetchRequest)
-        if let category = results.first {
-            // Category already exists
-            category.addToTrackers(tracker)
-        } else {
-            // Category does not exist, create new category
-            let category = TrackerCategoryCoreData(context: context)
-            category.header = name
-            category.addToTrackers(tracker)
+    func addTracker(toCategoryWithName name: String, tracker: TrackerCoreData) throws {
+        // Fetch all existing categories with the same name
+        let categories = try fetchTrackerCategories(context: context) {
+            self.predicateBuilder.addPredicate(.equalTo, keyPath: \.header, value: name).build()
         }
-        saveContext()
-    }
-    
-    func addTrackerToCategoryWith(name: String, tracker: Tracker) throws {
-        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = predicateBuilder
-            .addPredicate(.equalTo, keyPath: \.header, value: name)
-            .build()
-        let results = try context.fetch(fetchRequest)
         
-        let trackerCoreData = TrackerCoreData(tracker: tracker, context: context)
-        
-        if let category = results.first {
+        if let category = categories.first {
             // Category already exists
-            category.addToTrackers(trackerCoreData)
+            category.addToTrackers(tracker)
         } else {
             // Category does not exist, create new category
             let category = TrackerCategoryCoreData(context: context)
             category.header = name
-            category.addToTrackers(trackerCoreData)
+            category.addToTrackers(tracker)
         }
         saveContext()
     }
     
     func addCategory(with name: String) throws {
-        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = predicateBuilder
-            .addPredicate(.equalTo, keyPath: \.header, value: name)
-            .build()
-        let results = try context.fetch(fetchRequest)
-        if let category = results.first {
-            // Category already exists
-            return
-        } else {
-            // Category does not exist, create new category
-            let category = TrackerCategoryCoreData(context: context)
-            category.header = name            
+        // Fetch all existing categories with the same name
+        let categories = try fetchTrackerCategories(context: context) {
+            self.predicateBuilder.addPredicate(.equalTo, keyPath: \.header, value: name).build()
         }
+        
+        // If a category with the same name already exists, return without doing anything
+        if let category = categories.first {
+            return
+        }
+        
+        // Otherwise, create a new category with the given name and save it to the context
+        let category = TrackerCategoryCoreData(context: context)
+        category.header = name
         saveContext()
     }
     
     func isNameAvailable(name: String) throws -> Bool {
-        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        fetchRequest.predicate = predicateBuilder
-            .addPredicate(.equalTo, keyPath: \.header, value: name)
-            .build()
-        let results = try context.fetch(fetchRequest)
-        if let category = results.first {
-            return false
-        } else {
-            return true
+        // Fetch all existing categories with the same name
+        let categories = try fetchTrackerCategories(context: context) {
+            self.predicateBuilder.addPredicate(.equalTo, keyPath: \.header, value: name).build()
         }
+        
+        return (categories.first != nil) ? false : true
     }
     
     func getAllCategories() -> [TrackerCategory] {
-        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
         do {
-            let trackerCategoryCoreData = try context.fetch(fetchRequest)
-            return try trackerCategoryCoreData.map { try convertToTrackerCategory($0) }
+            let categories = try fetchTrackerCategories(context: context)
+            return try categories.map { try convertToTrackerCategory($0) }
         } catch {
             print("Error fetching categories: \(error.localizedDescription)")
             return []
         }
     }
+    
+    func putToAttachedCategory(tracker: TrackerCoreData) {
+        tracker.isAttached = true
+        tracker.lastCategory = tracker.category?.header
+        try? addTracker(toCategoryWithName: "Attached", tracker: tracker)
+    }
+    
+    func putBackToOriginalCategory(tracker: TrackerCoreData) {
+        guard let lastCategory = tracker.lastCategory else { return }
+        tracker.isAttached = false
+        tracker.lastCategory = nil
+        try? addTracker(toCategoryWithName: lastCategory, tracker: tracker)
+    }
 }
 
 // MARK: - Private
 private extension TrackerCategoryStore {
-    func convertToTrackerCategory(
-        _ trackerCategoriesCoreData: TrackerCategoryCoreData
-    ) throws -> TrackerCategory {
-        // Get categories for catefory view controller
-        let header = trackerCategoriesCoreData.header
+    func convertToTrackerCategory(_ category: TrackerCategoryCoreData) throws -> TrackerCategory {
+        let header = category.header
         return TrackerCategory(
             header: header ?? "",
             trackers: []
         )
+    }
+    
+    func fetchTrackerCategories(
+        context: NSManagedObjectContext,
+        withPredicate predicateClosure: (() -> NSPredicate)? = nil
+    ) throws -> [TrackerCategoryCoreData] {
+        
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        
+        if let predicateClosure = predicateClosure {
+            fetchRequest.predicate = predicateClosure()
+        }
+        
+        let results = try context.fetch(fetchRequest)
+        return results
     }
     
     func saveContext() {

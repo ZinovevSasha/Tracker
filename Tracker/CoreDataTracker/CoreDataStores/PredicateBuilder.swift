@@ -2,7 +2,7 @@ import Foundation
 
 final class SearchLogicProvider {
     let predicate = PredecateBuilder<TrackerCoreData>()
-    
+        
     func weekDay(weekDay: String) -> NSPredicate {
         return predicate
             .addPredicate(.contains, keyPath: \.schedule, value: weekDay)

@@ -15,6 +15,7 @@ extension UIImage {
     static let noResult           = UIImage(named: "12placeholderNoStatistic")
     static let noStatistic        = UIImage(named: "13placeholderNoResult")
     static let checkmarkBlue      = UIImage(named: "14checkmark")
+    static let pin                = UIImage(named: "15pin")
     
     enum Placeholder {
         case star

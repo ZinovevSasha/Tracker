@@ -62,6 +62,7 @@ final class SplashViewcontroller: UIViewController {
     private func presentOnboardingViewController() {
         let onboardingPageViewController = OnboardingPageViewController()
         onboardingPageViewController.modalPresentationStyle = .fullScreen
+        onboardingPageViewController.modalTransitionStyle = .crossDissolve
         present(onboardingPageViewController, animated: true)
        
         onboardingPageViewController.userSuccesfullyLoggedIn = { [weak self] in

@@ -21,6 +21,9 @@
 // Main
 "main.search" = "Search";
 "main.trackers" = "Trackers";
+"main.tracker.attach" = "Attach";
+"main.tracker.modify" = "Update";
+"main.tracker.delete" = "Delete";
 
 // Create Tracker
 "create.new.habit" = "New habit";

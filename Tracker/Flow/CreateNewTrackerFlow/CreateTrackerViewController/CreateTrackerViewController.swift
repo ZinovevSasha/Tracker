@@ -77,13 +77,13 @@ final class CreateTrackerViewController: UIViewController {
     }
     
     func bind() {
-        viewModel?.$onCreateAllowedStateChange.bind { [weak self] isEnabled in
+        viewModel?.$isButtonAllowedToChangeState.bind { [weak self] isEnabled in
             self?.setCreateButton(enabled: isEnabled)
         }
-        viewModel?.$needToShakeButton.bind { [weak self] _ in
+        viewModel?.$isShakeOfButtonRequired.bind { [weak self] _ in
             self?.createButton.shakeSelf()
         }
-        viewModel?.$trackersAddedToCoreData.bind { [weak self] _ in
+        viewModel?.$isTrackersAddedToCoreData.bind { [weak self] _ in
             self?.dismiss(animated: true)
         }
     }
@@ -154,11 +154,7 @@ private extension CreateTrackerViewController {
         
         mainScrollView.addSubviews(mainStackView)
         
-        mainStackView.addSubviews(
-            titleTextfield,
-            warningCharactersLabel,
-            tableView,
-            collectionView
+        mainStackView.addSubviews(titleTextfield, warningCharactersLabel, tableView, collectionView
         )
         mainStackView.setCustomSpacing(8, after: titleTextfield)
         mainStackView.setCustomSpacing(16, after: warningCharactersLabel)
@@ -216,7 +212,7 @@ private extension CreateTrackerViewController {
 
 // MARK: - UITableViewDataSource
 extension CreateTrackerViewController: UITableViewDataSource{
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {       
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel?.numberOfRows ?? .zero
     }
     
@@ -253,7 +249,6 @@ extension CreateTrackerViewController: UITableViewDelegate {
         // Call back
         scheduleController.weekDaysToShow = { [weak self] weekDays in
             guard let self = self else { return }
-            // save data
             self.viewModel?.userTracker.weekDay = weekDays
             self.viewModel?.dataForTableView.addSchedule(weekDays.weekdayStringShort())
             self.tableView.reloadData()
@@ -349,7 +344,7 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
         case .colorSection:
             collectionView.deselectOldSelectNewCellOf(
                 type: ColorCell.self, selectedColorIndexPath) { [weak self]  color in
-                    self?.viewModel?.userTracker.color = color                   
+                    self?.viewModel?.userTracker.color = color
                     self?.selectedColorIndexPath = indexPath
             }
         }
