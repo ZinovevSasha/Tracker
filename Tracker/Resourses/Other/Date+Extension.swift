@@ -17,7 +17,8 @@ extension Date {
     }
     
     static func currentWeekDayNumber(from day: Date) -> Int {
-        let calendar = Calendar(identifier: .gregorian)
+        var calendar = Calendar(identifier: .iso8601)
+        calendar.locale = .current
         // days will be from 0 to 6 (monday, sunday)
         let weekday = (calendar.component(.weekday, from: day) + 5) % 7
         return weekday

@@ -3,9 +3,9 @@ import CoreData
 
 final class CreateTrackerViewModel {
     // MARK: - Public
-    @Observable var onCreateAllowedStateChange = false
-    @Observable var trackersAddedToCoreData = false
-    @Observable var needToShakeButton = false
+    @Observable var isButtonAllowedToChangeState = false
+    @Observable var isTrackersAddedToCoreData = false
+    @Observable var isShakeOfButtonRequired = false
         
     // MARK: - Private
     // 1) Configuration
@@ -23,15 +23,23 @@ final class CreateTrackerViewModel {
             return nil
         }
     }()
+    
+    private lazy var trackerStore: TrackerStore? = {
+        do {
+            return try TrackerStore()
+        } catch {
+            return nil
+        }
+    }()
         
     // 3) UserInput is public so that controller can store user input there
     var userTracker: UserTracker {
         didSet {
             switch trackerType {
             case .habit:
-                onCreateAllowedStateChange = userTracker.isEnoughForHabit
+                isButtonAllowedToChangeState = userTracker.isEnoughForHabit
             case .ocasional:
-                onCreateAllowedStateChange = userTracker.isEnoughForOcasion
+                isButtonAllowedToChangeState = userTracker.isEnoughForOcasion
             }
         }
     }
@@ -66,20 +74,30 @@ final class CreateTrackerViewModel {
         case .habit:
             if userTracker.isEnoughForHabit {
                 guard let tracker = userTracker.createHabitTracker() else { return }
-                try? trackerCategoryStore?.addTrackerToCategoryWith(name: categoryName, tracker: tracker)
-                self.trackersAddedToCoreData = true
+                addTracker(tracker: tracker, trackerStore: trackerStore, categoryStore: trackerCategoryStore, isAdded: &isTrackersAddedToCoreData)
             } else {
-                self.needToShakeButton = true
+                self.isShakeOfButtonRequired = true
             }
         case .ocasional:
             if userTracker.isEnoughForOcasion {
-                guard let tracker = userTracker.createOcasionalTracker() else { return
-                }
-                try? trackerCategoryStore?.addTrackerToCategoryWith(name: categoryName, tracker: tracker)
-                self.trackersAddedToCoreData = true
+                guard let tracker = userTracker.createOcasionalTracker() else { return }
+                addTracker(tracker: tracker, trackerStore: trackerStore, categoryStore: trackerCategoryStore, isAdded: &isTrackersAddedToCoreData)
             } else {
-                self.needToShakeButton = true
+                self.isShakeOfButtonRequired = true
             }
+        }
+    }
+    
+    // Private
+    private func addTracker(
+        tracker: Tracker,
+        trackerStore: TrackerStore?,
+        categoryStore: TrackerCategoryStore?,
+        isAdded:  inout Bool
+    ) {
+        if let trackerCoreData = trackerStore?.createTrackerCoreData(tracker) {
+            try? trackerCategoryStore?.addTracker(toCategoryWithName: categoryName, tracker: trackerCoreData)
+            isAdded = true
         }
     }
 }

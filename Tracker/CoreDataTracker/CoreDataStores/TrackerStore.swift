@@ -2,7 +2,7 @@ import CoreData
 
 protocol TrackerStoreProtocol {
     func delete(_ record: TrackerCoreData) throws
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData   
 }
 
 final class TrackerStore {
@@ -10,6 +10,11 @@ final class TrackerStore {
     
     init(context: NSManagedObjectContext) {
         self.context = context
+    }
+    
+    convenience init() throws {
+        let context = try Context.getContext()
+        self.init(context: context)
     }
 }
 
@@ -20,26 +25,14 @@ extension TrackerStore: TrackerStoreProtocol {
         saveContext()
     }
     
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData {
-        let trackerCoreData = convertToTrackerCoreData(tracker)
+    func createTrackerCoreData(_ tracker: Tracker) -> TrackerCoreData {
+        let trackerCoreData = TrackerCoreData(tracker: tracker, context: context)
         return trackerCoreData
     }
 }
 
 // MARK: - Private
 private extension TrackerStore {
-    func convertToTrackerCoreData(
-        _ tracker: Tracker
-    ) -> TrackerCoreData {
-        let trackerCoreData = TrackerCoreData(context: context)
-        trackerCoreData.name = tracker.name
-        trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.id = tracker.id
-        trackerCoreData.color = tracker.color
-        trackerCoreData.schedule = tracker.schedule
-        return trackerCoreData
-    }
-    
     func saveContext() {
         do {
             try context.save()
@@ -56,6 +49,7 @@ enum TrackerStoreError: Error {
     case decodingErrorInvalidEmoji
     case decodingErrorInvalidSchedule
 }
+
 extension TrackerCoreData {
     convenience init(tracker: Tracker, context: NSManagedObjectContext) {
         self.init(context: context)
@@ -64,6 +58,7 @@ extension TrackerCoreData {
         self.emoji = tracker.emoji
         self.color = tracker.color
         self.schedule = tracker.schedule
+        self.isAttached = tracker.isAttached
     }
     
     func tracker() throws -> Tracker {
@@ -82,6 +77,6 @@ extension TrackerCoreData {
         guard let schedule = self.schedule else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
-        return Tracker(id: id, name: name, emoji: emoji, color: color, schedule: schedule)
+        return Tracker(id: id, name: name, emoji: emoji, color: color, schedule: schedule, isAttached: self.isAttached)
     }
 }

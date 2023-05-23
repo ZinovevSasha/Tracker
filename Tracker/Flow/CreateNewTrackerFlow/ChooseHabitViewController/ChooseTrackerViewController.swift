@@ -31,19 +31,8 @@ final class ChooseTrackerViewController: UIViewController {
         static let stackTrailingInset: CGFloat = -20
         static let buttonsHeight: CGFloat = 60
     }
-      
-    private let date: String
     
-    // MARK: - Init
-    init(date: String) {
-        self.date = date
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("Unsupported")
-    }
-    
+    ///// ASK: where it should be stored?
     var initialInteractivePopGestureRecognizerDelegate: UIGestureRecognizerDelegate?
     
     // MARK: - Lifecycle

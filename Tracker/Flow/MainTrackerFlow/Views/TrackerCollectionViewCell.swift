@@ -1,7 +1,11 @@
 import UIKit
 
 protocol TrackerCollectionViewCellDelegate: AnyObject {
-    func plusButtonTapped(for cell: TrackerCollectionViewCell)
+    func didMarkTrackerCompleted(for cell: TrackerCollectionViewCell)
+    func didAttachTracker(for cell: TrackerCollectionViewCell)
+    func didDeleteTracker(for cell: TrackerCollectionViewCell)
+    func didUpdateTracker(for cell: TrackerCollectionViewCell)
+    func didUnattachTracker(for cell: TrackerCollectionViewCell)
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
@@ -11,10 +15,12 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         let color = UIColor(hexString: info.color)
         emojiLabel.text = info.emoji
         trackerNameLabel.text = info.name
+        attachedSighView.isHidden = !info.isAttached
         trackerContainerView.backgroundColor = color
         addButton.backgroundColor = color
+        isAttached = info.isAttached
     }
-    
+            
     func configure(with trackedDays: Int?, isCompleted: Bool?) {
         guard let trackedDays = trackedDays, let isCompleted = isCompleted else { return }
         trackedDaysLabel.text = Localized.Main.numberOf(days: trackedDays)
@@ -77,6 +83,13 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return button
     }()
     
+    private let attachedSighView: UIImageView = {
+        let imageView = UIImageView(image: .pin)
+        imageView.isHidden = true
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
     // MARK: UIConstants
     private enum UIConstants {
         static let trackerCornerRadius: CGFloat = 16
@@ -104,6 +117,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    private var isAttached: Bool = false
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -117,7 +132,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Private @objc target action methods
     @objc private func handleAddButtonTap() {
-        delegate?.plusButtonTapped(for: self)
+        delegate?.didMarkTrackerCompleted(for: self)
     }
 }
 
@@ -125,9 +140,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
 private extension TrackerCollectionViewCell {
     func setupUI() {
         emojiContainerView.addSubviews(emojiLabel)
-        trackerContainerView.addSubviews(emojiContainerView, trackerNameLabel)
+        trackerContainerView.addSubviews(emojiContainerView, trackerNameLabel, attachedSighView)
         contentView.addSubviews(trackerContainerView, trackedDaysLabel, addButton)
         addButton.addTarget(self, action: #selector(handleAddButtonTap), for: .touchUpInside)
+        let contextMenu = UIContextMenuInteraction(delegate: self)
+        trackerContainerView.addInteraction(contextMenu)
     }
     
     func setupLayout() {
@@ -166,7 +183,12 @@ private extension TrackerCollectionViewCell {
                 constant: (-UIConstants.trackerNameLabelInset)),
             trackerNameLabel.heightAnchor.constraint(equalToConstant: UIConstants.trackerNameLabelHeight)
         ]
-        
+
+        let attachSignConstraints = [
+            attachedSighView.trailingAnchor.constraint(equalTo: trackerContainerView.trailingAnchor, constant: -12),
+            attachedSighView.topAnchor.constraint(equalTo: trackerContainerView.topAnchor, constant: 18)
+        ]
+                
         let buttonConstraints = [
             addButton.heightAnchor.constraint(equalToConstant: UIConstants.buttonSize),
             addButton.widthAnchor.constraint(equalToConstant: UIConstants.buttonSize),
@@ -185,6 +207,7 @@ private extension TrackerCollectionViewCell {
             emojiContainerConstraints +
             emojiConstraints +
             trackNameConstraints +
+            attachSignConstraints +
             labelConstraints +
             buttonConstraints
         )
@@ -200,6 +223,36 @@ private extension TrackerCollectionViewCell {
             let image = UIImage.plus?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite ?? .white)
             addButton.setImage(image, for: .normal)
             addButton.alpha = 1            
+        }
+    }
+}
+
+extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        let title = isAttached ? "Unattach" : "Attach"
+        let attachAction = UIAction(title: title) { [weak self] _ in
+            guard let self = self else { return }
+            if isAttached {
+                isAttached = false
+                self.delegate?.didUnattachTracker(for: self)
+            } else {
+                isAttached = true
+                self.delegate?.didAttachTracker(for: self)
+            }
+        }
+        let modifyAction = UIAction(title: "Update") { [weak self] _ in
+            guard let self = self else { return }
+            self.delegate?.didUpdateTracker(for: self)
+        }
+        let deleteAction = UIAction(title: "Delete", attributes: .destructive) { [weak self] _ in
+            guard let self = self else { return }
+            self.delegate?.didDeleteTracker(for: self)
+        }
+        let menu = UIMenu(title: "", children: [attachAction, modifyAction, deleteAction])
+        
+        return UIContextMenuConfiguration(
+            identifier: nil, previewProvider: nil) { _ in
+            return menu
         }
     }
 }

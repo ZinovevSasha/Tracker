@@ -2,7 +2,6 @@ import CoreData
 
 protocol CategoriesListViewModelProtocol {
     var categories: [CategoryViewModel] { get }
-    var categoryObserver: Observable<[CategoryViewModel]> { get }
     func getAllCategories()
     func isNameAvailable(name: String) -> Bool?
     func categoryNameEntered(name: String)
@@ -12,7 +11,7 @@ protocol CategoriesListViewModelProtocol {
 final class CategoriesListViewModel {
     @Observable var categories: [CategoryViewModel] = []
     
-    var categoryName: String
+    private var categoryName: String
     
     // Store
     private var categoryStore: TrackerCategoryStore?
@@ -31,10 +30,6 @@ final class CategoriesListViewModel {
 
 // MARK: - Init
 extension CategoriesListViewModel: CategoriesListViewModelProtocol {
-    var categoryObserver: Observable<[CategoryViewModel]> {
-        $categories
-    }
-
     func categoryNameEntered(name: String) {
         do {
             try categoryStore?.addCategory(with: name)
@@ -46,6 +41,7 @@ extension CategoriesListViewModel: CategoriesListViewModelProtocol {
     
     func getAllCategories() {
         categories = categoryStore?.getAllCategories()
+            .filter { $0.header != "Attached" }
             .map {
                 let isLastCelected = $0.header == categoryName
                 return CategoryViewModel(

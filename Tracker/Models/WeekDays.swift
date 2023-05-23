@@ -23,14 +23,14 @@ enum WeekDay: Int, CaseIterable {
     }
     
     var abbreviationShort: String {
-        switch self {
-        case .sunday: return Localized.NewHabit.sun
+        switch self {        
         case .monday: return Localized.NewHabit.mon
         case .tuesday: return Localized.NewHabit.tue
         case .wednesday: return Localized.NewHabit.wed
         case .thursday: return Localized.NewHabit.thu
-        case .friday: return Localized.NewHabit.sat
-        case .saturday: return Localized.NewHabit.sun
+        case .friday: return Localized.NewHabit.fri
+        case .saturday: return Localized.NewHabit.sat
+        case .sunday: return Localized.NewHabit.sun
         }
     }
 }
@@ -46,11 +46,12 @@ extension Set<Int> {
         if self == WeekDay.allDaysOfWeek {
             return Localized.NewHabit.everyday
         } else {
-            return WeekDay
+            let weekDay = WeekDay
                 .allCases // take all cases  from Mon to Sun
                 .filter { self.contains($0.rawValue) } // check if set has any of weekDays
                 .map { $0.abbreviationShort } // map(transform) to string
                 .joined(separator: ", ") // joing with coma
+            return weekDay
         }
     }
     

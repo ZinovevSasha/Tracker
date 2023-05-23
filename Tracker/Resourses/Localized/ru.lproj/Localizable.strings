@@ -21,6 +21,9 @@
 // Main
 "main.search" = "Поиск";
 "main.trackers" = "Трекеры";
+"main.tracker.attach" = "Закрепить";
+"main.tracker.modify" = "Редактировать";
+"main.tracker.delete" = "Удалить";
 
 // Create Tracker
 "create.new.habit" = "Новая привычка";
@@ -34,6 +37,8 @@
 "create.schedule" = "Расписание";
 
 // Schedule
+"schedule" = "Расписание";
+"schedule.ready" = "Готово";
 "scheule.monday" = "Понедельник";
 "scheule.tuesday" = "Вторник";
 "scheule.wednesday" = "Среда";
@@ -41,13 +46,13 @@
 "scheule.friday" = "Пятница";
 "scheule.saturday" = "Суббота";
 "scheule.sunday" = "Воскресенье";
-"scheule.mon" = "Вс";
-"scheule.tue" = "Пн";
-"scheule.wed" = "Вт";
-"scheule.thu" = "Ср";
-"scheule.fri" = "Чт";
-"scheule.sat" = "Пт";
-"scheule.sun" = "Сб";
+"scheule.mon" = "Пн";
+"scheule.tue" = "Вт";
+"scheule.wed" = "Ср";
+"scheule.thu" = "Чт";
+"scheule.fri" = "Пт";
+"scheule.sat" = "Сб";
+"scheule.sun" = "Вс";
 "scheule.everyday" = "Каждый день";
 
 // CategoryList
@@ -60,6 +65,3 @@
 "newCategory.new" = "Новая категория";
 "newCategory.ready" = "Готово";
 
-// Schedule
-"schedule" = "Расписание";
-"schedule.ready" = "Готово";

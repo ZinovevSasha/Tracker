@@ -32,7 +32,8 @@ final class CategoriesListViewController: FrameViewController {
     }
     
     func bind() {
-        viewModel?.categoryObserver.bind { [weak self] categories in
+        guard let viewModel = viewModel as? CategoriesListViewModel else { return }
+        viewModel.$categories.bind { [weak self] categories in            
             self?.tableView.reloadData()
             if !categories.isEmpty {
                 self?.placeholder.state = .invisible(animate: false)
@@ -117,13 +118,28 @@ extension CategoriesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
+        if let _ = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
             if let header = viewModel?.categories[indexPath.row].header {
-                getHeaderOfCategory?(header)                
+                getHeaderOfCategory?(header)
             }
             viewModel?.categorySelected(at: indexPath)
             navigationController?.popViewController(animated: true)
         }
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            let action1 = UIAction(title: "Action 1") { _ in
+                // Handle action 1
+            }
+            let action2 = UIAction(title: "Action 2") { _ in
+                // Handle action 2
+            }
+            let menu = UIMenu(title: "", children: [action1, action2])
+            return menu
+        }
+        
+        return configuration
     }
 }
 

@@ -30,13 +30,15 @@ protocol DataProviderProtocol {
     func header(for section: Int) -> String
     func daysTracked(for indexPath: IndexPath) -> Int
     func getCategories() -> [TrackerCategory]
-    func addTrackerCategory(_ record: TrackerCategory) throws
+    func addTrackerCategory(_ category: TrackerCategory) throws
     func getTracker(at indexPath: IndexPath) -> Tracker?
     func deleteTracker(at indexPath: IndexPath) throws
     func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws
     func fetchTrackersBy(name: String, weekDay: String) throws
     func fetchTrackersBy(weekDay: String) throws
+    func attachTrackerAt(indexPath: IndexPath)
+    func unattachTrackerAt(indexPath: IndexPath)
 }
 
 final class DataProvider: NSObject {
@@ -65,13 +67,14 @@ final class DataProvider: NSObject {
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
         fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: #keyPath(TrackerCoreData.isAttached), ascending: false),
             NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true),
             NSSortDescriptor(key: #keyPath(TrackerCoreData.name), ascending: true)
         ]
 
         let weekDay = String(Date().weekDayNumber)
         fetchRequest.predicate = searchLogic.weekDay(weekDay: weekDay)
-        
+                
         let sectionKeyPath = #keyPath(TrackerCoreData.category.header)
         
         let fetchedResultsController = NSFetchedResultsController(
@@ -149,10 +152,10 @@ extension DataProvider: DataProviderProtocol {
         try? fetchedResultsController.object(at: indexPath).tracker()
     }
     
-    func addTrackerCategory(_ record: TrackerCategory) throws {
-        guard let tracker = record.trackers.first else { return }
+    func addTrackerCategory(_ category: TrackerCategory) throws {
+        guard let tracker = category.trackers.first else { return }
         let trackerCoreData = try trackerStore.createTrackerCoreData(tracker)
-        try trackerCategoryStore.addCategory(with: record.header, and: trackerCoreData)
+        try trackerCategoryStore.addTracker(toCategoryWithName: category.header, tracker: trackerCoreData)
     }
     
     func deleteTracker(at indexPath: IndexPath) throws {
@@ -169,7 +172,17 @@ extension DataProvider: DataProviderProtocol {
         trackerCategoryStore.getAllCategories()
     }
     
-    // Searching
+    func attachTrackerAt(indexPath: IndexPath) {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        trackerCategoryStore.putToAttachedCategory(tracker: trackerCoreData)
+    }
+    
+    func unattachTrackerAt(indexPath: IndexPath) {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        trackerCategoryStore.putBackToOriginalCategory(tracker: trackerCoreData)
+    }
+    
+    // Searching by name
     func fetchTrackersBy(name: String, weekDay: String) throws {
         if !name.isEmpty {
             fetchedResultsController
@@ -186,7 +199,7 @@ extension DataProvider: DataProviderProtocol {
         }
     }
     
-    // Searching
+    // Searching by weekDay
     func fetchTrackersBy(weekDay: String) throws {
         fetchedResultsController
             .fetchRequest
@@ -272,8 +285,8 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
             guard let indexPath = indexPath else { return }
             updatedIndexes = indexPath
         case .move:
-            guard let oldIndexPath = indexPath, let newIndexPath = newIndexPath else { return }
-            movedIndexes?.insert(.init(oldIndexPath: oldIndexPath, newIndexPath: newIndexPath))
+            guard let indexPath = indexPath, let newIndexPath = newIndexPath else { return }
+            movedIndexes?.insert(.init(oldIndexPath: indexPath, newIndexPath: newIndexPath))
         @unknown default:
             break
         }

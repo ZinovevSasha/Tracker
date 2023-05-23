@@ -9,7 +9,7 @@ final class TrackersViewController: UIViewController {
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
         view.backgroundColor = .myWhite
         view.allowsSelection = true
-        view.registerHeader(TrackerHeader.self)
+        view.registerHeader(TrackerCollectionHeader.self)
         view.register(cellClass: TrackerCollectionViewCell.self)
         return view
     }()
@@ -40,6 +40,8 @@ final class TrackersViewController: UIViewController {
             return nil
         }
     }()
+    
+    lazy var alertPresenter = AlertPresenter(presentingViewController: self)
     
     private var currentDay = Date()
     private var weekDayNumber: String {
@@ -79,7 +81,7 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - @objc target action methods
     func handlePlusButtonTap() {
-        let trackerCreationViewController = ChooseTrackerViewController(date: dateString)
+        let trackerCreationViewController = ChooseTrackerViewController()
         let navVc = UINavigationController(rootViewController: trackerCreationViewController)
         navVc.isNavigationBarHidden = true
         navVc.interactivePopGestureRecognizer?.isEnabled = true
@@ -173,13 +175,19 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header: TrackerHeader = collectionView.dequeueHeader(
+        let header: TrackerCollectionHeader = collectionView.dequeueHeader(
             ofKind: UICollectionView.elementKindSectionHeader,
             for: indexPath
         )
         header.configure(with: dataProvider?.header(for: indexPath.section) ?? "")
         return header
     }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
+        return false
+    }
+   
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -216,13 +224,34 @@ extension TrackersViewController: UICollectionViewDelegate {
 
 // MARK: - TrackerCollectionViewCellDelegate
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
-    func plusButtonTapped(for cell: TrackerCollectionViewCell) {
+    func didMarkTrackerCompleted(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         do {
             try dataProvider?.saveAsCompletedTracker(with: indexPath, for: dateString)
         } catch {
             print("⛈️", error)
         }
+    }
+    
+    func didAttachTracker(for cell: TrackerCollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        dataProvider?.attachTrackerAt(indexPath: indexPath)
+    }
+    
+    func didUnattachTracker(for cell: TrackerCollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        dataProvider?.unattachTrackerAt(indexPath: indexPath)        
+    }
+    
+    func didDeleteTracker(for cell: TrackerCollectionViewCell) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        alertPresenter.show(message: "Уверены что хотите удалить трекер?") { [weak self] in
+            try? self?.dataProvider?.deleteTracker(at: indexPath)
+        }        
+    }
+    
+    func didUpdateTracker(for cell: TrackerCollectionViewCell) {
+        print("update")
     }
 }
 
@@ -266,6 +295,7 @@ extension TrackersViewController: DataProviderDelegate {
     }
     
     func didUpdate(_ update: DataProviderUpdate) {
+       
         collectionView.performBatchUpdates {
             if !update.insertedIndexes.isEmpty {
                 collectionView.insertItems(at: [update.insertedIndexes])
@@ -276,12 +306,27 @@ extension TrackersViewController: DataProviderDelegate {
             if !update.deletedIndexes.isEmpty {
                 collectionView.deleteItems(at: [update.deletedIndexes])
             }
-            if !update.deletedIndexes.isEmpty {
+            if !update.deletedSection.isEmpty {
                 collectionView.deleteSections(update.deletedSection)
             }
             if !update.updatedIndexes.isEmpty {
                 collectionView.reloadItems(at: [update.updatedIndexes])
             }
+            
+            if !update.movedIndexes.isEmpty {
+                for move in update.movedIndexes {
+                    collectionView.moveItem(
+                        at: move.oldIndexPath,
+                        to: move.newIndexPath
+                    )
+                }
+            }
+        } completion: { _ in
+            for move in update.movedIndexes {
+                if update.deletedSection.isEmpty && update.insertedSection.isEmpty {
+                    self.collectionView.reloadItems(at: [move.newIndexPath])
+                }
+            }            
         }
     }
 }
