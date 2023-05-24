@@ -1,6 +1,6 @@
 import UIKit
 
-final class EmojiCell: UICollectionViewCell, Highilable {
+final class CreateTrackerCollectionEmojiCell: UICollectionViewCell, Highilable {
     // MARK: - Public
     func configure(with emoji: String) {
         text.text = emoji
@@ -49,7 +49,7 @@ final class EmojiCell: UICollectionViewCell, Highilable {
 }
 
 // MARK: Private methods
-private extension EmojiCell {
+private extension CreateTrackerCollectionEmojiCell {
     func setupUI() {
         contentView.addSubviews(text)
         contentView.layer.cornerRadius = 16

@@ -18,7 +18,8 @@ struct TrackerMaker {
             name: name,
             emoji: emoji,
             color: color,
-            schedule: schedule
+            schedule: schedule,
+            type: .habit
         )
     }
     
@@ -38,7 +39,8 @@ struct TrackerMaker {
             name: name,
             emoji: emoji,
             color: color,
-            schedule: WeekDay.allDaysOfWeek.toNumbersString()
+            schedule: WeekDay.allDaysOfWeek.toNumbersString(),
+            type: .ocasional
         )
     }
 }

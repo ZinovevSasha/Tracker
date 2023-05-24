@@ -1,9 +1,6 @@
 import UIKit
 
 final class CategoriesListViewController: FrameViewController {
-    // MARK: - Call Back
-    var getHeaderOfCategory: ((String) -> Void)?
-    
     // MARK: - Private properties
     private let placeholder = PlaceholderView(state: .recomendation)
     
@@ -118,22 +115,17 @@ extension CategoriesListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if let _ = tableView.cellForRow(at: indexPath) as? CategoryTableViewCell {
-            if let header = viewModel?.categories[indexPath.row].header {
-                getHeaderOfCategory?(header)
-            }
-            viewModel?.categorySelected(at: indexPath)
-            navigationController?.popViewController(animated: true)
-        }
+        viewModel?.categorySelected(at: indexPath)
+        navigationController?.popViewController(animated: true)
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            let action1 = UIAction(title: "Action 1") { _ in
-                // Handle action 1
+            let action1 = UIAction(title: "Update") { _ in
+                // Handle action
             }
-            let action2 = UIAction(title: "Action 2") { _ in
-                // Handle action 2
+            let action2 = UIAction(title: "Delete") { _ in
+                // Handle action
             }
             let menu = UIMenu(title: "", children: [action1, action2])
             return menu

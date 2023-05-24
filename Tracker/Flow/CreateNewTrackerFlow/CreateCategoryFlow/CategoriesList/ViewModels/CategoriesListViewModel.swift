@@ -9,10 +9,11 @@ protocol CategoriesListViewModelProtocol {
 }
 
 final class CategoriesListViewModel {
+    
+    var categoryHeader: ((String) -> Void)?
+    
     @Observable var categories: [CategoryViewModel] = []
-    
-    private var categoryName: String
-    
+   
     // Store
     private var categoryStore: TrackerCategoryStore?
     
@@ -21,8 +22,7 @@ final class CategoriesListViewModel {
     }
         
     // MARK: - Init
-    init(categoryName: String, categoryStore: TrackerCategoryStore? = nil) {
-        self.categoryName = categoryName
+    init(categoryStore: TrackerCategoryStore? = nil) {
         guard let context = context else { return }
         self.categoryStore = TrackerCategoryStore(context: context)
     }
@@ -43,10 +43,9 @@ extension CategoriesListViewModel: CategoriesListViewModelProtocol {
         categories = categoryStore?.getAllCategories()
             .filter { $0.header != "Attached" }
             .map {
-                let isLastCelected = $0.header == categoryName
                 return CategoryViewModel(
                     header: $0.header,
-                    isLastSelectedCategory: isLastCelected)
+                    isLastSelectedCategory: $0.isLastSelected)
             } ?? []
     }
     
@@ -55,7 +54,13 @@ extension CategoriesListViewModel: CategoriesListViewModelProtocol {
     }
     
     func categorySelected(at indexPath: IndexPath) {
-        categories.forEach { $0.isLastSelectedCategory = false }
-        categories[indexPath.row].isLastSelectedCategory = true
+        let categoryName = categories[indexPath.row].header
+        categoryHeader?(categoryName)
+        markCategoryWith(name: categoryName)
+    }
+    
+    func markCategoryWith(name: String) {
+        categoryStore?.removeMarkFromLastSelectedCategory()
+        categoryStore?.markCategoryAsLastSelected(categoryName: name)
     }
 }
