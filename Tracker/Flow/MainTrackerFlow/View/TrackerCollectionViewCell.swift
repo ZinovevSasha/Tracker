@@ -18,7 +18,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         attachedSighView.isHidden = !info.isAttached
         trackerContainerView.backgroundColor = color
         addButton.backgroundColor = color
-        isAttached = info.isAttached
+        let isAttached: PendingAction = info.isAttached ? .attach : .unattach
+        pendingAction = isAttached
     }
             
     func configure(with trackedDays: Int?, isCompleted: Bool?) {
@@ -117,13 +118,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    private enum UIContextMenuAction {
-        case attach, unattach, update
+    private enum PendingAction {
+        case attach, unattach
     }
     
-    private var contextMunuAction: UIContextMenuAction?
-    
-    private var isAttached: Bool = true
+    private var pendingAction: PendingAction?
     
     // MARK: - Init
     override init(frame: CGRect) {
@@ -235,21 +234,23 @@ private extension TrackerCollectionViewCell {
 
 extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        let title = isAttached ? "Unattach" : "Attach"
+        
+        let title = pendingAction == .attach ? "Unattach" : "Attach"
+        
         let attachAction = UIAction(title: title) { [weak self] _ in
-            guard let self = self else { return }
-            if isAttached {
-                isAttached = false
-                contextMunuAction = .unattach
-            } else {
-                isAttached = true
-                contextMunuAction = .attach
+            guard let self = self, let pendingAction = pendingAction else { return }
+            
+            switch pendingAction {
+            case .attach:
+                self.pendingAction = .unattach
+            case .unattach:
+                self.pendingAction = .attach
             }
         }
         
         let updateAction = UIAction(title: "Update") { [weak self] _ in
             guard let self = self else { return }
-            contextMunuAction = .update
+            self.delegate?.didUpdateTracker(for: self)
         }
         
         let deleteAction = UIAction(title: "Delete", attributes: .destructive) { [weak self] _ in
@@ -266,16 +267,14 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
     }
            
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willEndFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
-        guard let munuAction = contextMunuAction else { return }
+        guard let pendingAction = pendingAction else { return }
         
         animator?.addCompletion {
-            switch munuAction {
+            switch pendingAction {
             case .attach:
                 self.delegate?.didAttachTracker(for: self)
             case .unattach:
                 self.delegate?.didUnattachTracker(for: self)
-            case .update:
-                self.delegate?.didUpdateTracker(for: self)
             }
         }
     }

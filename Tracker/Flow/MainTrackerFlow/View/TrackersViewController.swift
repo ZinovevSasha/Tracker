@@ -254,7 +254,16 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     }
     
     func didUpdateTracker(for cell: TrackerCollectionViewCell) {
-        print("update")
+        guard
+            let indexPath = collectionView.indexPath(for: cell),
+            let trackerType = dataProvider?.getTracker(at: indexPath)?.type
+        else {
+            return
+        }
+        let updateTrackerViewController = CreateTrackerViewController()
+        let updateTrackerViewModel = CreateTrackerViewModel(trackerType: trackerType, isUpdatingScreen: true)
+        updateTrackerViewController.setViewModel(viewModel: updateTrackerViewModel)
+        present(updateTrackerViewController, animated: true)
     }
 }
 
@@ -314,7 +323,6 @@ extension TrackersViewController: DataProviderDelegate {
             if !update.updatedIndexes.isEmpty {
                 collectionView.reloadItems(at: [update.updatedIndexes])
             }
-            
             if !update.movedIndexes.isEmpty {
                 for move in update.movedIndexes {
                     collectionView.moveItem(

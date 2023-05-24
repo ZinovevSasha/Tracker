@@ -50,11 +50,10 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         // If a category with the same name already exists, return without doing anything
         if let category = categories.first {
             return
-        }
-        
+        }        
         // Otherwise, create a new category with the given name and save it to the context
         let category = TrackerCategoryCoreData(context: context)
-        category.header = name
+        category.header = name       
         saveContext()
     }
     
@@ -77,6 +76,43 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         }
     }
     
+    func markCategoryAsLastSelected(categoryName: String) {
+        let categories = try? fetchTrackerCategories(context: context) {
+            self.predicateBuilder.addPredicate(.equalTo, keyPath: \.header, value: categoryName).build()
+        }
+        
+        if let category = categories?.first {
+            category.isLastSelected = true
+        }
+        saveContext()
+    }
+    
+    func removeMarkFromLastSelectedCategory() {
+        let categories = try? fetchTrackerCategories(context: context) {
+            NSPredicate(format: "%K == %@",
+                        #keyPath(TrackerCategoryCoreData.isLastSelected),
+                        NSNumber(value: true)
+            )
+        }
+        if let category = categories?.first {
+            category.isLastSelected = false
+        }
+        saveContext()
+    }
+    
+    func getNameOfLastSelectedCategory() -> String? {
+        let categories = try? fetchTrackerCategories(context: context) {
+            NSPredicate(format: "%K == %@",
+                        #keyPath(TrackerCategoryCoreData.isLastSelected),
+                        NSNumber(value: true)
+            )
+        }
+        if let category = categories?.first {
+            return category.header
+        }
+        return nil
+    }
+    
     func putToAttachedCategory(tracker: TrackerCoreData) {
         tracker.isAttached = true
         tracker.lastCategory = tracker.category?.header
@@ -94,10 +130,10 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
 // MARK: - Private
 private extension TrackerCategoryStore {
     func convertToTrackerCategory(_ category: TrackerCategoryCoreData) throws -> TrackerCategory {
-        let header = category.header
         return TrackerCategory(
-            header: header ?? "",
-            trackers: []
+            header: category.header ?? "",
+            trackers: [],
+            isLastSelected: category.isLastSelected
         )
     }
     

@@ -1,12 +1,13 @@
 import UIKit
 
-final class MyTableViewCell: UITableViewCell {
+final class CreateTrackerTableViewCell: UITableViewCell {
     // MARK: - Public
-    func configure(with info: RowData?) {
+    func configure(with info: TableData?) {
         guard let info = info else { return }
-        myTextLabel.text = info.title
-        supplementaryTextLabel.text = info.subtitle
+        titleLabelName.text = info.title
+        subtitleLabelName.text = info.subtitle
     }
+
     
     // MARK: - Private properties
     private let accessoryImageView: UIImageView = {
@@ -16,14 +17,14 @@ final class MyTableViewCell: UITableViewCell {
         return view
     }()
     
-    private let myTextLabel: UILabel = {
+    private let titleLabelName: UILabel = {
         let view = UILabel()
         view.textColor = .myBlack
         view.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         return view
     }()
     
-    private let supplementaryTextLabel: UILabel = {
+    private let subtitleLabelName: UILabel = {
         let view = UILabel()
         view.textColor = .myGray
         view.font = .regular17
@@ -51,12 +52,12 @@ final class MyTableViewCell: UITableViewCell {
 }
 
 // MARK: - Private methods
-private extension MyTableViewCell {
+private extension CreateTrackerTableViewCell {
     func setupUI() {
         contentView.addSubviews(stackView, accessoryImageView)
         contentView.backgroundColor = .myBackground
         selectionStyle = .none
-        stackView.addSubviews(myTextLabel, supplementaryTextLabel)        
+        stackView.addSubviews(titleLabelName, subtitleLabelName)
         
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(

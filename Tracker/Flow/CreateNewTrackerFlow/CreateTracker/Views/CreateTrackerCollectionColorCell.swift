@@ -7,7 +7,7 @@ protocol Highilable {
     func toggle() -> Bool
 }
 
-final class ColorCell: UICollectionViewCell, Highilable {
+final class CreateTrackerCollectionColorCell: UICollectionViewCell, Highilable {
     // MARK: Public
     func configure(with color: String) {
         colorView.backgroundColor = UIColor(hexString: color)
@@ -72,7 +72,7 @@ final class ColorCell: UICollectionViewCell, Highilable {
 }
 
 // MARK: Private methods
-private extension ColorCell {
+private extension CreateTrackerCollectionColorCell {
     func initialise() {
         contentView.addSubviews(colorView, highlightedImage)
         

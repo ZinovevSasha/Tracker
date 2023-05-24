@@ -1,6 +1,6 @@
 import UIKit
 
-final class CollectionReusableView: UICollectionReusableView {
+final class CreateTrackerCollectionReusableView: UICollectionReusableView {
     // MARK: Public
     func configure(with info: String) {
         text.text = info
@@ -25,7 +25,7 @@ final class CollectionReusableView: UICollectionReusableView {
 }
 
 // MARK: Private methods
-private extension CollectionReusableView {
+private extension CreateTrackerCollectionReusableView {
     func setupUI() {
         addSubviews(text)
         

@@ -8,15 +8,17 @@ struct SelectedFields: OptionSet {
     static let color = SelectedFields(rawValue: 1 << 3)
     static let weekDay = SelectedFields(rawValue: 1 << 4)
     static let date = SelectedFields(rawValue: 1 << 5)
+    static let categoryName = SelectedFields(rawValue: 1 << 6)
 }
 
 struct UserTracker {
-    enum TrackerType {
+    enum TrackerType: String {
         case habit
         case ocasional        
     }
-        
+
     private let trackerBuilder: TrackerMaker
+    private var selectedFields = SelectedFields()
     
     init(trackerBuilder: TrackerMaker = TrackerMaker()) {
         self.trackerBuilder = trackerBuilder
@@ -61,7 +63,16 @@ struct UserTracker {
             }
         }
     }
-    var selectedFields = SelectedFields()
+    
+    var categoryName: String? {
+        didSet {
+            if categoryName != nil {
+                selectedFields.insert(.categoryName)
+            } else {
+                selectedFields.remove(.categoryName)
+            }
+        }
+    }
 }
 
 extension UserTracker {
@@ -70,12 +81,14 @@ extension UserTracker {
             && selectedFields.contains(.weekDay)
             && selectedFields.contains(.emoji)
             && selectedFields.contains(.color)
+            && selectedFields.contains(.categoryName)
     }
     
     var isEnoughForOcasion: Bool {
         return selectedFields.contains(.name)
             && selectedFields.contains(.emoji)
             && selectedFields.contains(.color)
+            && selectedFields.contains(.categoryName)
     }
 }
 

@@ -59,6 +59,7 @@ extension TrackerCoreData {
         self.color = tracker.color
         self.schedule = tracker.schedule
         self.isAttached = tracker.isAttached
+        self.type = tracker.type.rawValue
     }
     
     func tracker() throws -> Tracker {
@@ -77,6 +78,12 @@ extension TrackerCoreData {
         guard let schedule = self.schedule else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
-        return Tracker(id: id, name: name, emoji: emoji, color: color, schedule: schedule, isAttached: self.isAttached)
+        guard let type = self.type, let trackertype = UserTracker.TrackerType(rawValue: type) else {
+            throw TrackerStoreError.decodingErrorInvalidEmoji
+        }
+        return Tracker(
+            id: id, name: name, emoji: emoji,
+            color: color, schedule: schedule,
+            isAttached: self.isAttached, type: trackertype)
     }
 }
