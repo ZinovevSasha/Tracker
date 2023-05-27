@@ -1,21 +1,26 @@
 import Foundation
 
 struct Tracker {
+    enum Kind: String {
+        case habit
+        case ocasional
+    }
+
     let id: String
     let name: String
     let emoji: String
     let color: String
-    let schedule: String
+    let schedule: Set<Int>
     let isAttached: Bool
-    let type: UserTracker.TrackerType
+    let kind: Kind
     
-    init(id: String, name: String, emoji: String, color: String, schedule: String, isAttached: Bool = false, type: UserTracker.TrackerType) {
+    init(id: String = UUID().uuidString, name: String, emoji: String, color: String, schedule: Set<Int>, isAttached: Bool = false, kind: Kind) {
         self.id = id
         self.name = name
         self.emoji = emoji
         self.color = color
         self.schedule = schedule
         self.isAttached = isAttached
-        self.type = type
+        self.kind = kind
     }
 }

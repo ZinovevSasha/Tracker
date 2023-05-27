@@ -9,7 +9,6 @@ protocol CategoriesListViewModelProtocol {
 }
 
 final class CategoriesListViewModel {
-    
     var categoryHeader: ((String) -> Void)?
     
     @Observable var categories: [CategoryViewModel] = []

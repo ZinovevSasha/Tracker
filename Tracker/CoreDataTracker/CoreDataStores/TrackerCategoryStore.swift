@@ -9,7 +9,7 @@ protocol TrackerCategoryStoreProtocol {
 
 final class TrackerCategoryStore {
     private let context: NSManagedObjectContext
-    private let predicateBuilder = PredecateBuilder<TrackerCategoryCoreData>()
+    private let predicateBuilder = PredicateBuilder<TrackerCategoryCoreData>()
         
     init(context: NSManagedObjectContext) {
         self.context = context

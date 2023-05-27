@@ -1,4 +1,5 @@
 import UIKit
+import Combine
 
 final class CreateTrackerViewController: UIViewController {
     // MARK: - Private properties
@@ -10,7 +11,7 @@ final class CreateTrackerViewController: UIViewController {
         return view
     }()
     
-    private let daysUpdatingView = DaysUpdaitingView()   
+    private let daysUpdatingView = DaysUpdaitingView()
 
     private let mainStackView: UIStackView = {
         let view = UIStackView()
@@ -74,25 +75,56 @@ final class CreateTrackerViewController: UIViewController {
         spacing: 0
     )
     
-    private var viewModel: CreateTrackerViewModel?
+    private var cancellables = Set<AnyCancellable>()
+    private var viewModel: CreateTrackerViewModelImpl?
     
-    func setViewModel(viewModel: CreateTrackerViewModel) {
+    init(viewModel: CreateTrackerViewModelImpl? = nil) {
         self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
         bind()
     }
     
-    func bind() {
-        viewModel?.$isButtonAllowedToChangeState.bind { [weak self] isEnabled in
-            self?.setCreateButton(enabled: isEnabled)
-        }
-        viewModel?.$isShakeOfButtonRequired.bind { [weak self] _ in
-            self?.createButton.shakeSelf()
-        }
-        viewModel?.$isTrackersAddedToCoreData.bind { [weak self] _ in
-            self?.dismiss(animated: true)
-        }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
+    func bind() {
+        guard let viewModel = viewModel else { return }
+               
+        viewModel.shouldUpdateButtonStylePublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isEnoughForTracker in
+                if isEnoughForTracker {
+                    self?.createButton.buttonState = .enabled
+                } else {
+                    self?.createButton.buttonState = .disabled
+                }
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$isTrackersAddedToCoreData
+            .sink { [weak self] isAdded in
+                if isAdded {
+                    self?.dismiss(animated: true)
+                }
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$updateTrackerViewModel
+            .dropFirst()
+            .sink { [weak self] updateViewModel in
+                guard let updateViewModel else { return }
+                
+                self?.updateCollectionView(
+                    emojiIndexPath: updateViewModel.emoji,
+                    colorIndexPath: updateViewModel.color
+            )
+            self?.titleTextfield.set(text: updateViewModel.name)
+            self?.tableView.reloadSections(IndexSet(integer: .zero), with: .fade)
+        }
+        .store(in: &cancellables)
+    }
+
     // IndexPath representing selected item
     var selectedEmojiIndexPath: IndexPath?
     var selectedColorIndexPath: IndexPath?
@@ -109,6 +141,7 @@ final class CreateTrackerViewController: UIViewController {
         addTargets()
         setupUI()
         setupLayout()
+        viewModel?.updateUI()
     }
     
     override func viewWillLayoutSubviews() {
@@ -124,7 +157,11 @@ final class CreateTrackerViewController: UIViewController {
     }
 
     @objc private func createButtonTapped() {
-        viewModel?.createButtonTapped()
+        if let isShaking = viewModel?.isShakingButton, isShaking {
+            viewModel?.createOrUpdateTracker()
+        } else {
+            createButton.shakeSelf()
+        }
     }
 }
 
@@ -159,7 +196,7 @@ private extension CreateTrackerViewController {
         
         mainScrollView.addSubviews(mainStackView)
         
-        if let isUpdatingScreen = viewModel?.isUpdatingScreen, isUpdatingScreen {
+        if let _ = viewModel?.tracker {
             mainStackView.insertArrangedSubview(daysUpdatingView, at: .zero)
             mainStackView.setCustomSpacing(40, after: daysUpdatingView)
         }
@@ -219,6 +256,15 @@ private extension CreateTrackerViewController {
             createButton.buttonState = .disabled
         }
     }
+    
+    private func updateCollectionView(emojiIndexPath: IndexPath, colorIndexPath: IndexPath) {
+        guard let viewModel = viewModel else { return }
+        
+        selectedEmojiIndexPath = emojiIndexPath
+        selectedColorIndexPath = colorIndexPath
+        collectionView.reloadItems(at: [emojiIndexPath])
+        collectionView.reloadItems(at: [colorIndexPath])
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -239,7 +285,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
         if indexPath.row == .zero {
             pushCategoryListViewController()
         } else {
-            let selectedWeekDays = viewModel?.userTracker.weekDay ?? []
+            let selectedWeekDays = viewModel?.schedule ?? []
             pushScheduleListViewController(weekDays: selectedWeekDays)
         }
     }
@@ -262,10 +308,9 @@ extension CreateTrackerViewController: UITableViewDelegate {
             present(scheduleController, animated: true)
         }
         // Call back
-        scheduleController.weekDaysToShow = { [weak self] weekDays in
+        scheduleController.weekDaysToShow = { [weak self] schedule in
             guard let self = self else { return }
-            self.viewModel?.userTracker.weekDay = weekDays
-            self.viewModel?.dataSource.addSchedule(weekDays.weekdayStringShort())
+            self.viewModel?.setSchedule(schedule: schedule)
             self.tableView.reloadData()
         }
     }
@@ -281,9 +326,9 @@ extension CreateTrackerViewController: UITableViewDelegate {
             present(categoryController, animated: true)
         }
         // Call back
-        viewModel.categoryHeader = { [weak self] categoryName in
+        viewModel.categoryHeader = { [weak self] header in
             guard let self = self else { return }
-            self.viewModel?.addCategory(name: categoryName)
+            self.viewModel?.addCategory(header: header)
             self.tableView.reloadData()
         }
     }
@@ -331,10 +376,16 @@ extension CreateTrackerViewController: UICollectionViewDataSource {
         case .emojiSection(let items):
             let cell: CreateTrackerCollectionEmojiCell = collectionView.dequeueReusableCell(for: indexPath)
             cell.configure(with: items[indexPath.row])
+            if indexPath == selectedEmojiIndexPath {
+                cell.highlight()
+            }
             return cell
         case .colorSection(let items):
             let cell: CreateTrackerCollectionColorCell = collectionView.dequeueReusableCell(for: indexPath)
             cell.configure(with: items[indexPath.row].rawValue)
+            if indexPath == selectedColorIndexPath {
+                cell.highlight()
+            }
             return cell
         }
     }
@@ -358,13 +409,13 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
         case .emojiSection:
             collectionView.deselectOldSelectNewCellOf(
                 type: CreateTrackerCollectionEmojiCell.self, selectedEmojiIndexPath) { [weak self]  emoji in
-                    self?.viewModel?.userTracker.emoji = emoji
+                    self?.viewModel?.emoji = emoji
                     self?.selectedEmojiIndexPath = indexPath
             }
         case .colorSection:
             collectionView.deselectOldSelectNewCellOf(
                 type: CreateTrackerCollectionColorCell.self, selectedColorIndexPath) { [weak self]  color in
-                    self?.viewModel?.userTracker.color = color
+                    self?.viewModel?.color = color
                     self?.selectedColorIndexPath = indexPath
             }
         }
@@ -376,9 +427,9 @@ extension CreateTrackerViewController: TrackerUITextFieldDelegate {
     func isChangeText(text: String, newLength: Int) -> Bool? {
         // Save text as tracker Name
         if text.isEmpty {
-            self.viewModel?.userTracker.name = nil
+            self.viewModel?.name = nil
         } else {
-            self.viewModel?.userTracker.name = text
+            self.viewModel?.name = text
         }
         
         let maxLength = 38

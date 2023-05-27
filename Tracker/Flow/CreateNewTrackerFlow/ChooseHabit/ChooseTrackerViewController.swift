@@ -17,10 +17,13 @@ final class ChooseTrackerViewController: UIViewController {
         return view
     }()
     
-    let habitButton = ActionButton(colorType: .black,
+    let habitButton = ActionButton(
+        colorType: .black,
         title: Localized.Choosing.habit)
+    
     let irregularEventButton = ActionButton(
-        colorType: .black, title: Localized.Choosing.irregular)
+        colorType: .black,
+        title: Localized.Choosing.irregular)
     
     // MARK: UIConstants
     private enum UIConstants {
@@ -58,17 +61,16 @@ final class ChooseTrackerViewController: UIViewController {
     
     // MARK: - Private @objc target action methods
     @objc private func habitButtonTaped() {
-        pushCreateTrackerViewController(type: .habit)
+        pushCreateTrackerViewController(kind: .habit)
     }
     
     @objc private func irregularEventButtonTapped() {
-        pushCreateTrackerViewController(type: .ocasional)
+        pushCreateTrackerViewController(kind: .ocasional)
     }
     
-    private func pushCreateTrackerViewController(type: UserTracker.TrackerType) {
-        let viewModel = CreateTrackerViewModel(trackerType: type)
-        let vc = CreateTrackerViewController()
-        vc.setViewModel(viewModel: viewModel)
+    private func pushCreateTrackerViewController(kind: Tracker.Kind) {
+        let viewModel = CreateTrackerViewModelImpl(trackerKind: kind, tracker: nil)
+        let vc = CreateTrackerViewController(viewModel: viewModel)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

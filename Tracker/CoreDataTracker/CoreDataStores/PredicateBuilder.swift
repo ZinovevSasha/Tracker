@@ -1,40 +1,16 @@
 import Foundation
 
-final class SearchLogicProvider {
-    let predicate = PredecateBuilder<TrackerCoreData>()
-        
-    func weekDay(weekDay: String) -> NSPredicate {
-        return predicate
-            .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
-            .build(type: .or)
-    }
-    
-    func nameAndWeekDay(name: String, weekDay: String) -> NSPredicate {
-        return predicate
-            .addPredicate(.contains, keyPath: \.name, value: name)
-            .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
-            .build()
-    }
-    
-    func onlyName(_ name: String) -> NSPredicate {
-        return predicate
-            .addPredicate(.contains, keyPath: \.name, value: name)
-            .build()
-    }
-}
-
-final class PredecateBuilder<T> {
+struct PredicateBuilder<T> {
     private var predicates: [NSPredicate] = []
     
-    func addPredicate(_ predicateType: PredicateType, keyPath: KeyPath<T, String?>, value: String) -> PredecateBuilder {
+    func addPredicate(_ predicateType: PredicateType, keyPath: KeyPath<T, String?>, value: String) -> PredicateBuilder<T> {
+        var copy = self
         let predicate = predicateType.predicate(keyPath: keyPath, value: value)
-        predicates.append(predicate)
-        return self
+        copy.predicates.append(predicate)
+        return copy
     }
     
     func build(type: NSCompoundPredicate.LogicalType = .and) -> NSPredicate {
-        let predicates = predicates
-        self.predicates.removeAll()
         return NSCompoundPredicate(type: type, subpredicates: predicates)
     }
 }

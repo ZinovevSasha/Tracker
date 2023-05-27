@@ -7,9 +7,13 @@ protocol TrackerStoreProtocol {
 
 final class TrackerStore {
     private let context: NSManagedObjectContext
+    private var predicateBuilder: PredicateBuilder<TrackerCoreData>
     
-    init(context: NSManagedObjectContext) {
+    init(context: NSManagedObjectContext,
+         predicateBuilder: PredicateBuilder<TrackerCoreData> = PredicateBuilder()
+    ) {
         self.context = context
+        self.predicateBuilder = predicateBuilder
     }
     
     convenience init() throws {
@@ -29,6 +33,32 @@ extension TrackerStore: TrackerStoreProtocol {
         let trackerCoreData = TrackerCoreData(tracker: tracker, context: context)
         return trackerCoreData
     }
+    
+    func getCategoryHeaderForTrackerWith(id: String) -> String? {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.id, value: id)
+            .build()
+        let trackerCoreData = try? context.fetch(fetchRequest).first
+        return trackerCoreData?.category?.header
+    }
+    
+    func getTrackerBy(id: String) -> TrackerCoreData? {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.id, value: id).build()
+        let trackerCoreData = try? context.fetch(fetchRequest).first
+        return trackerCoreData
+    }
+    
+    func save(tracker: Tracker, categoryHeader: String) throws {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.id, value: tracker.id).build()
+        if let trackerCoreData = try context.fetch(fetchRequest).first {
+            updateCoreData(tracker: trackerCoreData, with: tracker, categoryHeader: categoryHeader)
+        }
+    }
 }
 
 // MARK: - Private
@@ -39,6 +69,16 @@ private extension TrackerStore {
         } catch {
             print("Error saving context: \(error.localizedDescription)")
         }
+    }
+    
+    func updateCoreData(tracker: TrackerCoreData, with newTracker: Tracker, categoryHeader: String) {
+        tracker.id = newTracker.id
+        tracker.name = newTracker.name
+        tracker.category?.header = categoryHeader
+        tracker.schedule = newTracker.schedule.toNumbersString()
+        tracker.emoji = newTracker.emoji
+        tracker.color = newTracker.color
+        saveContext()
     }
 }
 
@@ -57,9 +97,9 @@ extension TrackerCoreData {
         self.name = tracker.name
         self.emoji = tracker.emoji
         self.color = tracker.color
-        self.schedule = tracker.schedule
+        self.schedule = tracker.schedule.toNumbersString()
         self.isAttached = tracker.isAttached
-        self.type = tracker.type.rawValue
+        self.type = tracker.kind.rawValue
     }
     
     func tracker() throws -> Tracker {
@@ -75,15 +115,16 @@ extension TrackerCoreData {
         guard let emoji = self.emoji else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
-        guard let schedule = self.schedule else {
+        guard let schedule = self.schedule,
+                let scheduleSet = Set.fromString(schedule) else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
-        guard let type = self.type, let trackertype = UserTracker.TrackerType(rawValue: type) else {
+        guard let type = self.type, let trackertype = Tracker.Kind(rawValue: type) else {
             throw TrackerStoreError.decodingErrorInvalidEmoji
         }
         return Tracker(
             id: id, name: name, emoji: emoji,
-            color: color, schedule: schedule,
-            isAttached: self.isAttached, type: trackertype)
+            color: color, schedule: scheduleSet,
+            isAttached: self.isAttached, kind: trackertype)
     }
 }
