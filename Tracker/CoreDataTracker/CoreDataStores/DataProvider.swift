@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 import CoreData
 
 // Struct for updates, will be sent to delegate to update collection
@@ -57,7 +56,7 @@ final class DataProvider: NSObject {
     private let trackerCategoryStore: TrackerCategoryStoreProtocol
     private let trackerRecordStore: TrackerRecordStoreProtocol
     // PredicateBuilder
-    private let searchLogic = SearchLogicProvider()
+    private var predicateBuilder = PredicateBuilder<TrackerCoreData>()
     // Delegate
     weak var delegate: DataProviderDelegate?
     
@@ -73,8 +72,8 @@ final class DataProvider: NSObject {
         ]
 
         let weekDay = String(Date().weekDayNumber)
-        fetchRequest.predicate = searchLogic.weekDay(weekDay: weekDay)
-                
+        fetchRequest.predicate = makePredicateBy(weekDay)
+
         let sectionKeyPath = #keyPath(TrackerCoreData.category.header)
         
         let fetchedResultsController = NSFetchedResultsController(
@@ -185,15 +184,12 @@ extension DataProvider: DataProviderProtocol {
     // Searching by name
     func fetchTrackersBy(name: String, weekDay: String) throws {
         if !name.isEmpty {
-            fetchedResultsController
-                .fetchRequest
-                .predicate = searchLogic.nameAndWeekDay(name: name, weekDay: weekDay)
+            fetchedResultsController.fetchRequest
+                .predicate = makePredicateBy(name: name, weekDay: weekDay)
             try fetchedResultsController.performFetch()
             isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
         } else {
-            fetchedResultsController
-                .fetchRequest
-                .predicate = searchLogic.weekDay(weekDay: weekDay)
+            fetchedResultsController.fetchRequest.predicate = makePredicateBy(weekDay)
             try fetchedResultsController.performFetch()
             isEmpty ? delegate?.place() : delegate?.resultFound()
         }
@@ -201,11 +197,23 @@ extension DataProvider: DataProviderProtocol {
     
     // Searching by weekDay
     func fetchTrackersBy(weekDay: String) throws {
-        fetchedResultsController
-            .fetchRequest
-            .predicate = searchLogic.weekDay(weekDay: weekDay)
+        fetchedResultsController.fetchRequest.predicate = makePredicateBy(weekDay)
         try fetchedResultsController.performFetch()
         isEmpty ? delegate?.place() : delegate?.resultFound()
+    }
+    
+    // Private
+    private func makePredicateBy(_ weekDay: String) -> NSPredicate {
+        return predicateBuilder
+            .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
+            .build()
+    }
+    
+    private func makePredicateBy(name: String, weekDay: String) -> NSPredicate {
+        return predicateBuilder
+            .addPredicate(.contains, keyPath: \.name, value: name)
+            .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
+            .build()
     }
 }
 

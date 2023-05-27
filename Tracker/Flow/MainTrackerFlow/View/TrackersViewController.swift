@@ -254,16 +254,14 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     }
     
     func didUpdateTracker(for cell: TrackerCollectionViewCell) {
-        guard
-            let indexPath = collectionView.indexPath(for: cell),
-            let trackerType = dataProvider?.getTracker(at: indexPath)?.type
-        else {
-            return
-        }
-        let updateTrackerViewController = CreateTrackerViewController()
-        let updateTrackerViewModel = CreateTrackerViewModel(trackerType: trackerType, isUpdatingScreen: true)
-        updateTrackerViewController.setViewModel(viewModel: updateTrackerViewModel)
-        present(updateTrackerViewController, animated: true)
+        guard let indexPath = collectionView.indexPath(for: cell),
+            let tracker = dataProvider?.getTracker(at: indexPath) else { return }
+        
+        let updateTrackerViewModel = CreateTrackerViewModelImpl(trackerKind: tracker.kind, tracker: tracker)
+        
+        let updateTrackerViewController = CreateTrackerViewController(viewModel: updateTrackerViewModel)
+        
+        present(updateTrackerViewController, animated: true)        
     }
 }
 

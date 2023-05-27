@@ -9,7 +9,7 @@ protocol TrackerRecordStoreProtocol {
 
 final class TrackerRecordStore {
     private let context: NSManagedObjectContext
-    private let predicate = PredecateBuilder<TrackerRecordCoreData>()
+    private var predicate = PredicateBuilder<TrackerRecordCoreData>()
         
     init(context: NSManagedObjectContext) {
         self.context = context

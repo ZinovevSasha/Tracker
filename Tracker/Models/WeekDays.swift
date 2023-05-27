@@ -1,5 +1,3 @@
-import Foundation
-
 enum WeekDay: Int, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     

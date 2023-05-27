@@ -1,7 +1,23 @@
 import Foundation
 
-struct DataSource {
-    let collectionView: [CollectionViewData] = [
+protocol DataSourceProtocol {
+    mutating func addCategoryHeader(_ header: String)
+    mutating func addSchedule(_ schedule: String)
+    func numberOfTableViewRows(ofKind kind: Tracker.Kind) -> Int
+    func dataForTablView(ofKind kind: Tracker.Kind) -> [TableData]
+    func numberOfItemsInSection(_ section: Int) -> Int
+    func numberOfCollectionSections() -> Int
+    func getSection(_ indexPath: IndexPath) -> CollectionViewData
+    func indexPath(forEmoji item: String) -> IndexPath?
+    func indexPath(forColor item: String) -> IndexPath?
+}
+
+struct DataSourceImpl {
+    private var category = TableData(title: Localized.NewHabit.category, subtitle: "")
+    private var schedule = TableData(title: Localized.NewHabit.schedule, subtitle: "")
+    
+    // Public data
+    private let collectionViewData: [CollectionViewData] = [
         .emojiSection(items: [
             "🙂", "😻", "🌺", "🐶", "❤️",
             "😱", "😇","😡", "🥶", "🤔",
@@ -11,27 +27,77 @@ struct DataSource {
         .colorSection(items: CollectionViewColors.array)
     ]
     
-    private var category = TableData(title: Localized.NewHabit.category, subtitle: "")
-    private var schedule = TableData(title: Localized.NewHabit.schedule, subtitle: "")
-    
-    var categoryName: String {
-        category.subtitle
-    }
-    
-    var oneRow: [TableData] {
+    private var firstRowData: [TableData] {
         [category]
     }
     
-    var twoRows: [TableData] {
+    private var secondRowData: [TableData] {
         [category, schedule]
     }
-    
-    mutating func addCategory(_ subtitle: String) {
-        category.subtitle = subtitle
+}
+
+extension DataSourceImpl: DataSourceProtocol {
+    func getSection(_ indexPath: IndexPath) -> CollectionViewData {
+        collectionViewData[indexPath.section]
     }
     
-    mutating func addSchedule(_ subtitle: String) {
-        schedule.subtitle = subtitle
+    func numberOfItemsInSection(_ section: Int) -> Int {
+        switch collectionViewData[section] {
+        case .emojiSection(let items):
+            return items.count
+        case .colorSection(let items):
+            return items.count
+        }
+    }
+    
+    func numberOfCollectionSections() -> Int {
+        collectionViewData.count
+    }
+        
+    func dataForTablView(ofKind kind: Tracker.Kind) -> [TableData] {
+        switch kind {
+        case .ocasional:
+            return firstRowData
+        case .habit:
+            return secondRowData
+        }
+    }
+    
+    func numberOfTableViewRows(ofKind kind: Tracker.Kind) -> Int {
+        switch kind {
+        case .ocasional:
+            return firstRowData.count
+        case .habit:
+            return secondRowData.count
+        }
+    }
+    
+    func indexPath(forEmoji item: String) -> IndexPath? {
+        for (sectionIndex, section) in collectionViewData.enumerated() {
+            if case .emojiSection(let items) = section,
+               let itemIndex = items.firstIndex(of: item) {
+                return IndexPath(item: itemIndex, section: sectionIndex)
+            }
+        }
+        return nil
+    }
+    
+    func indexPath(forColor item: String) -> IndexPath? {
+        for (sectionIndex, section) in collectionViewData.enumerated() {
+            if case .colorSection(let items) = section,
+               let itemIndex = items.firstIndex(where: { $0.rawValue == item.uppercased() }) {
+                return IndexPath(item: itemIndex, section: sectionIndex)
+            }
+        }
+        return nil
+    }
+    
+    mutating func addCategoryHeader(_ header: String) {
+        self.category.subtitle = header
+    }
+    
+    mutating func addSchedule(_ schedule: String) {
+        self.schedule.subtitle = schedule
     }
 }
 
