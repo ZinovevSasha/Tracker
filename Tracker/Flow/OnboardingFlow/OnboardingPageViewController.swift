@@ -2,7 +2,7 @@ import UIKit
 
 final class OnboardingPageViewController: UIPageViewController {
     
-    var userSuccesfullyLoggedIn: (() -> Void)?
+    var userSuccessfullyLoggedIn: (() -> Void)?
     
     // MARK: Private properties
     private var pages: [UIViewController] = {
@@ -54,7 +54,7 @@ final class OnboardingPageViewController: UIPageViewController {
     }
     
     @objc private func buttonTapped() {
-        userSuccesfullyLoggedIn?()
+        userSuccessfullyLoggedIn?()
     }
     
     // Private methods
