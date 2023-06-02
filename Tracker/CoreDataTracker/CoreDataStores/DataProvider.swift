@@ -52,7 +52,7 @@ final class DataProvider: NSObject {
     // Context -> one for 3 stores
     private let context: NSManagedObjectContext
     // Stores
-    private let trackerStore: TrackerStoreProtocol
+    private let trackerStore: TrackerStoreDataProviderProtocol
     private let trackerCategoryStore: TrackerCategoryStoreProtocol
     private let trackerRecordStore: TrackerRecordStoreProtocol
     // PredicateBuilder
@@ -70,9 +70,8 @@ final class DataProvider: NSObject {
             NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true),
             NSSortDescriptor(key: #keyPath(TrackerCoreData.name), ascending: true)
         ]
-        
-        let weekDay = String(Date().weekDayNumber)
-        fetchRequest.predicate = makePredicateBy(weekDay)
+                
+        fetchRequest.predicate = makePredicateBy(Date().weekDayString)
         
         let sectionKeyPath = #keyPath(TrackerCoreData.category.header)
         
@@ -137,16 +136,17 @@ extension DataProvider: DataProviderProtocol {
     }
     
     func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool {
-        let tracker = fetchedResultsController.object(at: indexPath)
+        let tracker = fetchedResultsController.object(at: indexPath)        
         do {
-            return try trackerRecordStore.isTrackerCompletedFor(selectedDay: date, tracker)
+            return try trackerRecordStore.isCompletedFor(date, trackerWithId: tracker.id)
         } catch {
             return false
         }
     }
     
     func getTracker(at indexPath: IndexPath) -> Tracker? {
-        try? fetchedResultsController.object(at: indexPath).tracker()
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        return Tracker(coreData: trackerCoreData)
     }
     
     func addTrackerCategory(_ category: TrackerCategory) throws {
@@ -162,7 +162,7 @@ extension DataProvider: DataProviderProtocol {
     
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, with: day)
+        try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, forParticularDay: day)
     }
     
     func getCategories() -> [TrackerCategory] {

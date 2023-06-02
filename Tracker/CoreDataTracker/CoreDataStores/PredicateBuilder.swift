@@ -1,5 +1,13 @@
 import Foundation
 
+protocol PredicateBuilderProtocol {
+    associatedtype T
+    func build(type: NSCompoundPredicate.LogicalType) -> NSPredicate
+    func addPredicate(_ predicateType: PredicateBuilder<T>.PredicateType,
+        keyPath: KeyPath<T, String?>,
+        value: String) -> Self
+    
+}
 struct PredicateBuilder<T> {
     private var predicates: [NSPredicate] = []
     
@@ -15,33 +23,36 @@ struct PredicateBuilder<T> {
     }
 }
 
-enum PredicateType {
-    case equalTo
-    case notEqualTo
-    case greaterThan
-    case lessThan
-    case contains
-    case beginsWith
-    case endsWith
-    
-    func predicate<T>(keyPath: KeyPath<T, String?>, value: String) -> NSPredicate {
-        let format: String
-        switch self {
-        case .equalTo:
-            format = "%K == %@"
-        case .notEqualTo:
-            format = "NOT (%K == %@)"
-        case .greaterThan:
-            format = "%K > %@"
-        case .lessThan:
-            format = "%K < %@"
-        case .contains:
-            format = "%K CONTAINS[cd] %@"
-        case .beginsWith:
-            format = "%K BEGINSWITH[cd] %@"
-        case .endsWith:
-            format = "%K ENDSWITH[cd] %@"
+extension PredicateBuilder {
+    enum PredicateType {
+        case equalTo
+        case notEqualTo
+        case greaterThan
+        case lessThan
+        case contains
+        case beginsWith
+        case endsWith
+        
+        func predicate<T>(keyPath: KeyPath<T, String?>, value: String) -> NSPredicate {
+            let format: String
+            switch self {
+            case .equalTo:
+                format = "%K == %@"
+            case .notEqualTo:
+                format = "NOT (%K == %@)"
+            case .greaterThan:
+                format = "%K > %@"
+            case .lessThan:
+                format = "%K < %@"
+            case .contains:
+                format = "%K CONTAINS[cd] %@"
+            case .beginsWith:
+                format = "%K BEGINSWITH[cd] %@"
+            case .endsWith:
+                format = "%K ENDSWITH[cd] %@"
+            }
+            return NSPredicate(format: format, keyPath._kvcKeyPathString ?? "", value)
         }
-        return NSPredicate(format: format, keyPath._kvcKeyPathString ?? "", value)
     }
+
 }

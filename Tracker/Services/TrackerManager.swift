@@ -13,7 +13,7 @@ protocol TrackerManagerProtocol {
 
 struct TrackerManagerImpl: TrackerManagerProtocol {
     // MARK: - Dependencies
-    private var trackerCategoryStore: TrackerCategoryStore? = {
+    private var trackerCategoryStore: TrackerCategoryStoreProtocol? = {
         do {
             return try TrackerCategoryStore()
         } catch {
@@ -21,7 +21,7 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
         }
     }()
     
-    private var trackerStore: TrackerStore? = {
+    private var trackerStore: TrackerStoreManagerProtocol? = {
         do {
             return try TrackerStore()
         } catch {
@@ -29,7 +29,7 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
         }
     }()
     
-    private var trackerRecordStore: TrackerRecordStore? = {
+    private var trackerRecordStore: TrackerRecordStoreProtocol? = {
         do {
             return try TrackerRecordStore()
         } catch {
@@ -67,7 +67,7 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
             )
         }
         
-        if let trackerCoreData = trackerStore?.createTrackerCoreData(tracker) {
+        if let trackerCoreData = try trackerStore?.createTrackerCoreData(tracker) {
             try trackerCategoryStore?.addTracker(toCategoryWithName: categoryHeader, tracker: trackerCoreData)
         }
     }
@@ -117,7 +117,7 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
     
     func markAsTrackedFor(date: String?, trackerWithId id: String?) throws {
         if let id, let date, let tracker = trackerStore?.getTrackerBy(id: id) {
-            try trackerRecordStore?.removeTrackerOrAdd(tracker, forParticularDay: date)
+            try trackerRecordStore?.removeTrackerRecordOrAdd(tracker, forParticularDay: date)
         }
     }
 }

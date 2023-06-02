@@ -14,16 +14,11 @@ final class CategoriesListViewModel {
     @Observable var categories: [CategoryViewModel] = []
    
     // Store
-    private var categoryStore: TrackerCategoryStore?
+    private var categoryStore: TrackerCategoryListProtocol?
     
-    private var context: NSManagedObjectContext? {
-        try? Context.getContext()
-    }
-        
     // MARK: - Init
     init(categoryStore: TrackerCategoryStore? = nil) {
-        guard let context = context else { return }
-        self.categoryStore = TrackerCategoryStore(context: context)
+        self.categoryStore = try? TrackerCategoryStore()
     }
 }
 

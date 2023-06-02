@@ -25,4 +25,8 @@ extension UIView {
         
         self.layer.add(shakingAnimation, forKey: nil)
     }
+    
+    static var reuseIdentifier: String {
+        return String(describing: self)
+    }
 }
