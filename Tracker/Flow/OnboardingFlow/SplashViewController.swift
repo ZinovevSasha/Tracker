@@ -1,18 +1,23 @@
+//
+//  SplashViewController.swift
+//  Tracker
+//
+//  Created by Александр Зиновьев on 09.05.2023.
+//
+
 import UIKit
 
-final class SplashViewController: UIViewController {
-    // MARK: Private properties
+final class SplashViewcontroller: UIViewController {
     private var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .logo
         return imageView
     }()
     
-    private let viewModel: SplashViewModel
-
-    // MARK: - Init
-    init(viewModel: SplashViewModel) {
-        self.viewModel = viewModel
+    private let authService: AuthService
+    
+    init(authService: AuthService = AuthService()) {
+        self.authService = authService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -20,7 +25,6 @@ final class SplashViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setLayout()
@@ -39,36 +43,32 @@ final class SplashViewController: UIViewController {
     }
     
     private func start() {
-        if viewModel.isUserLoggedIn() {
+        if authService.isLogin == true  {
             presentTrackerViewcontroller()
         } else {
-            let onboardingPageViewController = OnboardingPageViewController()
-            onboardingPageViewController.modalPresentationStyle = .overFullScreen
-            onboardingPageViewController.modalTransitionStyle = .crossDissolve
-            present(onboardingPageViewController, animated: true)
-           
-            onboardingPageViewController.userSuccessfullyLoggedIn = { [weak self] in
-                guard let self = self else { return }
-                self.viewModel.loginUser {
-                    self.presentTrackerViewcontroller()
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                        
-//                    }
-                }               
-            }
+            presentOnboardingViewController()
         }
     }
     
     private func presentTrackerViewcontroller() {
-        guard let window = UIApplication.shared.windows.first else {
+        if let window = UIApplication.shared.windows.first {
+            let tabBar = MainTabBarController()
+            window.rootViewController = tabBar
+        } else {
             fatalError("Invalid Configuration")
         }
-
-        if let rootViewController = window.rootViewController as? MainTabBarController {
-            return
+    }
+    
+    private func presentOnboardingViewController() {
+        let onboardingPageViewController = OnboardingPageViewController()
+        onboardingPageViewController.modalPresentationStyle = .fullScreen
+        onboardingPageViewController.modalTransitionStyle = .crossDissolve
+        present(onboardingPageViewController, animated: true)
+       
+        onboardingPageViewController.userSuccesfullyLoggedIn = { [weak self] in
+            guard let self = self else { return }
+            self.authService.isLogin = true
+            self.presentTrackerViewcontroller()
         }
-
-        let tabBar = MainTabBarController()
-        window.rootViewController = tabBar
     }
 }

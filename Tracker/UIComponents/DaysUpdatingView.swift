@@ -13,6 +13,7 @@ protocol DaysUpdatingViewProtocol {
 }
 
 final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
+    
     var incrementClosure: (() -> Void)?
     var decrementClosure: (() -> Void)?
     
@@ -44,7 +45,8 @@ final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
     
     private let daysCountLabel: UILabel = {
         let view = UILabel()
-        view.font = .bold32        
+        view.font = .bold32
+        view.text = "5 daysfaf"
         return view
     }()
     

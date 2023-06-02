@@ -1,23 +1,20 @@
 import UIKit
 
 final class MainTabBarController: UITabBarController {
+    // MARK: - Init
     init() {
         super.init(nibName: nil, bundle: nil)
         
-        let trackersViewController =  generateViewController(
-            TrackersViewController(
-                viewModel: TrackerViewModel(diffCalculator: DiffCalculator() )),
-            image: .leftTabBar,
-            title: Localized.TabBar.trackers
-        
-        )
-        
-        let statisticViewController = generateViewController(
-            StatisticViewController(),
-            image: .rightTabBar,
-            title: Localized.TabBar.statistics
-        )
-        setViewControllers([trackersViewController, statisticViewController], animated: true)
+        viewControllers = [
+            generateViewController(
+                TrackersViewController(),
+                image: .leftTabBar,
+                title: Localized.TabBar.trackers),
+            generateViewController(
+                StatisticViewController(),
+                image: .rightTabBar,
+                title: Localized.TabBar.statistics)
+        ]
     }
     
     required init?(coder: NSCoder) {
@@ -28,17 +25,18 @@ final class MainTabBarController: UITabBarController {
         super.viewDidLoad()
         setAppearance()
     }
+}
 
-    // MARK: - Private methods
-    
-    private func generateViewController(_ rootViewController: UIViewController, image: UIImage?, title: String) -> UIViewController {
+// MARK: - Private methods
+private extension MainTabBarController {
+    func generateViewController(_ rootViewController: UIViewController, image: UIImage?, title: String) -> UIViewController {
         let viewController = rootViewController
         viewController.tabBarItem.image = image
         viewController.tabBarItem.title = title
         return viewController
     }
     
-    private func setAppearance() {
+    func setAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .myWhite

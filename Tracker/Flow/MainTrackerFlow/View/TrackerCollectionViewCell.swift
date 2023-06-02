@@ -1,5 +1,4 @@
 import UIKit
-import Combine
 
 protocol TrackerCollectionViewCellDelegate: AnyObject {
     func didMarkTrackerCompleted(for cell: TrackerCollectionViewCell)
@@ -11,35 +10,21 @@ protocol TrackerCollectionViewCellDelegate: AnyObject {
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
     // MARK: - Public
-    private var isAttached = false
-    
-    var cancellables = Set<AnyCancellable>()
-    
-    func configure(with viewModel: TrackerCellViewModel?) {
-        guard let viewModel = viewModel else { return }
-        
-        viewModel.$trackedDaysViewModel
-            .sink { [weak self] trackedDaysViewModel in
-                self?.updateTrackedDaysView(trackedDaysViewModel)
-            }.store(in: &cancellables)
-        
-        updateTrackedDaysView(viewModel.trackedDaysViewModel)
-        
-        let color = UIColor(hexString: viewModel.color)
-        let isAttached = viewModel.isPinned
-        emojiLabel.text = viewModel.emoji
-        trackerNameLabel.text = viewModel.name
-        attachedSighView.isHidden = !isAttached
+    func configure(with info: Tracker?) {
+        guard let info = info else { return }
+        let color = UIColor(hexString: info.color)
+        emojiLabel.text = info.emoji
+        trackerNameLabel.text = info.name
+        attachedSighView.isHidden = !info.isAttached
         trackerContainerView.backgroundColor = color
         addButton.backgroundColor = color
-        self.isAttached = isAttached
+        isAttached = info.isAttached
     }
             
-    func updateTrackedDaysView(_ trackedDaysViewModel: TrackedDaysViewModel?) {
-        guard let trackedDaysViewModel = trackedDaysViewModel else { return }
-        trackedDaysLabel.text = Localized.Main.numberOf(days: trackedDaysViewModel.trackedDays)
-        
-        if trackedDaysViewModel.isTrackedForToday {
+    func configure(with trackedDays: Int?, isCompleted: Bool?) {
+        guard let trackedDays = trackedDays, let isCompleted = isCompleted else { return }
+        trackedDaysLabel.text = Localized.Main.numberOf(days: trackedDays)
+        if isCompleted {
             buttonState = .selected
         } else {
             buttonState = .unselected
@@ -137,6 +122,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     private var pendingAction: PendingAction?
+    private var isAttached = false
     
     // MARK: - Init
     override init(frame: CGRect) {
@@ -147,11 +133,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        pendingAction = nil
     }
     
     // MARK: - Private @objc target action methods
@@ -288,7 +269,7 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
             case .unattach:
                 self.delegate?.didUnattachTracker(for: self)
             }
-            
+            self.pendingAction = nil
         }
     }
 }

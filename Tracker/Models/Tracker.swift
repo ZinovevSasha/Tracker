@@ -1,6 +1,6 @@
 import Foundation
 
-struct Tracker: Hashable {
+struct Tracker {
     enum Kind: String {
         case habit
         case ocasional
@@ -11,16 +11,28 @@ struct Tracker: Hashable {
     let emoji: String
     let color: String
     let schedule: Set<Int>
-    let isPinned: Bool
+    let isAttached: Bool
     let kind: Kind
     
-    init(id: String = UUID().uuidString, name: String, emoji: String, color: String, schedule: Set<Int>, isPinned: Bool = false, kind: Kind) {
+    init(id: String = UUID().uuidString, name: String, emoji: String, color: String, schedule: Set<Int>, isAttached: Bool = false, kind: Kind) {
         self.id = id
         self.name = name
         self.emoji = emoji
         self.color = color
         self.schedule = schedule
-        self.isPinned = isPinned
+        self.isAttached = isAttached
         self.kind = kind
+    }
+}
+
+extension Tracker {
+    init(coreData: TrackerCoreData) {
+        self.id = coreData.id ?? UUID().uuidString
+        self.name = coreData.name ?? ""
+        self.emoji = coreData.emoji ?? ""
+        self.color = coreData.color ?? ""
+        self.isAttached = coreData.isAttached
+        self.kind = Kind(rawValue: coreData.type ?? "") ?? .habit
+        self.schedule = Set.fromString(coreData.schedule ?? "") ?? []
     }
 }

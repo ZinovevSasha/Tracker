@@ -14,10 +14,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
        
-        let viewModel = SplashViewModel(authService: AuthService())
-        window.rootViewController = SplashViewController(viewModel: viewModel)
-        window.makeKeyAndVisible()
+              
+        window.rootViewController = SplashViewcontroller()
         self.window = window
+        window.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

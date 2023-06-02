@@ -45,20 +45,7 @@ final class ChooseTrackerViewController: UIViewController {
         setupLayout()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-        // we must set the delegate to nil whether we are popping or pushing to..
-        // ..this view controller, thus we set it in viewWillAppear()
-        self.navigationController?.interactivePopGestureRecognizer?.delegate = nil
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(true)
-        // and every time we leave this view controller we must set the delegate back..
-        // ..to what it was originally
-        self.navigationController?.interactivePopGestureRecognizer?.delegate = initialInteractivePopGestureRecognizerDelegate
-    }
-    
+
     // MARK: - Private @objc target action methods
     @objc private func habitButtonTaped() {
         pushCreateTrackerViewController(kind: .habit)
@@ -71,7 +58,7 @@ final class ChooseTrackerViewController: UIViewController {
     private func pushCreateTrackerViewController(kind: Tracker.Kind) {
         let viewModel = CreateTrackerViewModelImpl(trackerKind: kind, tracker: nil, date: nil)
         let vc = CreateTrackerViewController(viewModel: viewModel)
-        navigationController?.pushViewController(vc, animated: true)
+        present(vc, animated: true)
     }
 }
 
