@@ -1,11 +1,5 @@
 import UIKit
 
-extension UIView {
-    static var reuseIdentifier: String {
-        return String(describing: self)
-    }
-}
-
 extension UICollectionView {
     // MARK: - Dequeue
     func dequeueReusableCell<T: UICollectionViewCell>(for indexPath: IndexPath) -> T {

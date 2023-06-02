@@ -35,7 +35,6 @@ final class ChooseTrackerViewController: UIViewController {
         static let buttonsHeight: CGFloat = 60
     }
     
-    ///// ASK: where it should be stored?
     var initialInteractivePopGestureRecognizerDelegate: UIGestureRecognizerDelegate?
     
     // MARK: - Lifecycle
@@ -45,7 +44,6 @@ final class ChooseTrackerViewController: UIViewController {
         setupLayout()
     }
     
-
     // MARK: - Private @objc target action methods
     @objc private func habitButtonTaped() {
         pushCreateTrackerViewController(kind: .habit)

@@ -44,9 +44,9 @@
 		F97774EF29D4456100959E7C /* TrackerCollectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97774EE29D4456100959E7C /* TrackerCollectionHeader.swift */; };
 		F97774F129D44CD900959E7C /* ChooseTrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97774F029D44CD800959E7C /* ChooseTrackerViewController.swift */; };
 		F978FA982A2A610C002F415F /* SplashViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F978FA972A2A610C002F415F /* SplashViewModel.swift */; };
+		F978FA9C2A2A6D69002F415F /* StoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F978FA9B2A2A6D69002F415F /* StoreProtocol.swift */; };
 		F97E3C0629FE7056001C252E /* CategoriesListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E3C0529FE7056001C252E /* CategoriesListViewModel.swift */; };
 		F97E3C0829FE72C2001C252E /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E3C0729FE72C2001C252E /* Observable.swift */; };
-		F97E3C0A29FEBC99001C252E /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E3C0929FEBC99001C252E /* Context.swift */; };
 		F97E3C0D29FEC053001C252E /* CategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E3C0C29FEC053001C252E /* CategoryViewModel.swift */; };
 		F97E3C0F29FEF905001C252E /* CreateTrackerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E3C0E29FEF905001C252E /* CreateTrackerViewModel.swift */; };
 		F97E8FD929E328B4002BB0C8 /* UITableView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97E8FD829E328B4002BB0C8 /* UITableView+Extension.swift */; };
@@ -128,9 +128,9 @@
 		F97774EE29D4456100959E7C /* TrackerCollectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionHeader.swift; sourceTree = "<group>"; };
 		F97774F029D44CD800959E7C /* ChooseTrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseTrackerViewController.swift; sourceTree = "<group>"; };
 		F978FA972A2A610C002F415F /* SplashViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewModel.swift; sourceTree = "<group>"; };
+		F978FA9B2A2A6D69002F415F /* StoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreProtocol.swift; sourceTree = "<group>"; };
 		F97E3C0529FE7056001C252E /* CategoriesListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesListViewModel.swift; sourceTree = "<group>"; };
 		F97E3C0729FE72C2001C252E /* Observable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Observable.swift; sourceTree = "<group>"; };
-		F97E3C0929FEBC99001C252E /* Context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
 		F97E3C0C29FEC053001C252E /* CategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewModel.swift; sourceTree = "<group>"; };
 		F97E3C0E29FEF905001C252E /* CreateTrackerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTrackerViewModel.swift; sourceTree = "<group>"; };
 		F97E8FD829E328B4002BB0C8 /* UITableView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Extension.swift"; sourceTree = "<group>"; };
@@ -379,6 +379,24 @@
 			path = CreateNewTrackerFlow;
 			sourceTree = "<group>";
 		};
+		F978FA992A2A6308002F415F /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F978FA972A2A610C002F415F /* SplashViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		F978FA9A2A2A6312002F415F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F970EF0A2A0A6F4B00AAAA84 /* SplashViewController.swift */,
+				F970EF0C2A0A725D00AAAA84 /* OnboardingPageViewController.swift */,
+				F98235CE29FBD1E700B7CEEC /* OnboardingViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		F97E3C0B29FEC02E001C252E /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -420,10 +438,8 @@
 		F98235CD29FBD1CC00B7CEEC /* OnboardingFlow */ = {
 			isa = PBXGroup;
 			children = (
-				F970EF0A2A0A6F4B00AAAA84 /* SplashViewController.swift */,
-				F970EF0C2A0A725D00AAAA84 /* OnboardingPageViewController.swift */,
-				F98235CE29FBD1E700B7CEEC /* OnboardingViewController.swift */,
-				F978FA972A2A610C002F415F /* SplashViewModel.swift */,
+				F978FA9A2A2A6312002F415F /* View */,
+				F978FA992A2A6308002F415F /* ViewModel */,
 			);
 			path = OnboardingFlow;
 			sourceTree = "<group>";
@@ -431,12 +447,12 @@
 		F98840D529F13FB800422FD5 /* CoreDataStores */ = {
 			isa = PBXGroup;
 			children = (
+				F978FA9B2A2A6D69002F415F /* StoreProtocol.swift */,
 				F98840D629F1408B00422FD5 /* TrackerStore.swift */,
 				F98840D829F1409500422FD5 /* TrackerCategoryStore.swift */,
 				F98840DA29F140AC00422FD5 /* TrackerRecordStore.swift */,
 				F98840DE29F1699F00422FD5 /* DataProvider.swift */,
 				F9D87F5529F814A40085C483 /* PredicateBuilder.swift */,
-				F97E3C0929FEBC99001C252E /* Context.swift */,
 			);
 			path = CoreDataStores;
 			sourceTree = "<group>";
@@ -651,6 +667,7 @@
 				F97E3C0D29FEC053001C252E /* CategoryViewModel.swift in Sources */,
 				F970EFF12A0E974900AAAA84 /* LocalizedStrings.swift in Sources */,
 				F967CCC029E08C2F00E3C811 /* DataSource.swift in Sources */,
+				F978FA9C2A2A6D69002F415F /* StoreProtocol.swift in Sources */,
 				F97E3C0829FE72C2001C252E /* Observable.swift in Sources */,
 				F978FA982A2A610C002F415F /* SplashViewModel.swift in Sources */,
 				F97774B929D2EA6C00959E7C /* TrackerHeaderView.swift in Sources */,
@@ -686,7 +703,6 @@
 				F967CCF929E1C75F00E3C811 /* FrameViewController.swift in Sources */,
 				F97774B529D2DB5900959E7C /* StatisticViewController.swift in Sources */,
 				F946FB562A1938CB00579E93 /* AlertPresenter.swift in Sources */,
-				F97E3C0A29FEBC99001C252E /* Context.swift in Sources */,
 				F918018829CEECCB00767F16 /* SceneDelegate.swift in Sources */,
 				F97E8FE429E407E5002BB0C8 /* UICollectionView+Extension.swift in Sources */,
 				F9F1233029D897B60039D1B3 /* CreateTrackerViewController.swift in Sources */,
