@@ -118,9 +118,16 @@ final class CreateTrackerViewController: UIViewController {
                 self?.updateCollectionView(
                     emojiIndexPath: updateViewModel.emoji,
                     colorIndexPath: updateViewModel.color
-            )
-            self?.titleTextfield.set(text: updateViewModel.name)
-            self?.tableView.reloadSections(IndexSet(integer: .zero), with: .fade)
+                )
+                self?.titleTextfield.set(text: updateViewModel.name)                       
+        }
+        .store(in: &cancellables)
+        
+        viewModel.$updateTrackedDaysViewModel
+            .dropFirst()
+            .sink { [weak self] updateTrackedDaysViewModel in
+                guard let updateTrackedDaysViewModel else { return }
+                self?.updateTracked(days: updateTrackedDaysViewModel)
         }
         .store(in: &cancellables)
     }
@@ -142,6 +149,7 @@ final class CreateTrackerViewController: UIViewController {
         setupUI()
         setupLayout()
         viewModel?.updateUI()
+        handleDaysUpdatingViewActions()
     }
     
     override func viewWillLayoutSubviews() {
@@ -184,6 +192,16 @@ private extension CreateTrackerViewController {
     
     func setupUI() {
         mainScrollView.showsVerticalScrollIndicator = false
+    }
+    
+    func handleDaysUpdatingViewActions() {
+        daysUpdatingView.incrementClosure = { [weak self] in
+            self?.viewModel?.incrementButtonTapped()
+        }
+        
+        daysUpdatingView.decrementClosure = { [weak self] in
+            self?.viewModel?.decrementButtonTapped()
+        }
     }
     
     func setupLayout() {
@@ -264,6 +282,10 @@ private extension CreateTrackerViewController {
         selectedColorIndexPath = colorIndexPath
         collectionView.reloadItems(at: [emojiIndexPath])
         collectionView.reloadItems(at: [colorIndexPath])
+    }
+    
+    private func updateTracked(days: UpdateTrackedDaysViewModel) {
+        daysUpdatingView.configure(with: days)
     }
 }
 

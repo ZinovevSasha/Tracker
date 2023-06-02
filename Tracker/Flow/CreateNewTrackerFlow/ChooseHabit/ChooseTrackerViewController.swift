@@ -69,7 +69,7 @@ final class ChooseTrackerViewController: UIViewController {
     }
     
     private func pushCreateTrackerViewController(kind: Tracker.Kind) {
-        let viewModel = CreateTrackerViewModelImpl(trackerKind: kind, tracker: nil)
+        let viewModel = CreateTrackerViewModelImpl(trackerKind: kind, tracker: nil, date: nil)
         let vc = CreateTrackerViewController(viewModel: viewModel)
         navigationController?.pushViewController(vc, animated: true)
     }

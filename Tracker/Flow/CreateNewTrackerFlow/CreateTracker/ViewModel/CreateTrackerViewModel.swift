@@ -11,21 +11,22 @@ protocol CreateTrackerViewModelProtocol {
     func getHeaderName() -> String?
     
     // Data source
-    func addCategory(header: String)
-    func setSchedule(schedule: Set<Int>)
-    func numberOfItemsInSection(_ section: Int) -> Int
-    func getSection(_ indexPath: IndexPath) -> CollectionViewData
     var numberOfTableViewRows: Int { get }
     var numberOfCollectionSections: Int { get }
     var dataForTablView: [TableData] { get }
+    func numberOfItemsInSection(_ section: Int) -> Int
+    func getSection(_ indexPath: IndexPath) -> CollectionViewData
+    func addCategory(header: String)
+    func setSchedule(schedule: Set<Int>)
 }
 
 final class CreateTrackerViewModelImpl: ObservableObject {
     // Need to dismiss screen or show alert
-    @Published var isTrackersAddedToCoreData: Bool = false
+    @Published var isTrackersAddedToCoreData = false
     
     //  Property for updating a screen in eddit mode
     @Published var updateTrackerViewModel: UpdateTrackerViewModel?
+    @Published var updateTrackedDaysViewModel: UpdateTrackedDaysViewModel?
     
     // Properties for creating a new tracker
     @Published var name: String?
@@ -36,6 +37,7 @@ final class CreateTrackerViewModelImpl: ObservableObject {
     
     // MARK: - Dependencies
     private(set) var tracker: Tracker?
+    private let date: String?
     private var dataSource: DataSourceProtocol
     private let trackerKind: Tracker.Kind
     private let trackerManager: TrackerManagerProtocol
@@ -44,13 +46,16 @@ final class CreateTrackerViewModelImpl: ObservableObject {
     init(
         trackerKind: Tracker.Kind,
         tracker: Tracker?,
+        date: String?,
         dataSource: DataSourceProtocol = DataSourceImpl(),
         trackerManager: TrackerManagerProtocol = TrackerManagerImpl()
     ) {
         self.trackerKind = trackerKind
         self.tracker = tracker
+        self.date = date
         self.dataSource = dataSource
         self.trackerManager = trackerManager
+        
         // set schedule for ocasional tracker to all days for button disabling
         trackerKind == .ocasional ? schedule = WeekDay.allDaysOfWeek : nil
         if let categoryHeader = getHeaderName() {
@@ -70,19 +75,22 @@ final class CreateTrackerViewModelImpl: ObservableObject {
     }
     
     var isShakingButton: Bool {
-       shouldShakeButton()
+        shouldShakeButton()
     }
     
     // MARK: - Public Methods
     func updateUI() {
         if let id = tracker?.id,
+            let date = date,
             let name = tracker?.name,
             let emoji = tracker?.emoji,
             let color = tracker?.color,
             let schedule = tracker?.schedule,
             let colorIndexPath = dataSource.indexPath(forColor: color),
             let emojiIndexPath = dataSource.indexPath(forEmoji: emoji),
-            let categoryHeader = trackerManager.getCategoryNameFor(trackerID: id) {
+            let categoryHeader = trackerManager.getCategoryNameFor(trackerID: id),
+            let trackedDays = trackerManager.getTrackedDaysNumberFor(id: id),
+            let isTrackedTracker = trackerManager.isCompletedFor(date: date, trackerWithId: id) {
             
             // add data to data source to update tableView
             dataSource.addCategoryHeader(categoryHeader)
@@ -100,6 +108,28 @@ final class CreateTrackerViewModelImpl: ObservableObject {
                 name: name,
                 emoji: emojiIndexPath,
                 color: colorIndexPath)
+            
+            updateTrackedDaysViewModel = UpdateTrackedDaysViewModel(
+                trackedDays: Localized.Main.numberOf(days: trackedDays),
+                isTrackedForToday: isTrackedTracker)
+        }
+    }
+    
+    func incrementButtonTapped() {
+        do {
+            try trackerManager.markAsTrackedFor(date: date, trackerWithId: tracker?.id)
+            getDataForUpdateTrackedDaysViewModel()
+        } catch {
+            
+        }
+    }
+    
+    func decrementButtonTapped() {
+        do {
+            try trackerManager.markAsTrackedFor(date: date, trackerWithId: tracker?.id)
+            getDataForUpdateTrackedDaysViewModel()
+        } catch {
+            
         }
     }
     
@@ -109,6 +139,7 @@ final class CreateTrackerViewModelImpl: ObservableObject {
             switch tracker.kind {
             case .habit:
                 do {
+                    trackerManager.removeTrackerWith(id: tracker.id)
                     try trackerManager.updateTracker(kind: .habit, id: tracker.id, name: name, emoji: emoji, color: color, schedule: schedule, categoryHeader: categoryHeader)
                     isTrackersAddedToCoreData = true
                 } catch {
@@ -116,7 +147,8 @@ final class CreateTrackerViewModelImpl: ObservableObject {
                 }
             case .ocasional:
                 do {
-                    try trackerManager.updateTracker(kind: .habit, id: tracker.id, name: name, emoji: emoji, color: color, schedule: schedule, categoryHeader: categoryHeader)
+                    trackerManager.removeTrackerWith(id: tracker.id)
+                    try trackerManager.updateTracker(kind: .ocasional, id: tracker.id, name: name, emoji: emoji, color: color, schedule: schedule, categoryHeader: categoryHeader)
                     isTrackersAddedToCoreData = true
                 } catch {
                     print(error.localizedDescription)
@@ -135,7 +167,7 @@ final class CreateTrackerViewModelImpl: ObservableObject {
             case .ocasional:
                 do {
                     // for ocasional tracker we set all days of week
-                    let shcedule = WeekDay.allDaysOfWeek
+                    let schedule = WeekDay.allDaysOfWeek
                     
                     try trackerManager.createTracker(kind: .ocasional, name: name, emoji: emoji, color: color, schedule: schedule, categoryHeader: categoryHeader)
                     isTrackersAddedToCoreData = true
@@ -180,7 +212,11 @@ extension CreateTrackerViewModelImpl {
     }
     
     func getHeaderName() -> String? {
-        trackerManager.getHeaderName()
+        if let tracker {
+            return trackerManager.getCategoryNameFor(trackerID: tracker.id)
+        } else {
+            return trackerManager.getHeaderName()
+        }
     }
 }
 
@@ -192,19 +228,19 @@ private extension CreateTrackerViewModelImpl {
     
     func isTrackerValid(args: Args) -> Bool {
         guard let name = args.0.0,
-              let emoji = args.0.1,
-              let color = args.0.2,
-              let schedule = args.1.0,
-              let categeryHeader = args.1.1
+            let emoji = args.0.1,
+            let color = args.0.2,
+            let schedule = args.1.0,
+            let categeryHeader = args.1.1
         else {
             return false
         }
         
         return !name.isEmpty &&
-               !emoji.isEmpty &&
-               !color.isEmpty &&
-               !schedule.isEmpty &&
-               !categeryHeader.isEmpty
+            !emoji.isEmpty &&
+            !color.isEmpty &&
+            !schedule.isEmpty &&
+            !categeryHeader.isEmpty
     }
     
     func setPublisherValues(name: String, emoji: String, color: String, schedule: Set<Int>, categeryHeader: String) {
@@ -214,12 +250,26 @@ private extension CreateTrackerViewModelImpl {
         self.emoji = emoji
         self.categoryHeader = categeryHeader
     }
+    
+    func getDataForUpdateTrackedDaysViewModel() {
+        guard let tracker = tracker, let date = date else { return }
+        if let trackedDays = trackerManager.getTrackedDaysNumberFor(id: tracker.id), let isCompleted = trackerManager.isCompletedFor(date: date, trackerWithId: tracker.id) {
+            updateTrackedDaysViewModel = UpdateTrackedDaysViewModel(
+                trackedDays: Localized.Main.numberOf(days: trackedDays),
+                isTrackedForToday: isCompleted)
+        }
+    }
 }
 
 struct UpdateTrackerViewModel {
-    var name: String
-    var emoji: IndexPath
-    var color: IndexPath
+    let name: String
+    let emoji: IndexPath
+    let color: IndexPath
+}
+
+struct UpdateTrackedDaysViewModel {
+    let trackedDays: String
+    let isTrackedForToday: Bool
 }
 
 typealias Args = (

@@ -6,6 +6,10 @@ protocol TrackerManagerProtocol {
     func getCategoryNameFor(trackerID: String) -> String?
     func getTrackerBy(id: String) -> TrackerCoreData?
     func getHeaderName() -> String?
+    func getTrackedDaysNumberFor(id: String) -> Int?
+    func isCompletedFor(date: String, trackerWithId id: String) -> Bool?
+    func markAsTrackedFor(date: String?, trackerWithId id: String?) throws
+    func removeTrackerWith(id: String)
 }
 
 struct TrackerManagerImpl: TrackerManagerProtocol {
@@ -18,9 +22,17 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
         }
     }()
     
-    private var trackerStore: TrackerStore? = {
+    private var trackerStore: TrackerStoreImpl? = {
         do {
-            return try TrackerStore()
+            return try TrackerStoreImpl()
+        } catch {
+            return nil
+        }
+    }()
+    
+    private var trackerRecordStore: TrackerRecordStore? = {
+        do {
+            return try TrackerRecordStore()
         } catch {
             return nil
         }
@@ -48,6 +60,12 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
         }
     }
     
+    func removeTrackerWith(id: String) {
+        if let trackerCoreData = trackerStore?.getTrackerBy(id: id) {
+            try? trackerCategoryStore?.removeTrackerFromCategory(withName: trackerCoreData.category?.header, tracker: trackerCoreData)
+        }
+    }
+    
     func updateTracker(kind: Tracker.Kind, id: String?, name: String?, emoji: String?, color: String?, schedule: Set<Int>?, categoryHeader: String?) throws {
         guard let id = id,
               let name = name,
@@ -64,7 +82,10 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
             schedule: schedule,
             kind: kind
         )
-        try trackerStore?.save(tracker: tracker, categoryHeader: categoryHeader)
+               
+        if let trackerCoreData = try trackerStore?.update(tracker: tracker) {
+            try trackerCategoryStore?.addTracker(toCategoryWithName: categoryHeader, tracker: trackerCoreData)
+        }
     }
     
     func getCategoryNameFor(trackerID: String) -> String? {
@@ -77,5 +98,19 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
     
     func getHeaderName() -> String? {
         trackerCategoryStore?.getNameOfLastSelectedCategory()
+    }
+    
+    func getTrackedDaysNumberFor(id: String) -> Int? {
+        trackerStore?.getTrackedDaysNumberFor(id: id)
+    }
+    
+    func isCompletedFor(date: String, trackerWithId id: String) -> Bool? {
+        try? trackerRecordStore?.isCompletedFor(date, trackerWithId: id)
+    }
+    
+    func markAsTrackedFor(date: String?, trackerWithId id: String?) throws {
+        if let id, let date, let tracker = trackerStore?.getTrackerBy(id: id) {
+            try trackerRecordStore?.removeTrackerOrAdd(tracker, forParticularDay: date)
+        }
     }
 }

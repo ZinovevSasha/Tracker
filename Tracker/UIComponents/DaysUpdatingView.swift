@@ -13,9 +13,13 @@ protocol DaysUpdatingViewProtocol {
 }
 
 final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
-    
     var incrementClosure: (() -> Void)?
     var decrementClosure: (() -> Void)?
+    
+    func configure(with viewModel: UpdateTrackedDaysViewModel) {
+        daysCountLabel.text = viewModel.trackedDays
+        updateButtonsStyle(isTrackedForToday: !viewModel.isTrackedForToday)
+    }
     
     private let horizontalStackView: UIStackView = {
         let view = UIStackView()
@@ -40,8 +44,7 @@ final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
     
     private let daysCountLabel: UILabel = {
         let view = UILabel()
-        view.font = .bold32
-        view.text = "5 daysfaf"
+        view.font = .bold32        
         return view
     }()
     
@@ -90,5 +93,21 @@ private extension DaysUpdaitingView {
     func setTargets() {
         incrementButton.addTarget(self, action: #selector(incrementButtonTapped), for: .touchUpInside)
         decrementButton.addTarget(self, action: #selector(decrementButtonTapped), for: .touchUpInside)
+    }
+    
+    func updateButtonsStyle(isTrackedForToday: Bool) {
+        if isTrackedForToday {
+            decrementButton.alpha = 0.5
+            decrementButton.isEnabled = false
+            
+            incrementButton.alpha = 1
+            incrementButton.isEnabled = true
+        } else {
+            decrementButton.alpha = 1
+            decrementButton.isEnabled = true
+            
+            incrementButton.alpha = 0.5
+            incrementButton.isEnabled = false
+        }
     }
 }
