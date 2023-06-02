@@ -1,18 +1,11 @@
 import CoreData
 
 protocol TrackerStoreProtocol {
-    func deleteTrackerWith(id: String) throws
-    func pinTrackerWith(id: String)
-    func unPinTrackerWith(id: String)
-    
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData
-    func getCategoryHeaderForTrackerWith(id: String) -> String?
-    func getTrackerBy(id: String) -> TrackerCoreData?
-    func save(tracker: Tracker, categoryHeader: String) throws
-    func getTrackedDaysNumberFor(id: String) -> Int?
+    func delete(_ record: TrackerCoreData) throws
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData   
 }
 
-final class TrackerStoreImpl {
+final class TrackerStore {
     private let context: NSManagedObjectContext
     private var predicateBuilder: PredicateBuilder<TrackerCoreData>
     
@@ -30,26 +23,10 @@ final class TrackerStoreImpl {
 }
 
 // MARK: - Public
-extension TrackerStoreImpl: TrackerStoreProtocol {
-    func deleteTrackerWith(id: String) throws {
-        if let tracker = getTrackerBy(id: id) {
-            context.delete(tracker)
-            saveContext()
-        }
-    }
-    
-    func pinTrackerWith(id: String) {
-        if let tracker = getTrackerBy(id: id) {
-            tracker.isPinned = true
-            saveContext()
-        }
-    }
-    
-    func unPinTrackerWith(id: String) {
-        if let tracker = getTrackerBy(id: id) {
-            tracker.isPinned = false
-            saveContext()
-        }
+extension TrackerStore: TrackerStoreProtocol {
+    func delete(_ record: TrackerCoreData) throws {
+        context.delete(record)
+        saveContext()
     }
     
     func createTrackerCoreData(_ tracker: Tracker) -> TrackerCoreData {
@@ -62,8 +39,8 @@ extension TrackerStoreImpl: TrackerStoreProtocol {
         fetchRequest.predicate = predicateBuilder
             .addPredicate(.equalTo, keyPath: \.id, value: id)
             .build()
-        let trackerCoreData = try? context.fetch(fetchRequest).first
-        return trackerCoreData?.category?.header
+        let trackerCoreData = try? context.fetch(fetchRequest).first        
+        return trackerCoreData?.lastCategory ?? trackerCoreData?.category?.header
     }
     
     func getTrackerBy(id: String) -> TrackerCoreData? {
@@ -72,26 +49,6 @@ extension TrackerStoreImpl: TrackerStoreProtocol {
             .addPredicate(.equalTo, keyPath: \.id, value: id).build()
         let trackerCoreData = try? context.fetch(fetchRequest).first
         return trackerCoreData
-    }
-    
-    func update(tracker: Tracker) throws -> TrackerCoreData? {
-        let fetchRequest = TrackerCoreData.fetchRequest()
-        fetchRequest.predicate = predicateBuilder
-            .addPredicate(.equalTo, keyPath: \.id, value: tracker.id).build()
-        if let trackerCoreData = try context.fetch(fetchRequest).first {
-            return updateCoreData(trackerCoreData: trackerCoreData, with: tracker)
-        } else {
-            return nil
-        }
-    }
-    
-    func save(tracker: Tracker, categoryHeader: String) throws {
-        let fetchRequest = TrackerCoreData.fetchRequest()
-        fetchRequest.predicate = predicateBuilder
-            .addPredicate(.equalTo, keyPath: \.id, value: tracker.id).build()
-        if let trackerCoreData = try context.fetch(fetchRequest).first {
-            updateCoreData(trackerCoreData: trackerCoreData, with: tracker)
-        }
     }
     
     func getTrackedDaysNumberFor(id: String) -> Int? {
@@ -104,10 +61,22 @@ extension TrackerStoreImpl: TrackerStoreProtocol {
             return nil
         }
     }
+    
+    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCoreData) throws {
+        if let trackerCoreData = getTrackerBy(id: tracker.id) {
+            updateCoreData(tracker: trackerCoreData, with: tracker)
+            if trackerCoreData.lastCategory != nil {
+                trackerCoreData.lastCategory = category.header
+            } else {
+                trackerCoreData.category = category
+            }
+            saveContext()
+        }
+    }
 }
 
 // MARK: - Private
-private extension TrackerStoreImpl {
+private extension TrackerStore {
     func saveContext() {
         do {
             try context.save()
@@ -115,15 +84,15 @@ private extension TrackerStoreImpl {
             print("Error saving context: \(error.localizedDescription)")
         }
     }
-    
-    func updateCoreData(trackerCoreData: TrackerCoreData, with newTracker: Tracker) -> TrackerCoreData {
-        
-        trackerCoreData.id = newTracker.id
-        trackerCoreData.name = newTracker.name
-        trackerCoreData.schedule = newTracker.schedule.toNumbersString()
-        trackerCoreData.emoji = newTracker.emoji
-        trackerCoreData.color = newTracker.color
-        return trackerCoreData
+       
+    func updateCoreData(tracker: TrackerCoreData, with newTracker: Tracker) {
+        tracker.id = newTracker.id
+        tracker.name = newTracker.name
+        tracker.schedule = newTracker.schedule.toNumbersString()
+        tracker.emoji = newTracker.emoji
+        tracker.color = newTracker.color
+        tracker.type = newTracker.kind.rawValue
+        tracker.isAttached = newTracker.isAttached
     }
 }
 
@@ -143,7 +112,7 @@ extension TrackerCoreData {
         self.emoji = tracker.emoji
         self.color = tracker.color
         self.schedule = tracker.schedule.toNumbersString()
-        self.isPinned = tracker.isPinned
+        self.isAttached = tracker.isAttached
         self.type = tracker.kind.rawValue
     }
     
@@ -170,6 +139,6 @@ extension TrackerCoreData {
         return Tracker(
             id: id, name: name, emoji: emoji,
             color: color, schedule: scheduleSet,
-            isPinned: self.isPinned, kind: trackertype)
+            isAttached: self.isAttached, kind: trackertype)
     }
 }

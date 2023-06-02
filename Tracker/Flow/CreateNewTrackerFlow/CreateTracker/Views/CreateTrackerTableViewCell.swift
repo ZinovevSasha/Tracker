@@ -8,7 +8,6 @@ final class CreateTrackerTableViewCell: UITableViewCell {
         subtitleLabelName.text = info.subtitle
     }
 
-    
     // MARK: - Private properties
     private let accessoryImageView: UIImageView = {
         let view = UIImageView()

@@ -49,6 +49,17 @@ final class CreateTrackerViewController: UIViewController {
         view.register(cellClass: CreateTrackerCollectionColorCell.self)
         return view
     }()
+    // Collection view setup
+    let params = GeometryParams(
+        cellCount: 6,
+        cellSize: CGSize(width: 40, height: 40),
+        leftInset: 16,
+        rightInset: 16,
+        topInset: 24,
+        bottomInset: 24,
+        spacing: 0
+    )
+    
     private let cancelButton = ActionButton(colorType: .red, title: Localized.NewHabit.cancel)
     // Button that is changing depending on how the data is filled
     private let createButton = ActionButton(colorType: .grey, title: Localized.NewHabit.create)
@@ -63,21 +74,12 @@ final class CreateTrackerViewController: UIViewController {
     }()
     private let container = UIView()
     private let mainScrollView = UIScrollView()
-        
-    // Collection view setup   
-    let params = GeometryParams(
-        cellCount: 6,
-        cellSize: CGSize(width: 40, height: 40),
-        leftInset: 16,
-        rightInset: 16,
-        topInset: 24,
-        bottomInset: 24,
-        spacing: 0
-    )
-    
+            
+    // MARK: - Dependencies
     private var cancellables = Set<AnyCancellable>()
     private var viewModel: CreateTrackerViewModelImpl?
     
+    // MARK: - Init
     init(viewModel: CreateTrackerViewModelImpl? = nil) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -105,7 +107,12 @@ final class CreateTrackerViewController: UIViewController {
         viewModel.$isTrackersAddedToCoreData
             .sink { [weak self] isAdded in
                 if isAdded {
-                    self?.dismiss(animated: true)
+                    guard let presentingVC = self?.presentingViewController else {
+                        return
+                    }
+                    self?.dismiss(animated: false) {
+                        presentingVC.dismiss(animated: true, completion: nil)
+                    }
                 }
             }
             .store(in: &cancellables)
@@ -118,8 +125,8 @@ final class CreateTrackerViewController: UIViewController {
                 self?.updateCollectionView(
                     emojiIndexPath: updateViewModel.emoji,
                     colorIndexPath: updateViewModel.color
-                )
-                self?.titleTextfield.set(text: updateViewModel.name)                       
+            )
+            self?.titleTextfield.set(text: updateViewModel.name)           
         }
         .store(in: &cancellables)
         
@@ -171,6 +178,16 @@ final class CreateTrackerViewController: UIViewController {
             createButton.shakeSelf()
         }
     }
+    
+    func handleDaysUpdatingViewActions() {
+        daysUpdatingView.incrementClosure = { [weak self] in
+            self?.viewModel?.incrementButtonTapped()
+        }
+        
+        daysUpdatingView.decrementClosure = { [weak self] in
+            self?.viewModel?.decrementButtonTapped()
+        }
+    }
 }
 
 // MARK: - Private methods
@@ -192,16 +209,6 @@ private extension CreateTrackerViewController {
     
     func setupUI() {
         mainScrollView.showsVerticalScrollIndicator = false
-    }
-    
-    func handleDaysUpdatingViewActions() {
-        daysUpdatingView.incrementClosure = { [weak self] in
-            self?.viewModel?.incrementButtonTapped()
-        }
-        
-        daysUpdatingView.decrementClosure = { [weak self] in
-            self?.viewModel?.decrementButtonTapped()
-        }
     }
     
     func setupLayout() {
