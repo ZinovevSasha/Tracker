@@ -1,10 +1,10 @@
 import CoreData
 
 protocol TrackerRecordStoreProtocol {
-    func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int
-    func removeTrackerRecordOrAdd(_ record: TrackerCoreData, with day: String) throws
-    func isTrackerCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool
-    func isTrackerCompletedFor(selectedDay: String, _ tracker: TrackerCoreData) throws -> Bool
+    func getTrackedDaysNumberForTrackerWith(id: String) throws -> Int
+    func removeTrackerOrAdd(_ record: TrackerCoreData, forParticularDay day: String) throws
+    func isCompletedForToday(trackerWithId id: String?) throws -> Bool
+    func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool
 }
 
 final class TrackerRecordStore {
@@ -14,39 +14,44 @@ final class TrackerRecordStore {
     init(context: NSManagedObjectContext) {
         self.context = context
     }
+    
+    convenience init() throws {
+        let context = try Context.getContext()
+        self.init(context: context)
+    }
 }
 
 // MARK: - Public
 extension TrackerRecordStore: TrackerRecordStoreProtocol {
-    func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int {
+    func getTrackedDaysNumberForTrackerWith(id: String) throws -> Int {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
         fetchRequest.predicate = predicate
-            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "").build()
+            .addPredicate(.equalTo, keyPath: \.recordId, value: id).build()
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.count
     }
     
-    func isTrackerCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool {
+    func isCompletedForToday(trackerWithId id: String?) throws -> Bool {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
         fetchRequest.predicate = predicate
-            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "")
+            .addPredicate(.equalTo, keyPath: \.recordId, value: id ?? "")
             .addPredicate(.equalTo, keyPath: \.date, value: Date.dateString(for: Date()))
             .build(type: .and)
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.first != nil ? true : false
     }
 
-    func isTrackerCompletedFor(selectedDay: String, _ tracker: TrackerCoreData) throws -> Bool {
+    func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
         fetchRequest.predicate = predicate
-            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "")
+            .addPredicate(.equalTo, keyPath: \.recordId, value: id ?? "")
             .addPredicate(.equalTo, keyPath: \.date, value: selectedDay)
             .build(type: .and)
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.first != nil ? true : false
     }
     
-    func removeTrackerRecordOrAdd(_ record: TrackerCoreData, with day: String) throws {
+    func removeTrackerOrAdd(_ record: TrackerCoreData, forParticularDay day: String) throws {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
         let trackerRecordCoreData = try context.fetch(fetchRequest)
         

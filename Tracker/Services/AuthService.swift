@@ -18,12 +18,19 @@ final class AuthService {
         case isLogin
     }
     
-    var isLogin: Bool {
+    var isLoggedIn: Bool {
         get {
             userDefaults.bool(forKey: Key.isLogin.rawValue)
         }
         set {
             userDefaults.set(newValue, forKey: Key.isLogin.rawValue)
+        }
+    }
+    
+    func login(completion: @escaping (Bool) -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            self.isLoggedIn = true
+            completion(true)
         }
     }
 }

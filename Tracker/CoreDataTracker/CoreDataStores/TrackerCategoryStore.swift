@@ -2,9 +2,7 @@ import CoreData
 
 protocol TrackerCategoryStoreProtocol {
     func addTracker(toCategoryWithName name: String, tracker: TrackerCoreData) throws
-    func getAllCategories() -> [TrackerCategory]
-    func putToAttachedCategory(tracker: TrackerCoreData)
-    func putBackToOriginalCategory(tracker: TrackerCoreData)
+    func getAllCategories() -> [TrackerCategory]    
 }
 
 final class TrackerCategoryStore {
@@ -25,8 +23,11 @@ final class TrackerCategoryStore {
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func addTracker(toCategoryWithName name: String, tracker: TrackerCoreData) throws {
         // Fetch all existing categories with the same name
-        let categories = try fetchTrackerCategories(context: context) {
-            self.predicateBuilder.addPredicate(.equalTo, keyPath: \.header, value: name).build()
+        let categories = try fetchTrackerCategories(context: context) { [weak self] in
+            guard let self = self else {
+                return NSPredicate()
+            }
+            return self.predicateBuilder.addPredicate(.equalTo, keyPath: \.header, value: name).build()
         }
         
         if let category = categories.first {
@@ -37,6 +38,17 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             let category = TrackerCategoryCoreData(context: context)
             category.header = name
             category.addToTrackers(tracker)
+        }
+        saveContext()
+    }
+    
+    func removeTrackerFromCategory(withName name: String?, tracker: TrackerCoreData) throws {
+        guard let name = name else { return }
+        let categories = try fetchTrackerCategories(context: context) {
+            self.predicateBuilder.addPredicate(.equalTo, keyPath: \.header, value: name).build()
+        }
+        if let category = categories.first {
+            category.removeFromTrackers(tracker)
         }
         saveContext()
     }
@@ -112,29 +124,27 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         }
         return nil
     }
-    
-    func putToAttachedCategory(tracker: TrackerCoreData) {
-        tracker.isAttached = true
-        tracker.lastCategory = tracker.category?.header
-        try? addTracker(toCategoryWithName: "Attached", tracker: tracker)
-    }
-    
-    func putBackToOriginalCategory(tracker: TrackerCoreData) {
-        guard let lastCategory = tracker.lastCategory else { return }
-        tracker.isAttached = false
-        tracker.lastCategory = nil
-        try? addTracker(toCategoryWithName: lastCategory, tracker: tracker)
-    }
 }
 
 // MARK: - Private
 private extension TrackerCategoryStore {
     func convertToTrackerCategory(_ category: TrackerCategoryCoreData) throws -> TrackerCategory {
-        return TrackerCategory(
-            header: category.header ?? "",
-            trackers: [],
-            isLastSelected: category.isLastSelected
-        )
+        if let trackersCoreData = category.trackers?.allObjects as? [TrackerCoreData] {
+            let trackers = try trackersCoreData.map { try $0.tracker() }
+            return TrackerCategory(
+                header: category.header ?? "",
+                trackers: trackers,
+                isLastSelected: category.isLastSelected
+            )
+        } else {
+            return TrackerCategory(
+                header: category.header ?? "",
+                trackers: [],
+                isLastSelected: category.isLastSelected
+            )
+        }
+        
+        
     }
     
     func fetchTrackerCategories(

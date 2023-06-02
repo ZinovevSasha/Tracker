@@ -1,11 +1,18 @@
 import CoreData
 
 protocol TrackerStoreProtocol {
-    func delete(_ record: TrackerCoreData) throws
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData   
+    func deleteTrackerWith(id: String) throws
+    func pinTrackerWith(id: String)
+    func unPinTrackerWith(id: String)
+    
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData
+    func getCategoryHeaderForTrackerWith(id: String) -> String?
+    func getTrackerBy(id: String) -> TrackerCoreData?
+    func save(tracker: Tracker, categoryHeader: String) throws
+    func getTrackedDaysNumberFor(id: String) -> Int?
 }
 
-final class TrackerStore {
+final class TrackerStoreImpl {
     private let context: NSManagedObjectContext
     private var predicateBuilder: PredicateBuilder<TrackerCoreData>
     
@@ -23,10 +30,26 @@ final class TrackerStore {
 }
 
 // MARK: - Public
-extension TrackerStore: TrackerStoreProtocol {
-    func delete(_ record: TrackerCoreData) throws {
-        context.delete(record)
-        saveContext()
+extension TrackerStoreImpl: TrackerStoreProtocol {
+    func deleteTrackerWith(id: String) throws {
+        if let tracker = getTrackerBy(id: id) {
+            context.delete(tracker)
+            saveContext()
+        }
+    }
+    
+    func pinTrackerWith(id: String) {
+        if let tracker = getTrackerBy(id: id) {
+            tracker.isPinned = true
+            saveContext()
+        }
+    }
+    
+    func unPinTrackerWith(id: String) {
+        if let tracker = getTrackerBy(id: id) {
+            tracker.isPinned = false
+            saveContext()
+        }
     }
     
     func createTrackerCoreData(_ tracker: Tracker) -> TrackerCoreData {
@@ -51,18 +74,40 @@ extension TrackerStore: TrackerStoreProtocol {
         return trackerCoreData
     }
     
+    func update(tracker: Tracker) throws -> TrackerCoreData? {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.id, value: tracker.id).build()
+        if let trackerCoreData = try context.fetch(fetchRequest).first {
+            return updateCoreData(trackerCoreData: trackerCoreData, with: tracker)
+        } else {
+            return nil
+        }
+    }
+    
     func save(tracker: Tracker, categoryHeader: String) throws {
         let fetchRequest = TrackerCoreData.fetchRequest()
         fetchRequest.predicate = predicateBuilder
             .addPredicate(.equalTo, keyPath: \.id, value: tracker.id).build()
         if let trackerCoreData = try context.fetch(fetchRequest).first {
-            updateCoreData(tracker: trackerCoreData, with: tracker, categoryHeader: categoryHeader)
+            updateCoreData(trackerCoreData: trackerCoreData, with: tracker)
+        }
+    }
+    
+    func getTrackedDaysNumberFor(id: String) -> Int? {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.id, value: id).build()
+        if let trackerCoreData = try? context.fetch(fetchRequest).first {
+            return trackerCoreData.trackerRecord?.count
+        } else {
+            return nil
         }
     }
 }
 
 // MARK: - Private
-private extension TrackerStore {
+private extension TrackerStoreImpl {
     func saveContext() {
         do {
             try context.save()
@@ -71,14 +116,14 @@ private extension TrackerStore {
         }
     }
     
-    func updateCoreData(tracker: TrackerCoreData, with newTracker: Tracker, categoryHeader: String) {
-        tracker.id = newTracker.id
-        tracker.name = newTracker.name
-        tracker.category?.header = categoryHeader
-        tracker.schedule = newTracker.schedule.toNumbersString()
-        tracker.emoji = newTracker.emoji
-        tracker.color = newTracker.color
-        saveContext()
+    func updateCoreData(trackerCoreData: TrackerCoreData, with newTracker: Tracker) -> TrackerCoreData {
+        
+        trackerCoreData.id = newTracker.id
+        trackerCoreData.name = newTracker.name
+        trackerCoreData.schedule = newTracker.schedule.toNumbersString()
+        trackerCoreData.emoji = newTracker.emoji
+        trackerCoreData.color = newTracker.color
+        return trackerCoreData
     }
 }
 
@@ -98,7 +143,7 @@ extension TrackerCoreData {
         self.emoji = tracker.emoji
         self.color = tracker.color
         self.schedule = tracker.schedule.toNumbersString()
-        self.isAttached = tracker.isAttached
+        self.isPinned = tracker.isPinned
         self.type = tracker.kind.rawValue
     }
     
@@ -125,6 +170,6 @@ extension TrackerCoreData {
         return Tracker(
             id: id, name: name, emoji: emoji,
             color: color, schedule: scheduleSet,
-            isAttached: self.isAttached, kind: trackertype)
+            isPinned: self.isPinned, kind: trackertype)
     }
 }

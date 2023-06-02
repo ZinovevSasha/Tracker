@@ -1,6 +1,7 @@
 import UIKit
 
 final class OnboardingViewController: UIViewController {
+            
     // MARK: - Private properties
     private let imageView = UIImageView()
     private let greetingLabel: UILabel = {
@@ -12,7 +13,7 @@ final class OnboardingViewController: UIViewController {
         greetingLabel.lineBreakMode = .byWordWrapping
         return greetingLabel
     }()
-    
+
     // MARK: - Init
     init(image: UIImage?, greetingText: String) {
         self.imageView.image = image
@@ -37,7 +38,7 @@ final class OnboardingViewController: UIViewController {
 private extension OnboardingViewController {
     func setupLayout() {
         view.addSubviews(imageView, greetingLabel)
-        
+    
         NSLayoutConstraint.activate([
             greetingLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .leadingInset),
             greetingLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: .trailingInset),

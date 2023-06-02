@@ -1,9 +1,11 @@
 import UIKit
+import Combine
 
 final class TrackersViewController: UIViewController {
     // MARK: - Private properties
     private let headerView = TrackerHeaderView()
     private let searchView = SearchView()
+    let placeholderView = PlaceholderView(state: .question)
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -13,8 +15,18 @@ final class TrackersViewController: UIViewController {
         view.register(cellClass: TrackerCollectionViewCell.self)
         return view
     }()
-    let placeholderView = PlaceholderView(state: .question)
-            
+
+    // Layout of collection helper
+    private let params = GeometryParams(
+        cellCount: UIConstants.cellCount,
+        cellSize: .zero,
+        leftInset: UIConstants.inset,
+        rightInset: UIConstants.inset,
+        topInset: .zero,
+        bottomInset: .zero,
+        spacing: UIConstants.cellSpacing
+    )
+    
     // MARK: - UIConstants
     private enum UIConstants {
         static let trackerHeaderHeight: CGFloat = 30
@@ -31,36 +43,34 @@ final class TrackersViewController: UIViewController {
         static let cellCount = 2
     }
     
-    // MARK: - Models
-    private lazy var dataProvider: DataProviderProtocol? = {
-        do {
-            return try DataProvider(delegate: self)
-        } catch {
-            print("Данные недоступны")
-            return nil
-        }
-    }()
+    // MARK: - Dependencies
+    private let viewModel: TrackerViewModel
+    private var cancellables = Set<AnyCancellable>()
+    private var alertPresenter: AlertPresenter?
     
-    lazy var alertPresenter = AlertPresenter(presentingViewController: self)
     
-    private var currentDay = Date()
-    private var weekDayNumber: String {
-        String(Date.currentWeekDayNumber(from: currentDay))
-    }
-    private var dateString: String {
-        Date.dateString(for: currentDay)
+    
+    // MARK: - Init
+    init(
+        viewModel: TrackerViewModel
+    ) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+        alertPresenter = AlertPresenter(presentingViewController: self)
+        bind()
     }
     
-    // Layout of collection helper
-    private let params = GeometryParams(
-        cellCount: UIConstants.cellCount,
-        cellSize: .zero,
-        leftInset: UIConstants.inset,
-        rightInset: UIConstants.inset,
-        topInset: .zero,
-        bottomInset: .zero,
-        spacing: UIConstants.cellSpacing
-    )
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func bind() {
+        viewModel.$update
+            .dropFirst()
+            .sink { [weak self] update in
+                self?.updateUI(batchUpdates: update)
+            }.store(in: &cancellables)
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -68,15 +78,14 @@ final class TrackersViewController: UIViewController {
         setupUI()
         setDelegates()
         setupLayout()
+        collectionView.reloadData()
+        collectionView.layoutIfNeeded()
+        viewModel.loadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let isEmpty = dataProvider?.isEmpty, isEmpty {
-            placeholderView.state = .question
-        } else {
-            placeholderView.state = .invisible(animate: false)
-        }
+        
     }
     
     // MARK: - @objc target action methods
@@ -151,25 +160,55 @@ private extension TrackersViewController {
             placeholderView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
         ])
     }
+    
+    func updateUI(batchUpdates: BatchUpdates?) {
+        guard let batchUpdates else { return }        
+        collectionView.performBatchUpdates({
+            // sections update
+            for section in batchUpdates.deleteSections {
+                collectionView.deleteSections(IndexSet(integer: section))
+            }
+            for (fromIndex, toIndex) in batchUpdates.moveSections {
+                collectionView.moveSection(fromIndex, toSection: toIndex)
+            }
+            for section in batchUpdates.insertSections {
+                collectionView.insertSections(IndexSet(integer: section))
+            }
+            for section in batchUpdates.updateSections {
+                collectionView.reloadSections(IndexSet(integer: section))
+            }
+           
+            // items update
+            for (section, indexPaths) in batchUpdates.deleteItems {
+                collectionView.deleteItems(at: indexPaths.map { IndexPath(item: $0, section: section) })
+            }
+            for (section, indexPaths) in batchUpdates.insertItems {
+                collectionView.insertItems(at: indexPaths.map { IndexPath(item: $0, section: section) })
+            }
+            for (section, indexPaths) in batchUpdates.updateItems {
+                collectionView.reloadItems(at: indexPaths.map { IndexPath(item: $0, section: section) })
+            }
+            for (fromIndexPath, toIndexPath) in batchUpdates.moveItems {
+                collectionView.moveItem(at: fromIndexPath, to: toIndexPath)
+            }
+        }, completion: nil)
+    }
 }
 
 // MARK: - UICollectionViewDataSource
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        dataProvider?.numberOfSections ?? .zero
+        viewModel.numberOfSections()
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        dataProvider?.numberOfRowsInSection(section) ?? .zero
+        viewModel.numberOfItemsInSection(section)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
-        let tracker = dataProvider?.getTracker(at: indexPath)
-        let daysTracked = dataProvider?.daysTracked(for: indexPath)
-        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: currentDay.todayString)
-        cell.configure(with: tracker)
-        cell.configure(with: daysTracked, isCompleted: isCompletedForToday)
+        let viewModel = viewModel.getTrackerCellViewModelFor(indexPath)
+        cell.configure(with: viewModel)
         cell.delegate = self
         return cell
     }
@@ -179,7 +218,8 @@ extension TrackersViewController: UICollectionViewDataSource {
             ofKind: UICollectionView.elementKindSectionHeader,
             for: indexPath
         )
-        header.configure(with: dataProvider?.header(for: indexPath.section) ?? "")
+        let headerName = viewModel.header(for: indexPath.section)
+        header.configure(with: headerName)
         return header
     }
     
@@ -214,127 +254,59 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - UICollectionViewDelegate
-extension TrackersViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        do {
-            try dataProvider?.deleteTracker(at: indexPath)
-        } catch {
-            print("🐳", error)
-        }
-    }
-}
-
 // MARK: - TrackerCollectionViewCellDelegate
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func didMarkTrackerCompleted(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        do {
-            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: dateString)
-        } catch {
-            print("⛈️", error)
-        }
+        viewModel.saveAsCompletedTrackerAt(indexPath: indexPath)
     }
     
     func didAttachTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        dataProvider?.attachTrackerAt(indexPath: indexPath)
+        viewModel.attachTrackerAt(indexPath: indexPath)
+       // viewModel.dataChanged()
     }
     
     func didUnattachTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        dataProvider?.unattachTrackerAt(indexPath: indexPath)        
+        viewModel.unattachTrackerAt(indexPath: indexPath)
+        //viewModel.dataChanged()
     }
     
     func didDeleteTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        alertPresenter.show(message: "Уверены что хотите удалить трекер?") { [weak self] in
-            try? self?.dataProvider?.deleteTracker(at: indexPath)
-        }        
+        alertPresenter?.show(message: "Уверены что хотите удалить трекер?") { [weak self] in
+            guard let self = self else { return }
+            self.viewModel.deleteTrackerAt(indexPath: indexPath)
+        }
     }
     
     func didUpdateTracker(for cell: TrackerCollectionViewCell) {
-        guard let indexPath = collectionView.indexPath(for: cell),
-            let tracker = dataProvider?.getTracker(at: indexPath) else { return }
-        
-        let updateTrackerViewModel = CreateTrackerViewModelImpl(trackerKind: tracker.kind, tracker: tracker)
-        
-        let updateTrackerViewController = CreateTrackerViewController(viewModel: updateTrackerViewModel)
-        
-        present(updateTrackerViewController, animated: true)        
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        if let tracker = viewModel.getTrackerAt(indexPath: indexPath) {
+            let updateTrackerViewModel = CreateTrackerViewModelImpl(
+                trackerKind: tracker.kind,
+                tracker: tracker,
+                date: viewModel.currentDateString
+            )
+            let updateTrackerViewController = CreateTrackerViewController(viewModel: updateTrackerViewModel)
+            
+            present(updateTrackerViewController, animated: true)
+        }
     }
 }
 
 // MARK: - TrackerHeaderViewDelegate
 extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
-        currentDay = date
-        do {
-            try dataProvider?.fetchTrackersBy(weekDay: weekDayNumber)
-            collectionView.reloadData()
-        } catch {
-            print("🏹", error)
-        }
+        viewModel.setCurrentDayTo(newDate: date)
+        viewModel.fetchTrackerBy(weekDay: date.todayString)
     }
 }
 
 // MARK: - SearchViewDelegate
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
-        do {
-            try dataProvider?.fetchTrackersBy(name: searchText, weekDay: weekDayNumber)
-            collectionView.reloadData()
-        } catch {
-            print("😎", error)
-        }
-    }
-}
-
-// MARK: - DataProviderDelegate
-extension TrackersViewController: DataProviderDelegate {
-    func place() {
-        placeholderView.state = .question
-    }
-    
-    func noResultFound() {
-        placeholderView.state = .noResult
-    }
-    
-    func resultFound() {
-        placeholderView.state = .invisible(animate: true)
-    }
-    
-    func didUpdate(_ update: DataProviderUpdate) {
-        collectionView.performBatchUpdates {
-            if !update.insertedIndexes.isEmpty {
-                collectionView.insertItems(at: [update.insertedIndexes])
-            }
-            if !update.insertedSection.isEmpty {
-                collectionView.insertSections(update.insertedSection)
-            }
-            if !update.deletedIndexes.isEmpty {
-                collectionView.deleteItems(at: [update.deletedIndexes])
-            }
-            if !update.deletedSection.isEmpty {
-                collectionView.deleteSections(update.deletedSection)
-            }
-            if !update.updatedIndexes.isEmpty {
-                collectionView.reloadItems(at: [update.updatedIndexes])
-            }
-            if !update.movedIndexes.isEmpty {
-                for move in update.movedIndexes {
-                    collectionView.moveItem(
-                        at: move.oldIndexPath,
-                        to: move.newIndexPath
-                    )
-                }
-            }
-        } completion: { _ in
-            for move in update.movedIndexes {
-                if update.deletedSection.isEmpty && update.insertedSection.isEmpty {
-                    self.collectionView.reloadItems(at: [move.newIndexPath])
-                }
-            }            
-        }
+        viewModel.fetchTrackerBy(name: searchText, andWeekDay: viewModel.currentDateString)
     }
 }
