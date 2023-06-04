@@ -38,6 +38,10 @@ protocol DataProviderProtocol {
     func fetchTrackersBy(weekDay: String) throws
     func attachTrackerAt(indexPath: IndexPath)
     func unattachTrackerAt(indexPath: IndexPath)
+    func getCompletedTrackers() throws
+    func getUnCompletedTrackers() throws
+    func getTrackersForToday() throws
+    func getAllTrackers() throws
 }
 
 final class DataProvider: NSObject {
@@ -71,7 +75,7 @@ final class DataProvider: NSObject {
             NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true),
             NSSortDescriptor(key: #keyPath(TrackerCoreData.name), ascending: true)
         ]
-                
+
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
@@ -193,7 +197,33 @@ extension DataProvider: DataProviderProtocol {
         try fetchedResultsController.performFetch()
         isEmpty ? delegate?.place() : delegate?.resultFound()
     }
-    
+
+    func getAllTrackers() throws {
+        fetchedResultsController.fetchRequest.predicate = nil
+        try fetchedResultsController.performFetch()
+    }
+
+    func getCompletedTrackers() throws {
+        fetchedResultsController.fetchRequest.predicate = NSPredicate(
+            format: "%K.@count > 0",
+            #keyPath(TrackerCoreData.trackerRecord))
+
+        try fetchedResultsController.performFetch()       
+    }
+
+    func getUnCompletedTrackers() throws {
+        fetchedResultsController.fetchRequest.predicate = NSPredicate(
+            format: "%K.@count == 0",
+            #keyPath(TrackerCoreData.trackerRecord))
+
+        try fetchedResultsController.performFetch()
+    }
+
+    func getTrackersForToday() throws {
+        fetchedResultsController.fetchRequest.predicate = makePredicateBy(Date().weekDayString)
+        try fetchedResultsController.performFetch()
+    }
+
     // Private
     private func makePredicateBy(_ weekDay: String) -> NSPredicate {
         return predicateBuilder

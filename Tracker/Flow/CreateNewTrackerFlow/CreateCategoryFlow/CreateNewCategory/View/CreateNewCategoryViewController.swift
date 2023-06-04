@@ -48,11 +48,13 @@ final class CreateNewCategoryViewController: FrameViewController {
     func bind() {
         viewModel.$trackerCategory.sink { [weak self] category in
             self?.textField.set(text: category?.header)
-        }.store(in: &cancellables)
+        }
+        .store(in: &cancellables)
         
         viewModel.$categoryNameStatus.sink { [weak self] status in
             self?.handleAnimationFor(status: status)
-        }.store(in: &cancellables)
+        }
+        .store(in: &cancellables)
     }
     
     required init?(coder: NSCoder) {

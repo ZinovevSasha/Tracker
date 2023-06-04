@@ -35,7 +35,8 @@ final class CategoriesListViewController: FrameViewController {
                 guard let self = self else { return }
                 self.handleCategories(categories)
                 self.setPlaceholder(for: categories)
-            }.store(in: &cancellables)
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Init
