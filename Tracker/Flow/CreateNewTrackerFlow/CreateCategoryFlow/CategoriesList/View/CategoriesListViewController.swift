@@ -11,7 +11,7 @@ final class CategoriesListViewController: FrameViewController {
         view.separatorInset.left = 16
         view.separatorInset.right = 16
         view.separatorColor = .myGray
-        view.backgroundColor = .myWhite
+        view.backgroundColor = .clear
         view.showsVerticalScrollIndicator = false
         view.register(cellClass: CategoryTableViewCell.self)
         return view
@@ -117,8 +117,7 @@ private extension CategoriesListViewController {
         } else {
             selectedCategory = nil
         }
-        let viewModel = CreateNewCategoryViewModel(trackerCategory: selectedCategory)
-        viewModel.delegate = self.viewModel
+        let viewModel = CreateNewCategoryViewModel(trackerCategory: selectedCategory, delegate: viewModel)
         let createNewCategoryVC = CreateNewCategoryViewController(viewModel: viewModel)
         present(createNewCategoryVC, animated: true)
     }

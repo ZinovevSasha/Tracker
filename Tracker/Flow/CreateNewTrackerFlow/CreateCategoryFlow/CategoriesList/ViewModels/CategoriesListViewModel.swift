@@ -9,6 +9,12 @@ protocol CategoriesListViewModelProtocol {
     func getCategoryAt(indexPath: IndexPath) -> CategoryViewModel
 }
 
+extension CategoriesListViewModel: CreateNewCategoryViewModelDelegate {
+    func categoryUpdatedOrCreated() {
+        getAllCategories()
+    }
+}
+
 final class CategoriesListViewModel: ObservableObject {
     var categoryHeader: ((String) -> Void)?
     
@@ -20,12 +26,6 @@ final class CategoriesListViewModel: ObservableObject {
     // MARK: - Init
     init(categoryStore: TrackerCategoryStore? = nil) {
         self.categoryStore = try? TrackerCategoryStore()
-    }
-}
-
-extension CategoriesListViewModel: CreateNewCategoryViewModelDelegate {
-    func categoryUpdatedOrCreated() {
-        getAllCategories()
     }
 }
 

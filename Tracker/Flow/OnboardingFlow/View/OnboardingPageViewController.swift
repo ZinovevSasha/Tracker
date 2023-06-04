@@ -1,7 +1,6 @@
 import UIKit
 
 final class OnboardingPageViewController: UIPageViewController {
-    
     var userSuccessfullyLoggedIn: (() -> Void)?
     
     // MARK: Private properties
