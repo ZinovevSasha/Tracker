@@ -1,9 +1,9 @@
 import CoreData
 
 protocol TrackerRecordStoreProtocol {
-    func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int
+    func getTrackedDaysNumberFor(trackerWithId id: String?) throws -> Int
     func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool
-    func removeTrackerRecordOrAdd(_ record: TrackerCoreData, forParticularDay day: String) throws
+    func removeOrAddRecordOf(tracker: TrackerCoreData, forParticularDay day: String) throws
 }
 
 struct TrackerRecordStore: Store {
@@ -22,8 +22,8 @@ struct TrackerRecordStore: Store {
 
 // MARK: - Public
 extension TrackerRecordStore: TrackerRecordStoreProtocol {
-    func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int {
-        return try getTrackerRecord(forID: tracker.id).count
+    func getTrackedDaysNumberFor(trackerWithId id: String?) throws -> Int {
+        return try getTrackerRecord(forID: id).count
     }
     
     func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool {
@@ -36,20 +36,20 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
         return trackerRecordsCoreData.first != nil ? true : false
     }
     
-    func removeTrackerRecordOrAdd(_ record: TrackerCoreData, forParticularDay day: String) throws {
+    func removeOrAddRecordOf(tracker: TrackerCoreData, forParticularDay day: String) throws {
         let fetchRequest = TrackerRecordCoreData.fetchRequest()
         let trackerRecordCoreData = try context.fetch(fetchRequest)
         
         if let trackerToRemoveIndex = trackerRecordCoreData.firstIndex(
-            where: { $0.date == day && $0.recordId == record.id }) {
+            where: { $0.date == day && $0.recordId == tracker.id }) {
             // Remove the tracker record from the array
             context.delete(trackerRecordCoreData[trackerToRemoveIndex])
         } else {
             // Create new record
             let trackerRecord = TrackerRecordCoreData(context: context)
-            trackerRecord.recordId = record.id
+            trackerRecord.recordId = tracker.id
             trackerRecord.date = day
-            trackerRecord.tracker = record
+            trackerRecord.tracker = tracker
         }
         save()
     }

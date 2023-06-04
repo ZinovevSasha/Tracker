@@ -53,7 +53,7 @@ final class ChooseScheduleViewController: FrameViewController {
     // MARK: - Private @objc target action methods
     override func handleButtonCenterTap() {
         weekDaysToShow?(selectedWeekDays)
-        navigationController?.popViewController(animated: true)
+        dismiss(animated: true)
     }
 }
 

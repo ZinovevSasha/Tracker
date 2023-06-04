@@ -1,17 +1,10 @@
 import Foundation
 
-protocol PredicateBuilderProtocol {
-    associatedtype T
-    func build(type: NSCompoundPredicate.LogicalType) -> NSPredicate
-    func addPredicate(_ predicateType: PredicateBuilder<T>.PredicateType,
-        keyPath: KeyPath<T, String?>,
-        value: String) -> Self
-    
-}
 struct PredicateBuilder<T> {
     private var predicates: [NSPredicate] = []
     
-    func addPredicate(_ predicateType: PredicateType, keyPath: KeyPath<T, String?>, value: String) -> PredicateBuilder<T> {
+    func addPredicate(_ predicateType: PredicateType,
+                      keyPath: KeyPath<T, String?>, value: String) -> PredicateBuilder<T> {
         var copy = self
         let predicate = predicateType.predicate(keyPath: keyPath, value: value)
         copy.predicates.append(predicate)
@@ -54,5 +47,4 @@ extension PredicateBuilder {
             return NSPredicate(format: format, keyPath._kvcKeyPathString ?? "", value)
         }
     }
-
 }

@@ -12,25 +12,30 @@ final class CategoryTableViewCell: UITableViewCell {
         }
     }
     
+    var interactionDelegate: UIContextMenuInteractionDelegate? {
+        didSet {
+            if let interactionDelegate {
+                contentView.addInteraction(UIContextMenuInteraction(delegate: interactionDelegate))
+            }
+        }
+    }
+    
     // MARK: - Private properties
     private let categoryName: UILabel = {
         let view = UILabel()
         view.textColor = .myBlack
         view.font = .regular17
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let selectedCategory: UIImageView = {
         let view = UIImageView()
         view.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let stackView: UIStackView = {
         let view = UIStackView()
-        view.translatesAutoresizingMaskIntoConstraints = false
         view.alignment = .center
         view.distribution = .fill
         return view
@@ -72,3 +77,4 @@ private extension CategoryTableViewCell {
         ])
     }
 }
+

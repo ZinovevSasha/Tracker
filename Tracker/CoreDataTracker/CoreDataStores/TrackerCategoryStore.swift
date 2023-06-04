@@ -16,6 +16,9 @@ protocol TrackerCategoryListProtocol {
     func removeMarkFromLastSelectedCategory()
     func markCategoryAsLastSelected(categoryName: String)
     func getAllCategories() -> [TrackerCategory]
+    func removeCategoryWith(name: String)
+//    func updateCategoryWith(by newCategory: CategoryViewModel)
+    func updateCategoryWith(id: String, byNewName name: String)
 }
 
 struct TrackerCategoryStore: Store {        
@@ -32,7 +35,7 @@ struct TrackerCategoryStore: Store {
     }
 }
 
-// MARK: - Public
+// MARK: - TrackerCategoryStoreProtocol
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func addTracker(toCategoryWithName name: String, tracker: TrackerCoreData) throws {
         if let category = getCategoryWith(name: name) {
@@ -59,6 +62,13 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func remove(tracker: TrackerCoreData, fromCategoryWithName name: String) {
         if let category = getCategoryWith(name: name) {
             category.removeFromTrackers(tracker)
+            save()
+        }
+    }
+    
+    func removeCategoryWith(name: String) {
+        if let category = getCategoryWith(name: name) {
+            context.delete(category)
             save()
         }
     }
@@ -90,6 +100,7 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     }
 }
 
+// MARK: - TrackerCategoryListProtocol
 extension TrackerCategoryStore: TrackerCategoryListProtocol {
     func isNameAvailable(name: String) throws -> Bool {
         return (getCategoryWith(name: name) != nil) ? false : true
@@ -108,6 +119,13 @@ extension TrackerCategoryStore: TrackerCategoryListProtocol {
             save()
         }
     }
+      
+    func updateCategoryWith(id: String, byNewName name: String) {
+        if let category = getCategoryBy(id: id) {
+            category.header = name
+            save()
+        }
+    }    
 }
 
 // MARK: - Private
@@ -115,15 +133,19 @@ private extension TrackerCategoryStore {
     func fetchTrackerCategories(context: NSManagedObjectContext,
                                 withPredicate predicateClosure: (() -> NSPredicate)? = nil
     ) throws -> [TrackerCategoryCoreData] {
-        
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
-        
         if let predicateClosure = predicateClosure {
             fetchRequest.predicate = predicateClosure()
         }
         
         let results = try context.fetch(fetchRequest)
         return results
+    }
+    
+    func getCategoryBy(id: String) -> TrackerCategoryCoreData? {
+        return try? fetchTrackerCategories(context: context) {
+            predicateBuilder.addPredicate(.equalTo, keyPath: \.id, value: id).build()
+        }.first
     }
     
     func getCategoryWith(name: String) -> TrackerCategoryCoreData? {
@@ -145,14 +167,7 @@ private extension TrackerCategoryStore {
 extension Array where Element == TrackerCategoryCoreData {
     func toTrackerCategories() -> [TrackerCategory] {
         return self.compactMap { category in
-            guard let header = category.header else { return nil }
-            
-            let trackers = category.trackers?.allObjects.compactMap { trackerCoreData in
-                return Tracker(coreData: trackerCoreData as! TrackerCoreData)
-            } ?? []
-            
-            let isLastSelected = category.isLastSelected
-            return TrackerCategory(header: header, trackers: trackers, isLastSelected: isLastSelected)
+            TrackerCategory(coreData: category)
         }
     }
 }

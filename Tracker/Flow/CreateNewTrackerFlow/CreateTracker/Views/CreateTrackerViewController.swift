@@ -49,6 +49,7 @@ final class CreateTrackerViewController: UIViewController {
         view.register(cellClass: CreateTrackerCollectionColorCell.self)
         return view
     }()
+    
     // Collection view setup
     let params = GeometryParams(
         cellCount: 6,
@@ -330,12 +331,8 @@ extension CreateTrackerViewController: UITableViewDelegate {
     // Private
     private func pushScheduleListViewController(weekDays: Set<Int>) {
         let scheduleController = ChooseScheduleViewController(weekDays: weekDays)
-        
-        if let navigationController = navigationController {
-            navigationController.pushViewController(scheduleController, animated: true)
-        } else {
-            present(scheduleController, animated: true)
-        }
+        present(scheduleController, animated: true)
+
         // Call back
         scheduleController.weekDaysToShow = { [weak self] schedule in
             guard let self = self else { return }
@@ -345,15 +342,10 @@ extension CreateTrackerViewController: UITableViewDelegate {
     }
     
     private func pushCategoryListViewController() {
-        let categoryController = CategoriesListViewController()
         let viewModel = CategoriesListViewModel()
-        categoryController.set(viewModel: viewModel)
-                
-        if let navigationController = navigationController {
-            navigationController.pushViewController(categoryController, animated: true)
-        } else {
-            present(categoryController, animated: true)
-        }
+        let categoryController = CategoriesListViewController(viewModel: viewModel)
+        present(categoryController, animated: true)
+        
         // Call back
         viewModel.categoryHeader = { [weak self] header in
             guard let self = self else { return }
@@ -362,6 +354,7 @@ extension CreateTrackerViewController: UITableViewDelegate {
         }
     }
 }
+
 // MARK: - UICollectionViewDelegateFlowLayout
 extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

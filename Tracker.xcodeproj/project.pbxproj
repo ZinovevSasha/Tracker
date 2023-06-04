@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F9053E792A2C806400C93CC7 /* CreateNewCategoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9053E782A2C806400C93CC7 /* CreateNewCategoryViewModel.swift */; };
 		F9118A3329DF299400B530D6 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = F9118A3229DF299400B530D6 /* SnapKit */; };
 		F918018629CEECCB00767F16 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F918018529CEECCB00767F16 /* AppDelegate.swift */; };
 		F918018829CEECCB00767F16 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F918018729CEECCB00767F16 /* SceneDelegate.swift */; };
@@ -73,7 +74,6 @@
 		F9F1236829DB60A40039D1B3 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1236729DB60A40039D1B3 /* Date+Extension.swift */; };
 		F9F1236A29DC282D0039D1B3 /* ChooseScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1236929DC282C0039D1B3 /* ChooseScheduleViewController.swift */; };
 		F9F1238C29DC35440039D1B3 /* ScheduleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1238B29DC35440039D1B3 /* ScheduleTableViewCell.swift */; };
-		F9F724BE2A1F7BAC007F0F0A /* TrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F724BD2A1F7BAC007F0F0A /* TrackerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +87,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F9053E782A2C806400C93CC7 /* CreateNewCategoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNewCategoryViewModel.swift; sourceTree = "<group>"; };
 		F918018229CEECCB00767F16 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F918018529CEECCB00767F16 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F918018729CEECCB00767F16 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -158,7 +159,6 @@
 		F9F1236929DC282C0039D1B3 /* ChooseScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseScheduleViewController.swift; sourceTree = "<group>"; };
 		F9F1238B29DC35440039D1B3 /* ScheduleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableViewCell.swift; sourceTree = "<group>"; };
 		F9F724BB2A1F7BAC007F0F0A /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F9F724BD2A1F7BAC007F0F0A /* TrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,11 +180,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F9053E7A2A2C8CC100C93CC7 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F9053E782A2C806400C93CC7 /* CreateNewCategoryViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		F9053E7B2A2C8CC800C93CC7 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F97E8FDC29E34CFA002BB0C8 /* CreateNewCategoryViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		F918017929CEECCB00767F16 = {
 			isa = PBXGroup;
 			children = (
 				F918018429CEECCB00767F16 /* Tracker */,
-				F9F724BC2A1F7BAC007F0F0A /* TrackerTests */,
 				F918018329CEECCB00767F16 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -202,11 +217,11 @@
 			isa = PBXGroup;
 			children = (
 				F918019C29CEF35300767F16 /* Application */,
-				F97774E529D3722200959E7C /* Models */,
 				F967CCF329E1B6BE00E3C811 /* UIComponents */,
 				F9E4C6D129D6CF0400F10B02 /* TabBar */,
 				F97774ED29D4441A00959E7C /* Flow */,
 				F970EF072A0A6BB700AAAA84 /* Services */,
+				F97774E529D3722200959E7C /* Models */,
 				F96F65EA29F05E0000C72A6A /* CoreDataTracker */,
 				F918019929CEED2600767F16 /* Resourses */,
 			);
@@ -409,7 +424,7 @@
 		F97E8FDA29E34C77002BB0C8 /* CategoriesList */ = {
 			isa = PBXGroup;
 			children = (
-				F9EC69BA29E2C75100D77C5F /* Views */,
+				F9EC69BA29E2C75100D77C5F /* View */,
 				F97E3C0B29FEC02E001C252E /* ViewModels */,
 			);
 			path = CategoriesList;
@@ -418,7 +433,8 @@
 		F97E8FDB29E34C95002BB0C8 /* CreateNewCategory */ = {
 			isa = PBXGroup;
 			children = (
-				F97E8FDC29E34CFA002BB0C8 /* CreateNewCategoryViewController.swift */,
+				F9053E7B2A2C8CC800C93CC7 /* View */,
+				F9053E7A2A2C8CC100C93CC7 /* ViewModel */,
 			);
 			path = CreateNewCategory;
 			sourceTree = "<group>";
@@ -473,13 +489,13 @@
 			path = TabBar;
 			sourceTree = "<group>";
 		};
-		F9EC69BA29E2C75100D77C5F /* Views */ = {
+		F9EC69BA29E2C75100D77C5F /* View */ = {
 			isa = PBXGroup;
 			children = (
 				F967CCF129E1B5CE00E3C811 /* CategoriesListViewController.swift */,
 				F9EC69BB29E2C76E00D77C5F /* CategoryTableViewCell.swift */,
 			);
-			path = Views;
+			path = View;
 			sourceTree = "<group>";
 		};
 		F9F1233229D897F40039D1B3 /* MainTrackerFlow */ = {
@@ -505,18 +521,10 @@
 		F9F1233429D898DD0039D1B3 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				F9F1238B29DC35440039D1B3 /* ScheduleTableViewCell.swift */,
 				F9F1236929DC282C0039D1B3 /* ChooseScheduleViewController.swift */,
+				F9F1238B29DC35440039D1B3 /* ScheduleTableViewCell.swift */,
 			);
 			path = View;
-			sourceTree = "<group>";
-		};
-		F9F724BC2A1F7BAC007F0F0A /* TrackerTests */ = {
-			isa = PBXGroup;
-			children = (
-				F9F724BD2A1F7BAC007F0F0A /* TrackerTests.swift */,
-			);
-			path = TrackerTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -668,6 +676,7 @@
 				F970EFF12A0E974900AAAA84 /* LocalizedStrings.swift in Sources */,
 				F967CCC029E08C2F00E3C811 /* DataSource.swift in Sources */,
 				F978FA9C2A2A6D69002F415F /* StoreProtocol.swift in Sources */,
+				F9053E792A2C806400C93CC7 /* CreateNewCategoryViewModel.swift in Sources */,
 				F97E3C0829FE72C2001C252E /* Observable.swift in Sources */,
 				F978FA982A2A610C002F415F /* SplashViewModel.swift in Sources */,
 				F97774B929D2EA6C00959E7C /* TrackerHeaderView.swift in Sources */,
@@ -720,7 +729,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9F724BE2A1F7BAC007F0F0A /* TrackerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,19 +1,20 @@
 import CoreData
+import Combine
 
 protocol CategoriesListViewModelProtocol {
     var categories: [CategoryViewModel] { get }
     func getAllCategories()
-    func isNameAvailable(name: String) -> Bool?
-    func categoryNameEntered(name: String)
     func categorySelected(at indexPath: IndexPath)
+    func deleteCategoryAt(indexPath: IndexPath)
+    func getCategoryAt(indexPath: IndexPath) -> CategoryViewModel
 }
 
-final class CategoriesListViewModel {
+final class CategoriesListViewModel: ObservableObject {
     var categoryHeader: ((String) -> Void)?
     
-    @Observable var categories: [CategoryViewModel] = []
+    @Published var categories: [CategoryViewModel] = []
    
-    // Store
+    // MARK: - Dependencies
     private var categoryStore: TrackerCategoryListProtocol?
     
     // MARK: - Init
@@ -22,29 +23,18 @@ final class CategoriesListViewModel {
     }
 }
 
+extension CategoriesListViewModel: CreateNewCategoryViewModelDelegate {
+    func categoryUpdatedOrCreated() {
+        getAllCategories()
+    }
+}
+
 // MARK: - Init
 extension CategoriesListViewModel: CategoriesListViewModelProtocol {
-    func categoryNameEntered(name: String) {
-        do {
-            try categoryStore?.addCategory(with: name)
-            getAllCategories()
-        } catch {
-            print(error)
-        }
-    }
-    
     func getAllCategories() {
-        categories = categoryStore?.getAllCategories()
-            .filter { $0.header != "Attached" }
-            .map {
-                return CategoryViewModel(
-                    header: $0.header,
-                    isLastSelectedCategory: $0.isLastSelected)
-            } ?? []
-    }
-    
-    func isNameAvailable(name: String) -> Bool? {
-        try? categoryStore?.isNameAvailable(name: name)
+        if let categories = categoryStore?.getAllCategories().filter { $0.header != "Attached" } {
+            self.categories = categories.map { CategoryViewModel(trackerCategory: $0) }
+        }
     }
     
     func categorySelected(at indexPath: IndexPath) {
@@ -56,5 +46,15 @@ extension CategoriesListViewModel: CategoriesListViewModelProtocol {
     func markCategoryWith(name: String) {
         categoryStore?.removeMarkFromLastSelectedCategory()
         categoryStore?.markCategoryAsLastSelected(categoryName: name)
+    }
+    
+    func deleteCategoryAt(indexPath: IndexPath) {
+        let header = categories[indexPath.row].header
+        categoryStore?.removeCategoryWith(name: header)
+        getAllCategories()
+    }
+    
+    func getCategoryAt(indexPath: IndexPath) -> CategoryViewModel {
+        categories[indexPath.row]
     }
 }

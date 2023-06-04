@@ -2,6 +2,7 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     // MARK: - Private properties
+    private let placeholderView = PlaceholderView(state: .question)
     private let headerView = TrackerHeaderView()
     private let searchView = SearchView()
     private let collectionView: UICollectionView = {
@@ -13,8 +14,17 @@ final class TrackersViewController: UIViewController {
         view.register(cellClass: TrackerCollectionViewCell.self)
         return view
     }()
-    let placeholderView = PlaceholderView(state: .question)
-            
+    // Layout of collection helper
+    private let params = GeometryParams(
+        cellCount: UIConstants.cellCount,
+        cellSize: .zero,
+        leftInset: UIConstants.inset,
+        rightInset: UIConstants.inset,
+        topInset: .zero,
+        bottomInset: .zero,
+        spacing: UIConstants.cellSpacing
+    )
+    
     // MARK: - UIConstants
     private enum UIConstants {
         static let trackerHeaderHeight: CGFloat = 30
@@ -50,17 +60,6 @@ final class TrackersViewController: UIViewController {
     private var dateString: String {
         Date.dateString(for: currentDay)
     }
-    
-    // Layout of collection helper
-    private let params = GeometryParams(
-        cellCount: UIConstants.cellCount,
-        cellSize: .zero,
-        leftInset: UIConstants.inset,
-        rightInset: UIConstants.inset,
-        topInset: .zero,
-        bottomInset: .zero,
-        spacing: UIConstants.cellSpacing
-    )
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -186,8 +185,8 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-            return false
-        }   
+        return false
+    }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -211,17 +210,6 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-// MARK: - UICollectionViewDelegate
-extension TrackersViewController: UICollectionViewDelegate {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        do {
-            try dataProvider?.deleteTracker(at: indexPath)
-        } catch {
-            print("🐳", error)
-        }
-    }
-}
-
 // MARK: - TrackerCollectionViewCellDelegate
 extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func didMarkTrackerCompleted(for cell: TrackerCollectionViewCell) {
@@ -240,25 +228,25 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     
     func didUnattachTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        dataProvider?.unattachTrackerAt(indexPath: indexPath)        
+        dataProvider?.unattachTrackerAt(indexPath: indexPath)
     }
     
     func didDeleteTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         alertPresenter.show(message: "Уверены что хотите удалить трекер?") { [weak self] in
             try? self?.dataProvider?.deleteTracker(at: indexPath)
-        }        
+        }
     }
     
     func didUpdateTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell),
-            let tracker = dataProvider?.getTracker(at: indexPath) else { return }
+              let tracker = dataProvider?.getTracker(at: indexPath) else { return }
         
         let updateTrackerViewModel = CreateTrackerViewModelImpl(trackerKind: tracker.kind, tracker: tracker, date: dateString)
         
         let updateTrackerViewController = CreateTrackerViewController(viewModel: updateTrackerViewModel)
         
-        present(updateTrackerViewController, animated: true)        
+        present(updateTrackerViewController, animated: true)
     }
 }
 
@@ -331,7 +319,7 @@ extension TrackersViewController: DataProviderDelegate {
                 if update.deletedSection.isEmpty && update.insertedSection.isEmpty {
                     self.collectionView.reloadItems(at: [move.newIndexPath])
                 }
-            }            
+            }
         }
     }
 }

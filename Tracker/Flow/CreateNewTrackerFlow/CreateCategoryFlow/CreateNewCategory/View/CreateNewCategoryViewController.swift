@@ -1,14 +1,7 @@
 import UIKit
-
-protocol CreateNewCategoryViewControllerDelegate: AnyObject {
-    func categoryNameDidEntered(categoryName name: String)
-    func isNameAvailable(name: String) -> Bool?
-}
+import Combine
 
 final class CreateNewCategoryViewController: FrameViewController {
-    // MARK: - Delegate
-    weak var delegate: CreateNewCategoryViewControllerDelegate?
-    
     // MARK: - Private properties
     private let textField = TrackerUITextField(text: Localized.NewCategory.enterName)
     
@@ -37,16 +30,27 @@ final class CreateNewCategoryViewController: FrameViewController {
         setupLayout()
     }
     
-    // MARK: - Category name
-    private var categoryName: String?
+    private let viewModel: CreateNewCategoryViewModel
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Init
-    init() {
-        // Super init from base class(with title and buttons at bottom)
+    init(viewModel: CreateNewCategoryViewModel) {
+        self.viewModel = viewModel
         super.init(
             title: Localized.NewCategory.new,
             buttonCenter: ActionButton(colorType: .grey, title: Localized.NewCategory.ready)
         )
+        bind()
+    }
+    
+    func bind() {
+        viewModel.$trackerCategory.sink { [weak self] category in
+            self?.textField.set(text: category?.header)
+        }.store(in: &cancellables)
+        
+        viewModel.$categoryNameStatus.sink { [weak self] status in
+            self?.handleAnimationFor(status: status)
+        }.store(in: &cancellables)
     }
     
     required init?(coder: NSCoder) {
@@ -55,11 +59,11 @@ final class CreateNewCategoryViewController: FrameViewController {
     
     // @objc
     override func handleButtonCenterTap() {
-        if let categoryName {
-            delegate?.categoryNameDidEntered(categoryName: categoryName)
-            dismiss(animated: true)
-        } else {
+        if !viewModel.canCreateCategory {
             buttonCenter?.shakeSelf()
+        } else {
+            viewModel.createButtonTapped()
+            dismiss(animated: true)
         }
     }
 }
@@ -85,40 +89,15 @@ private extension CreateNewCategoryViewController {
             textField.topAnchor.constraint(equalTo: container.topAnchor, constant: .topInsetFromTitle)
         ])
     }
-}
-
-// MARK: - TrackerUITextFieldDelegate
-extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
-    func isChangeText(text: String, newLength: Int) -> Bool? {
-        guard !text.isEmpty else {
-            // if text isEmpty
-            updateCategoryName(nil)
-            buttonCenter?.colorType = .grey
-            removeWarningLabel()
-            return true
-        }
-        // if there is no such category name exist
-        if delegate?.isNameAvailable(name: text) ?? false {
-            updateCategoryName(text)
-            buttonCenter?.colorType = .black
-            removeWarningLabel()
-        } else {
-            updateCategoryName(nil)
-            buttonCenter?.colorType = .grey
-            addWarningLabel()
-        }
-        return true
-    }
     
-    // Private metods
-    private func addWarningLabel() {
+    func addWarningLabel() {
         mainStackView.addArrangedSubview(warningCharactersLabel)
         UIView.animate(withDuration: 0.3) {
             self.warningCharactersLabel.alpha = 1
         }
     }
     
-    private func removeWarningLabel() {
+    func removeWarningLabel() {
         mainStackView.removeArrangedSubview(warningCharactersLabel)
         warningCharactersLabel.removeFromSuperview()
         UIView.animate(withDuration: 0.3) {
@@ -127,7 +106,25 @@ extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
         }
     }
     
-    private func updateCategoryName(_ text: String?) {
-        categoryName = text
+    func handleAnimationFor(status: CreateNewCategoryViewModel.CategoryNameStatus) {
+        switch status {
+        case .empty:
+            buttonCenter?.colorType = .grey
+            removeWarningLabel()
+        case .available:
+            buttonCenter?.colorType = .black
+            removeWarningLabel()
+        case .unavailable:
+            buttonCenter?.colorType = .grey
+            addWarningLabel()
+        }
+    }
+}
+
+// MARK: - TrackerUITextFieldDelegate
+extension CreateNewCategoryViewController: TrackerUITextFieldDelegate {
+    func isChangeText(text: String, newLength: Int) -> Bool? {
+        viewModel.categoryNameDidEnted(name: text)
+        return true
     }
 }

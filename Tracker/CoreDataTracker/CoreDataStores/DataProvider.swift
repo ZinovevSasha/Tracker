@@ -65,20 +65,17 @@ final class DataProvider: NSObject {
         let fetchRequest = TrackerCoreData.fetchRequest()
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
+        fetchRequest.predicate = makePredicateBy(Date().weekDayString)
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(TrackerCoreData.isAttached), ascending: false),
             NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true),
             NSSortDescriptor(key: #keyPath(TrackerCoreData.name), ascending: true)
         ]
                 
-        fetchRequest.predicate = makePredicateBy(Date().weekDayString)
-        
-        let sectionKeyPath = #keyPath(TrackerCoreData.category.header)
-        
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: sectionKeyPath,
+            sectionNameKeyPath: #keyPath(TrackerCoreData.category.header),
             cacheName: nil
         )
         
@@ -129,7 +126,7 @@ extension DataProvider: DataProviderProtocol {
     func daysTracked(for indexPath: IndexPath) -> Int {
         let tracker = fetchedResultsController.object(at: indexPath)
         do {
-            return try trackerRecordStore.getTrackedDaysNumberFor(tracker: tracker)
+            return try trackerRecordStore.getTrackedDaysNumberFor(trackerWithId: tracker.id)
         } catch {
             return .zero
         }
@@ -162,7 +159,7 @@ extension DataProvider: DataProviderProtocol {
     
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, forParticularDay: day)
+        try? trackerRecordStore.removeOrAddRecordOf(tracker: trackerCoreData, forParticularDay: day)
     }
     
     func getCategories() -> [TrackerCategory] {

@@ -1,5 +1,4 @@
 final class SplashViewModel {
-
     private let authService: AuthService
 
     init(authService: AuthService) {
