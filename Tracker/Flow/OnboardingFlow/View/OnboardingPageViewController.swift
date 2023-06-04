@@ -28,10 +28,8 @@ final class OnboardingPageViewController: UIPageViewController {
     private let button = ActionButton(title: Localized.Onboarding.enter)
     
     // MARK: - Init
-    private let authService: AuthService?
-    
-    init(authService: AuthService? = AuthService()) {
-        self.authService = authService
+   
+    init() {
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal)
     }
     
@@ -77,29 +75,15 @@ final class OnboardingPageViewController: UIPageViewController {
 
 extension OnboardingPageViewController: UIPageViewControllerDataSource {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        return getViewController(-, from: pages, relativeTo: viewController)
+        guard let viewControllerIndex = pages.firstIndex(of: viewController) else { return nil }
+        let previousIndex = (viewControllerIndex - 1 + pages.count) % pages.count
+        return pages[previousIndex]
     }
-    
+
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        return getViewController(+, from: pages, relativeTo: viewController)
-    }
-    
-    private func getViewController(_ operation: (Int, Int) -> Int, from viewControllers: [UIViewController], relativeTo viewController: UIViewController) -> UIViewController? {
-        guard let viewControllerIndex = viewControllers.firstIndex(of: viewController) else {
-            return nil
-        }
-        
-        let previousIndex = operation(viewControllerIndex, 1)
-        
-        if previousIndex < .zero {
-            return viewControllers.last
-        }
-        
-        if previousIndex >= viewControllers.count {
-            return viewControllers.first
-        }
-        
-        return viewControllers[previousIndex]
+        guard let viewControllerIndex = pages.firstIndex(of: viewController) else { return nil }
+        let nextIndex = (viewControllerIndex + 1) % pages.count
+        return pages[nextIndex]
     }
 }
 

@@ -255,7 +255,7 @@
 		F967CCC129E08D9A00E3C811 /* ChooseHabit */ = {
 			isa = PBXGroup;
 			children = (
-				F97774F029D44CD800959E7C /* ChooseTrackerViewController.swift */,
+				F9FF0A032A2CEB9B00E43C9B /* View */,
 			);
 			path = ChooseHabit;
 			sourceTree = "<group>";
@@ -292,7 +292,7 @@
 		F967CCCB29E093F800E3C811 /* StatisticFlow */ = {
 			isa = PBXGroup;
 			children = (
-				F97774B429D2DB5900959E7C /* StatisticViewController.swift */,
+				F9FF0A042A2CEBB100E43C9B /* View */,
 			);
 			path = StatisticFlow;
 			sourceTree = "<group>";
@@ -512,11 +512,11 @@
 			isa = PBXGroup;
 			children = (
 				F918018929CEECCB00767F16 /* TrackersViewController.swift */,
+				F9FF0A012A2CCA5400E43C9B /* FiltersViewController.swift */,
 				F97774DC29D3360100959E7C /* SearchView.swift */,
 				F97774B829D2EA6C00959E7C /* TrackerHeaderView.swift */,
 				F97774E029D35AB600959E7C /* TrackerCollectionViewCell.swift */,
 				F97774EE29D4456100959E7C /* TrackerCollectionHeader.swift */,
-				F9FF0A012A2CCA5400E43C9B /* FiltersViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -526,6 +526,22 @@
 			children = (
 				F9F1236929DC282C0039D1B3 /* ChooseScheduleViewController.swift */,
 				F9F1238B29DC35440039D1B3 /* ScheduleTableViewCell.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F9FF0A032A2CEB9B00E43C9B /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F97774F029D44CD800959E7C /* ChooseTrackerViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F9FF0A042A2CEBB100E43C9B /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F97774B429D2DB5900959E7C /* StatisticViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
