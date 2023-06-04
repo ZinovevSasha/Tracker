@@ -38,9 +38,10 @@ private extension TrackerCollectionHeader {
     
     func setupLayout() {
         NSLayoutConstraint.activate([
-            categoryLabel.leadingAnchor.constraint(equalTo: leadingAnchor,constant: UIConstants.categoryLabelLeadingInset),
+            categoryLabel.leadingAnchor.constraint(
+                equalTo: leadingAnchor, constant: UIConstants.categoryLabelLeadingInset),
             categoryLabel.trailingAnchor.constraint(equalTo: trailingAnchor),
-            categoryLabel.topAnchor.constraint(equalTo: topAnchor)           
+            categoryLabel.topAnchor.constraint(equalTo: topAnchor)
         ])
     }
 }

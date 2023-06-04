@@ -33,9 +33,8 @@ extension Date {
     /// - Returns: The day of the week represented as a number starting from 0 (Monday) to 6 (Sunday).
     static func currentWeekDayNumber(from day: Date) -> Int {
         var calendar = Calendar(identifier: .iso8601)
-        calendar.locale = .current        
+        calendar.locale = .current
         let weekday = (calendar.component(.weekday, from: day) + 5) % 7
         return weekday
     }
 }
-

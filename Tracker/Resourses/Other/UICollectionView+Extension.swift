@@ -82,7 +82,6 @@ extension UICollectionView {
             }
             // If new selected cell is not same as previous selected
             if previouslySelectedIndexPath != newIndexPath {
-               
                 deselectItem(at: previouslySelectedIndexPath, animated: false)
                 if let cell = self.cellForItem(at: previouslySelectedIndexPath) as? T {
                     cell.unhighlight()

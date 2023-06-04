@@ -21,7 +21,7 @@ enum WeekDay: Int, CaseIterable {
     }
     
     var abbreviationShort: String {
-        switch self {        
+        switch self {
         case .monday: return Localized.NewHabit.mon
         case .tuesday: return Localized.NewHabit.tue
         case .wednesday: return Localized.NewHabit.wed

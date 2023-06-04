@@ -22,7 +22,7 @@ protocol CreateTrackerViewModelProtocol {
 
 final class CreateTrackerViewModelImpl: ObservableObject {
     // Need to dismiss screen or show alert
-    @Published var isTrackersAddedToCoreData: Bool = false
+    @Published var isTrackersAddedToCoreData = false
     
     // Property for updating a screen in eddit mode
     @Published var updateTrackerViewModel: UpdateTrackerViewModel?
@@ -80,17 +80,16 @@ final class CreateTrackerViewModelImpl: ObservableObject {
     // MARK: - Public Methods
     func updateUI() {
         if let id = tracker?.id,
-           let date = date,
-           let name = tracker?.name,
-           let emoji = tracker?.emoji,
-           let color = tracker?.color,
-           let schedule = tracker?.schedule,
-           let colorIndexPath = dataSource.indexPath(forColor: color),
-           let emojiIndexPath = dataSource.indexPath(forEmoji: emoji),
-           let categoryHeader = trackerManager.getCategoryNameFor(trackerID: id),
-           let trackedDays = trackerManager.getTrackedDaysNumberFor(id: id),
-           let isTrackedTracker = trackerManager.isCompletedFor(date: date, trackerWithId: id) {
-            
+            let date = date,
+            let name = tracker?.name,
+            let emoji = tracker?.emoji,
+            let color = tracker?.color,
+            let schedule = tracker?.schedule,
+            let colorIndexPath = dataSource.indexPath(forColor: color),
+            let emojiIndexPath = dataSource.indexPath(forEmoji: emoji),
+            let categoryHeader = trackerManager.getCategoryNameFor(trackerID: id),
+            let trackedDays = trackerManager.getTrackedDaysNumberFor(id: id),
+            let isTrackedTracker = trackerManager.isCompletedFor(date: date, trackerWithId: id) {
             // add data to data source to update tableView
             dataSource.addCategoryHeader(categoryHeader)
             dataSource.addSchedule(schedule.weekdayStringShort())
@@ -139,7 +138,7 @@ final class CreateTrackerViewModelImpl: ObservableObject {
             try trackerManager.markAsTrackedFor(date: date, trackerWithId: tracker?.id)
             self.updateTrackedDaysViewModel = getDataForUpdateTrackedDaysViewModel()
         } catch {
-            
+            print(error)
         }
     }
     
@@ -148,7 +147,7 @@ final class CreateTrackerViewModelImpl: ObservableObject {
             try trackerManager.markAsTrackedFor(date: date, trackerWithId: tracker?.id)
             self.updateTrackedDaysViewModel = getDataForUpdateTrackedDaysViewModel()
         } catch {
-            
+            print(error)
         }
     }
 }
@@ -193,15 +192,19 @@ extension CreateTrackerViewModelImpl {
 // MARK: - Private methods
 private extension CreateTrackerViewModelImpl {
     func shouldShakeButton() -> Bool {
-        (name?.isEmpty == false) && (emoji?.isEmpty == false) && (color?.isEmpty == false) && (categoryHeader?.isEmpty == false) && (schedule?.isEmpty == false)
+        (name?.isEmpty == false)
+        && (emoji?.isEmpty == false)
+        && (color?.isEmpty == false)
+        && (categoryHeader?.isEmpty == false)
+        && (schedule?.isEmpty == false)
     }
     
     func isTrackerValid(args: Args) -> Bool {
         guard let name = args.0.0,
-              let emoji = args.0.1,
-              let color = args.0.2,
-              let schedule = args.1.0,
-              let categeryHeader = args.1.1
+            let emoji = args.0.1,
+            let color = args.0.2,
+            let schedule = args.1.0,
+            let categeryHeader = args.1.1
         else {
             return false
         }
@@ -223,9 +226,9 @@ private extension CreateTrackerViewModelImpl {
     
     func getDataForUpdateTrackedDaysViewModel() -> UpdateTrackedDaysViewModel {
         if let tracker = tracker,
-           let date = date,
-           let trackedDays = trackerManager.getTrackedDaysNumberFor(id: tracker.id),
-           let isCompleted = trackerManager.isCompletedFor(date: date, trackerWithId: tracker.id) {
+            let date = date,
+            let trackedDays = trackerManager.getTrackedDaysNumberFor(id: tracker.id),
+            let isCompleted = trackerManager.isCompletedFor(date: date, trackerWithId: tracker.id) {
             return UpdateTrackedDaysViewModel(
                 trackedDays: Localized.Main.numberOf(days: trackedDays),
                 isTrackedForToday: isCompleted

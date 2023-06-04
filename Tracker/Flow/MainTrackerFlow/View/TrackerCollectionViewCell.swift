@@ -227,14 +227,13 @@ private extension TrackerCollectionViewCell {
         case .unselected:
             let image = UIImage.plus?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite ?? .white)
             addButton.setImage(image, for: .normal)
-            addButton.alpha = 1            
+            addButton.alpha = 1
         }
     }
 }
 
 extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        
         let title = isAttached ? "Unattach" : "Attach"
         let attachAction = UIAction(title: title) { [weak self] _ in
             guard let self = self else { return }
@@ -256,7 +255,7 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
         return UIContextMenuConfiguration(
             identifier: nil, previewProvider: nil) { _ in
                 return menu
-            }
+        }
     }
            
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willEndFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {

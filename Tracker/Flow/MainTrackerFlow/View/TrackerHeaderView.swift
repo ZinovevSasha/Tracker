@@ -27,7 +27,7 @@ final class TrackerHeaderView: UIView {
     private let datePicker: UIDatePicker = {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
-        datePicker.locale = Locale.current        
+        datePicker.locale = Locale.current
         datePicker.tintColor = .systemBlue
         datePicker.backgroundColor = .myWhite
         datePicker.layer.cornerRadius = UIConstants.datePickerCornerRadius
@@ -93,7 +93,8 @@ private extension TrackerHeaderView {
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stackView.topAnchor.constraint(equalTo: plusButton.bottomAnchor, constant: UIConstants.trackerToPlusButtonOffset),
+            stackView.topAnchor.constraint(
+                equalTo: plusButton.bottomAnchor, constant: UIConstants.trackerToPlusButtonOffset),
             stackView.heightAnchor.constraint(equalToConstant: 41)
         ])
     }

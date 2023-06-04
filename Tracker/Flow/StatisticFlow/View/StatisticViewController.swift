@@ -3,7 +3,7 @@ import UIKit
 final class StatisticViewController: UIViewController {
     private let placeholder = PlaceholderView(state: .noStatistic)
            
-    init() {        
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     

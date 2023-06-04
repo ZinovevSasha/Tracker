@@ -280,9 +280,9 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     
     func didUpdateTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell),
-              let tracker = dataProvider?.getTracker(at: indexPath) else { return }
-        
-        let updateTrackerViewModel = CreateTrackerViewModelImpl(trackerKind: tracker.kind, tracker: tracker, date: dateString)
+            let tracker = dataProvider?.getTracker(at: indexPath) else { return }
+        let updateTrackerViewModel = CreateTrackerViewModelImpl(
+            trackerKind: tracker.kind, tracker: tracker, date: dateString)
         
         let updateTrackerViewController = CreateTrackerViewController(viewModel: updateTrackerViewModel)
         

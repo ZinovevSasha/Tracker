@@ -173,6 +173,7 @@ final class CreateTrackerViewController: UIViewController {
         if let isShaking = viewModel?.isShakingButton, isShaking {
             viewModel?.createOrUpdateTracker()
         } else {
+            feedbackGenerator.impactOccurred()
             createButton.shakeSelf()
         }
     }
@@ -274,8 +275,6 @@ private extension CreateTrackerViewController {
     }
     
     private func updateCollectionView(emojiIndexPath: IndexPath, colorIndexPath: IndexPath) {
-        guard viewModel != nil else { return }
-        
         selectedEmojiIndexPath = emojiIndexPath
         selectedColorIndexPath = colorIndexPath
         collectionView.reloadItems(at: [emojiIndexPath])

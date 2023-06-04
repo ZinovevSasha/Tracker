@@ -60,11 +60,7 @@ final class SplashViewController: UIViewController {
         guard let window = UIApplication.shared.windows.first else {
             fatalError("Invalid Configuration")
         }
-
-        if let rootViewController = window.rootViewController as? MainTabBarController {
-            return
-        }
-
+        
         let tabBar = MainTabBarController()
         window.rootViewController = tabBar
     }

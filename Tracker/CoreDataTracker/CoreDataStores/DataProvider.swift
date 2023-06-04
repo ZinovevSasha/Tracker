@@ -110,17 +110,14 @@ extension DataProvider: DataProviderProtocol {
     
     var numberOfSections: Int {
         fetchedResultsController.sections?.count ?? .zero
-        
     }
     
     func numberOfRowsInSection(_ section: Int) -> Int {
         fetchedResultsController.sections?[section].numberOfObjects ?? .zero
-        
     }
     
     func header(for section: Int) -> String {
         fetchedResultsController.sections?[section].name ?? ""
-        
     }
     
     func daysTracked(for indexPath: IndexPath) -> Int {
@@ -133,7 +130,7 @@ extension DataProvider: DataProviderProtocol {
     }
     
     func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool {
-        let tracker = fetchedResultsController.object(at: indexPath)        
+        let tracker = fetchedResultsController.object(at: indexPath)
         do {
             return try trackerRecordStore.isCompletedFor(date, trackerWithId: tracker.id)
         } catch {
@@ -225,11 +222,11 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         guard let insertedSectionIndexSet = insertedSection,
-              let deletedSectionIndexSet = deletedSection,
-              let insertedItem = insertedIndexes,
-              let deletedItem = deletedIndexes,
-              let updatedItem = updatedIndexes,
-              let movedItem = movedIndexes else {
+            let deletedSectionIndexSet = deletedSection,
+            let insertedItem = insertedIndexes,
+            let deletedItem = deletedIndexes,
+            let updatedItem = updatedIndexes,
+            let movedItem = movedIndexes else {
             return
         }
         

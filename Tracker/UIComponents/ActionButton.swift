@@ -54,7 +54,7 @@ final class ActionButton: UIButton {
         updateAppearance()
     }
     
-    convenience init(title: String) {       
+    convenience init(title: String) {
         self.init(colorType: .trueBlack, title: title)
     }
     

@@ -1,6 +1,6 @@
 import UIKit
 
-extension UIColor { 
+extension UIColor {
     static let myRed                     = UIColor(named: "myRed")
     static let myGray                    = UIColor(named: "myGray")
     static let myBlue                    = UIColor(named: "myBlue")
