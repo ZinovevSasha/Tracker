@@ -1,11 +1,22 @@
-struct TrackerCategory {
+import Foundation
+
+struct TrackerCategory: Hashable {
+    let id: String
     let header: String
     let trackers: [Tracker]
     let isLastSelected: Bool
+    
+    init(id: String = UUID().uuidString, header: String, trackers: [Tracker], isLastSelected: Bool) {
+        self.id = id
+        self.header = header
+        self.trackers = trackers
+        self.isLastSelected = isLastSelected
+    }
 }
 
 extension TrackerCategory {
     init(coreData: TrackerCategoryCoreData) {
+        self.id = coreData.id ?? ""
         self.header = coreData.header ?? ""
         self.isLastSelected = coreData.isLastSelected
         

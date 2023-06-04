@@ -113,10 +113,10 @@ private extension FrameViewController {
                 constant: UIConstants.containerToTitleInset),
             container.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor,
-                constant: UIConstants.leading),
+                constant: .leadingInset),
             container.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
-                constant: UIConstants.trailing),
+                constant: .trailingInset),
             container.bottomAnchor.constraint(equalTo: screenButtons.topAnchor),
         ])
         

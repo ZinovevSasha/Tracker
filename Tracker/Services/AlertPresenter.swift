@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AlertPresenter {
+final class AlertPresenter {
     private let presentingViewController: UIViewController
     
     init(presentingViewController: UIViewController) {

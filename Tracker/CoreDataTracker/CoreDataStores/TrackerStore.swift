@@ -27,7 +27,7 @@ struct TrackerStore: Store {
     }
 }
 
-// MARK: - Public
+// MARK: - TrackerStoreManagerProtocol
 extension TrackerStore: TrackerStoreManagerProtocol {
     func getCategoryHeaderForTrackerWith(id: String) -> String? {
         let trackerCoreData = getTrackerBy(id: id)
@@ -59,6 +59,7 @@ extension TrackerStore: TrackerStoreManagerProtocol {
     }
 }
 
+// MARK: - TrackerStoreDataProviderProtocol
 extension TrackerStore: TrackerStoreDataProviderProtocol {
     func createTrackerCoreData(_ tracker: Tracker) -> TrackerCoreData {
         return TrackerCoreData(tracker: tracker, context: context)

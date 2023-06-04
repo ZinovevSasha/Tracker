@@ -117,7 +117,7 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
     
     func markAsTrackedFor(date: String?, trackerWithId id: String?) throws {
         if let id, let date, let tracker = trackerStore?.getTrackerBy(id: id) {
-            try trackerRecordStore?.removeTrackerRecordOrAdd(tracker, forParticularDay: date)
+            try trackerRecordStore?.removeOrAddRecordOf(tracker: tracker, forParticularDay: date)
         }
     }
 }

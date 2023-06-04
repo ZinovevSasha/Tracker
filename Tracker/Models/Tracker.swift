@@ -1,6 +1,6 @@
 import Foundation
 
-struct Tracker {
+struct Tracker: Hashable {
     enum Kind: String {
         case habit
         case ocasional
