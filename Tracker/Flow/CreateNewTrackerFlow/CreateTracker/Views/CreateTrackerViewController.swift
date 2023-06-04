@@ -108,9 +108,7 @@ final class CreateTrackerViewController: UIViewController {
         viewModel.$isTrackersAddedToCoreData
             .sink { [weak self] isAdded in
                 if isAdded {
-                    guard let presentingVC = self?.presentingViewController else {
-                        return
-                    }
+                    guard let presentingVC = self?.presentingViewController else { return }
                     self?.dismiss(animated: false) {
                         presentingVC.dismiss(animated: true, completion: nil)
                     }
@@ -125,19 +123,18 @@ final class CreateTrackerViewController: UIViewController {
                 
                 self?.updateCollectionView(
                     emojiIndexPath: updateViewModel.emoji,
-                    colorIndexPath: updateViewModel.color
-            )
-            self?.titleTextfield.set(text: updateViewModel.name)           
-        }
-        .store(in: &cancellables)
+                    colorIndexPath: updateViewModel.color)
+                self?.titleTextfield.set(text: updateViewModel.name)
+            }
+            .store(in: &cancellables)
         
         viewModel.$updateTrackedDaysViewModel
             .dropFirst()
             .sink { [weak self] updateTrackedDaysViewModel in
                 guard let updateTrackedDaysViewModel else { return }
                 self?.updateTracked(days: updateTrackedDaysViewModel)
-        }
-        .store(in: &cancellables)
+            }
+            .store(in: &cancellables)
     }
 
     // IndexPath representing selected item
@@ -202,10 +199,8 @@ private extension CreateTrackerViewController {
     }
     
     func addTargets() {
-        cancelButton.addTarget(
-            self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-        createButton.addTarget(
-            self, action: #selector(createButtonTapped), for: .touchUpInside)
+        cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
+        createButton.addTarget(self, action: #selector(createButtonTapped), for: .touchUpInside)
     }
     
     func setupUI() {
@@ -217,23 +212,18 @@ private extension CreateTrackerViewController {
         view.backgroundColor = .myWhite
         
         buttonStackView.addSubviews(cancelButton, createButton)
-        
         container.addSubviews(mainScrollView)
-        
         mainScrollView.addSubviews(mainStackView)
-        
-        if let _ = viewModel?.tracker {
+        if viewModel?.tracker != nil {
             mainStackView.insertArrangedSubview(daysUpdatingView, at: .zero)
             mainStackView.setCustomSpacing(40, after: daysUpdatingView)
         }
-        
         mainStackView.addSubviews(titleTextfield, warningCharactersLabel, tableView, collectionView
         )
-                
         mainStackView.setCustomSpacing(8, after: titleTextfield)
         mainStackView.setCustomSpacing(16, after: warningCharactersLabel)
         mainStackView.setCustomSpacing(32, after: tableView)
-        
+
         NSLayoutConstraint.activate([
             nameOfScreenLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 27),
             nameOfScreenLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -284,7 +274,7 @@ private extension CreateTrackerViewController {
     }
     
     private func updateCollectionView(emojiIndexPath: IndexPath, colorIndexPath: IndexPath) {
-        guard let viewModel = viewModel else { return }
+        guard viewModel != nil else { return }
         
         selectedEmojiIndexPath = emojiIndexPath
         selectedColorIndexPath = colorIndexPath

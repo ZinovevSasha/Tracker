@@ -5,6 +5,15 @@ final class TrackersViewController: UIViewController {
     private let placeholderView = PlaceholderView(state: .question)
     private let headerView = TrackerHeaderView()
     private let searchView = SearchView()
+    private let filterButton: UIButton = {
+        let view = UIButton()
+        view.layer.cornerRadius = .cornerRadius
+        view.layer.masksToBounds = true
+        view.setTitle("Filters", for: .normal)
+        view.titleLabel?.font = .regular17
+        view.backgroundColor = .myBlue
+        return view
+    }()
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -60,6 +69,7 @@ final class TrackersViewController: UIViewController {
     private var dateString: String {
         Date.dateString(for: currentDay)
     }
+    private var currentFilter: FiltersViewController.Filters?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -87,15 +97,25 @@ final class TrackersViewController: UIViewController {
     @objc func hideKeyboard() {
         searchView.hideKeyboard()
     }
+    
+    @objc func filterTrackers() {
+        let filtersVC = FiltersViewController(filter: currentFilter)
+        filtersVC.filterSelected = { [weak self] filter in
+            self?.handle(filters: filter)
+            self?.currentFilter = filter
+        }
+        present(filtersVC, animated: true)
+    }
 }
 
 // MARK: - Private methods
 private extension TrackersViewController {
     func setupUI() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        filterButton.addTarget(self, action: #selector(filterTrackers), for: .touchUpInside)
         view.addGestureRecognizer(tapGesture)
         view.backgroundColor = .myWhite
-        view.addSubviews(headerView, searchView, collectionView, placeholderView)
+        view.addSubviews(headerView, searchView, collectionView, placeholderView, filterButton)
     }
     
     func setDelegates() {
@@ -146,6 +166,26 @@ private extension TrackersViewController {
             placeholderView.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
             placeholderView.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor)
         ])
+        
+        NSLayoutConstraint.activate([
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.widthAnchor.constraint(equalToConstant: 114),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
+        ])
+    }
+    
+    func handle(filters: FiltersViewController.Filters) {
+        switch filters {
+        case .all:
+            print("all")
+        case .forToday:
+            print("forToday")
+        case .completed:
+            print("completed")
+        case .uncompleted:
+            print("uncompleted")
+        }
     }
 }
 

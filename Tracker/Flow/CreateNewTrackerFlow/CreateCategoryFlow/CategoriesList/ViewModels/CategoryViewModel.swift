@@ -7,7 +7,7 @@ struct CategoryViewModel: Hashable {
     let trackerCategory: TrackerCategory
     
     init(trackerCategory: TrackerCategory) {
-        self.trackerCategory = trackerCategory
+        self.trackerCategory = trackerCategory        
     }
     
     var id: String {

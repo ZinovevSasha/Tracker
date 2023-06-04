@@ -34,8 +34,10 @@ final class CreateNewCategoryViewModel {
     
     // MARK: - Init
     init(trackerCategory: CategoryViewModel? = nil,
+         delegate: CreateNewCategoryViewModelDelegate? = nil,
          categoryStore: TrackerCategoryStore? = nil) {
         
+        self.delegate = delegate
         self.trackerCategory = trackerCategory
         self.categoryStore = try? TrackerCategoryStore()
     }

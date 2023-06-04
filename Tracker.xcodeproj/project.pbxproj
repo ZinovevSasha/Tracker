@@ -74,6 +74,7 @@
 		F9F1236829DB60A40039D1B3 /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1236729DB60A40039D1B3 /* Date+Extension.swift */; };
 		F9F1236A29DC282D0039D1B3 /* ChooseScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1236929DC282C0039D1B3 /* ChooseScheduleViewController.swift */; };
 		F9F1238C29DC35440039D1B3 /* ScheduleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1238B29DC35440039D1B3 /* ScheduleTableViewCell.swift */; };
+		F9FF0A022A2CCA5400E43C9B /* FiltersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FF0A012A2CCA5400E43C9B /* FiltersViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -159,6 +160,7 @@
 		F9F1236929DC282C0039D1B3 /* ChooseScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseScheduleViewController.swift; sourceTree = "<group>"; };
 		F9F1238B29DC35440039D1B3 /* ScheduleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableViewCell.swift; sourceTree = "<group>"; };
 		F9F724BB2A1F7BAC007F0F0A /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9FF0A012A2CCA5400E43C9B /* FiltersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -514,6 +516,7 @@
 				F97774B829D2EA6C00959E7C /* TrackerHeaderView.swift */,
 				F97774E029D35AB600959E7C /* TrackerCollectionViewCell.swift */,
 				F97774EE29D4456100959E7C /* TrackerCollectionHeader.swift */,
+				F9FF0A012A2CCA5400E43C9B /* FiltersViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -669,6 +672,7 @@
 				F97774B729D2DE5400959E7C /* UIImage+Extension.swift in Sources */,
 				F970EF092A0A6BC800AAAA84 /* AuthService.swift in Sources */,
 				F9F1233E29D899050039D1B3 /* CreateTrackerCollectionEmojiCell.swift in Sources */,
+				F9FF0A022A2CCA5400E43C9B /* FiltersViewController.swift in Sources */,
 				F918018A29CEECCB00767F16 /* TrackersViewController.swift in Sources */,
 				F967CCF529E1B78900E3C811 /* ActionButton.swift in Sources */,
 				F97E8FE229E3FF82002BB0C8 /* CGFloat+Extension.swift in Sources */,
