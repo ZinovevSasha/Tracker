@@ -32,7 +32,7 @@ final class CategoriesListViewModel: ObservableObject {
 // MARK: - Init
 extension CategoriesListViewModel: CategoriesListViewModelProtocol {
     func getAllCategories() {
-        if let categories = categoryStore?.getAllCategories().filter { $0.header != "Attached" } {
+        if let categories = categoryStore?.getAllCategories().filter({ $0.header != "Attached" }) {
             self.categories = categories.map { CategoryViewModel(trackerCategory: $0) }
         }
     }

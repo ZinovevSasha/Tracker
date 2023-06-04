@@ -6,8 +6,9 @@ final class FiltersViewController: FrameViewController {
     
     var filterSelected: ((Filters) -> Void)?
     
-    private lazy var dataSource = UITableViewDiffableDataSource<Int, Filters>(tableView: tableView) { [weak self] collectionView, indexPath, filter in
-        let cell = collectionView.dequeueReusableCell(for: indexPath)    
+    private lazy var dataSource = UITableViewDiffableDataSource<Int, Filters>(
+        tableView: tableView) { [weak self] collectionView, indexPath, filter in
+        let cell = collectionView.dequeueReusableCell(for: indexPath)
         cell.textLabel?.text = filter.description
         cell.backgroundColor = .myBackground
         cell.selectionStyle = .none

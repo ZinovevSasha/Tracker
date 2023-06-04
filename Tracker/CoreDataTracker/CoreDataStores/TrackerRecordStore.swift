@@ -12,8 +12,9 @@ struct TrackerRecordStore: Store {
     let context: NSManagedObjectContext
     var predicateBuilder: PredicateBuilder<TrackerRecordCoreData>
     
-    init(context: NSManagedObjectContext,
-         predicateBuilder: PredicateBuilder<TrackerRecordCoreData> = PredicateBuilder()
+    init(
+        context: NSManagedObjectContext,
+        predicateBuilder: PredicateBuilder<TrackerRecordCoreData> = PredicateBuilder()
     ) {
         self.context = context
         self.predicateBuilder = predicateBuilder

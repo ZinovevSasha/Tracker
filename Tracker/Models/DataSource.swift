@@ -20,7 +20,7 @@ struct DataSourceImpl {
     private let collectionViewData: [CollectionViewData] = [
         .emojiSection(items: [
             "🙂", "😻", "🌺", "🐶", "❤️",
-            "😱", "😇","😡", "🥶", "🤔",
+            "😱", "😇", "😡", "🥶", "🤔",
             "🙌", "🍔", "🥦", "🏓", "🥇",
             "🎸", "🏝️", "😪"
         ]),
@@ -75,7 +75,7 @@ extension DataSourceImpl: DataSourceProtocol {
     func indexPath(forEmoji item: String) -> IndexPath? {
         for (sectionIndex, section) in collectionViewData.enumerated() {
             if case .emojiSection(let items) = section,
-               let itemIndex = items.firstIndex(of: item) {
+                let itemIndex = items.firstIndex(of: item) {
                 return IndexPath(item: itemIndex, section: sectionIndex)
             }
         }
@@ -85,7 +85,7 @@ extension DataSourceImpl: DataSourceProtocol {
     func indexPath(forColor item: String) -> IndexPath? {
         for (sectionIndex, section) in collectionViewData.enumerated() {
             if case .colorSection(let items) = section,
-               let itemIndex = items.firstIndex(where: { $0.rawValue == item.uppercased() }) {
+                let itemIndex = items.firstIndex(where: { $0.rawValue == item.uppercased() }) {
                 return IndexPath(item: itemIndex, section: sectionIndex)
             }
         }

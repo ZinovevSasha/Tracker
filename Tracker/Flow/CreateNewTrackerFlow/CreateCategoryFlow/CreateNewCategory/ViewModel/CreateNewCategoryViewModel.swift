@@ -33,10 +33,11 @@ final class CreateNewCategoryViewModel {
     private var categoryStore: TrackerCategoryListProtocol?
     
     // MARK: - Init
-    init(trackerCategory: CategoryViewModel? = nil,
-         delegate: CreateNewCategoryViewModelDelegate? = nil,
-         categoryStore: TrackerCategoryStore? = nil) {
-        
+    init(
+        trackerCategory: CategoryViewModel? = nil,
+        delegate: CreateNewCategoryViewModelDelegate? = nil,
+        categoryStore: TrackerCategoryStore? = nil
+    ) {
         self.delegate = delegate
         self.trackerCategory = trackerCategory
         self.categoryStore = try? TrackerCategoryStore()

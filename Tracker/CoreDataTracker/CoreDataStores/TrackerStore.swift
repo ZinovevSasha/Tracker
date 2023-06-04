@@ -19,8 +19,9 @@ struct TrackerStore: Store {
     let context: NSManagedObjectContext
     var predicateBuilder: PredicateBuilder<TrackerCoreData>
     
-    init(context: NSManagedObjectContext,
-         predicateBuilder: PredicateBuilder<TrackerCoreData> = PredicateBuilder()
+    init(
+        context: NSManagedObjectContext,
+        predicateBuilder: PredicateBuilder<TrackerCoreData> = PredicateBuilder()
     ) {
         self.context = context
         self.predicateBuilder = predicateBuilder
@@ -35,7 +36,7 @@ extension TrackerStore: TrackerStoreManagerProtocol {
     }
     
     func getTrackedDaysNumberFor(id: String) -> Int? {
-        getTrackerBy(id: id)?.trackerRecord?.count ?? nil
+        getTrackerBy(id: id)?.trackerRecord?.count
     }
     
     func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCoreData) throws {

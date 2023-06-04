@@ -3,8 +3,11 @@ import Foundation
 struct PredicateBuilder<T> {
     private var predicates: [NSPredicate] = []
     
-    func addPredicate(_ predicateType: PredicateType,
-                      keyPath: KeyPath<T, String?>, value: String) -> PredicateBuilder<T> {
+    func addPredicate(
+        _ predicateType: PredicateType,
+        keyPath: KeyPath<T, String?>,
+        value: String
+    ) -> PredicateBuilder<T> {
         var copy = self
         let predicate = predicateType.predicate(keyPath: keyPath, value: value)
         copy.predicates.append(predicate)

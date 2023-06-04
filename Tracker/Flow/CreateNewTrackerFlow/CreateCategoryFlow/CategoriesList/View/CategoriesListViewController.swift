@@ -154,7 +154,7 @@ extension CategoriesListViewController: UITableViewDelegate {
 extension CategoriesListViewController: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
         guard let location = interaction.view?.convert(location, to: tableView),
-              let indexPath = tableView.indexPathForRow(at: location)
+            let indexPath = tableView.indexPathForRow(at: location)
         else {
             return UIContextMenuConfiguration()
         }
@@ -174,6 +174,6 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
         return UIContextMenuConfiguration(
             identifier: nil, previewProvider: nil) { _ in
                 return menu
-            }
+        }
     }
 }

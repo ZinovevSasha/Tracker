@@ -17,18 +17,18 @@ protocol TrackerCategoryListProtocol {
     func markCategoryAsLastSelected(categoryName: String)
     func getAllCategories() -> [TrackerCategory]
     func removeCategoryWith(name: String)
-//    func updateCategoryWith(by newCategory: CategoryViewModel)
     func updateCategoryWith(id: String, byNewName name: String)
 }
 
-struct TrackerCategoryStore: Store {        
+struct TrackerCategoryStore: Store {
     typealias EntityType = TrackerCategoryCoreData
             
     let context: NSManagedObjectContext
     var predicateBuilder = PredicateBuilder<TrackerCategoryCoreData>()
     
-    init(context: NSManagedObjectContext,
-         predicateBuilder: PredicateBuilder<TrackerCategoryCoreData> = PredicateBuilder()
+    init(
+        context: NSManagedObjectContext,
+        predicateBuilder: PredicateBuilder<TrackerCategoryCoreData> = PredicateBuilder()
     ) {
         self.context = context
         self.predicateBuilder = predicateBuilder
@@ -93,7 +93,7 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     }
     
     func putBackToOriginalCategory(tracker: TrackerCoreData) {
-        guard let lastCategory = tracker.lastCategory else { return }        
+        guard let lastCategory = tracker.lastCategory else { return }
         tracker.isAttached = false
         tracker.lastCategory = nil
         try? addTracker(toCategoryWithName: lastCategory, tracker: tracker)
@@ -125,13 +125,14 @@ extension TrackerCategoryStore: TrackerCategoryListProtocol {
             category.header = name
             save()
         }
-    }    
+    }
 }
 
 // MARK: - Private
 private extension TrackerCategoryStore {
-    func fetchTrackerCategories(context: NSManagedObjectContext,
-                                withPredicate predicateClosure: (() -> NSPredicate)? = nil
+    func fetchTrackerCategories(
+        context: NSManagedObjectContext,
+        withPredicate predicateClosure: (() -> NSPredicate)? = nil
     ) throws -> [TrackerCategoryCoreData] {
         let fetchRequest = TrackerCategoryCoreData.fetchRequest()
         if let predicateClosure = predicateClosure {
@@ -156,9 +157,10 @@ private extension TrackerCategoryStore {
     
     func getLastSelectedCategory() -> TrackerCategoryCoreData? {
         return try? fetchTrackerCategories(context: context) {
-            NSPredicate(format: "%K == %@",
-                        #keyPath(TrackerCategoryCoreData.isLastSelected),
-                        NSNumber(value: true)
+            NSPredicate(
+                format: "%K == %@",
+                #keyPath(TrackerCategoryCoreData.isLastSelected),
+                NSNumber(value: true)
             )
         }.first
     }
@@ -171,4 +173,3 @@ extension Array where Element == TrackerCategoryCoreData {
         }
     }
 }
-

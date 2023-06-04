@@ -74,7 +74,7 @@ private extension PlaceholderView {
     
     func updateAppearance() {
         switch state {
-        case .invisible(let isAnimate):            
+        case .invisible(let isAnimate):
             isAnimate ? setAlphaToZero() : setAlphaToZero(time: .zero)
         case .question:
             setState(image: .star, text: Localized.Placeholder.question)

@@ -8,7 +8,7 @@ final class CreateNewCategoryViewController: FrameViewController {
     private var mainStackView: UIStackView = {
         let view = UIStackView()
         view.alignment = .fill
-        view.axis = .vertical        
+        view.axis = .vertical
         return view
     }()
     
@@ -29,7 +29,9 @@ final class CreateNewCategoryViewController: FrameViewController {
         setupUI()
         setupLayout()
     }
-    
+
+    // FeedbackGenerator
+    private let feedbackGenerator = UIImpactFeedbackGenerator(style: .heavy)
     private let viewModel: CreateNewCategoryViewModel
     private var cancellables = Set<AnyCancellable>()
     
@@ -60,6 +62,7 @@ final class CreateNewCategoryViewController: FrameViewController {
     // @objc
     override func handleButtonCenterTap() {
         if !viewModel.canCreateCategory {
+            feedbackGenerator.impactOccurred()
             buttonCenter?.shakeSelf()
         } else {
             viewModel.createButtonTapped()

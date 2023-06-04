@@ -87,7 +87,7 @@ extension TrackerUITextField: UITextFieldDelegate {
         return delegate?.isChangeText(text: updatedText, newLength: newLength) ?? true
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {       
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }

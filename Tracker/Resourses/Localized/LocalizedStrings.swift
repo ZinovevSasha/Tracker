@@ -13,7 +13,7 @@ enum Localized {
             String.localizedStringWithFormat(
                 NSLocalizedString("daysNumber", comment: ""),
                 days)
-        }     
+        }
     }
     enum Choosing {
         static let title = NSLocalizedString("choosing.tracker", comment: "")

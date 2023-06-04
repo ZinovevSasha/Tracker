@@ -1,47 +1,5 @@
 import UIKit
 
-protocol TableViewCellSeparatorProtocol where Self: UITableViewCell {
-    
-    // Separator properties
-    var separatorView: UIView { get }
-    var separatorInsets: UIEdgeInsets { get }
-    var separatorColor: UIColor { get set }
-    var separatorHeight: CGFloat { get set }
-    var showsSeparator: Bool { get set }
-    
-    // Method to update separator appearance based on position in table view
-    func updateSeparatorLayout(isFirstRow: Bool, isLastRow: Bool)
-}
-
-extension TableViewCellSeparatorProtocol {
-    func updateSeparatorLayout(isFirstRow: Bool, isLastRow: Bool) {
-        let isFirstAndLastRow = isFirstRow && isLastRow
-        
-        // Hide separator for single cell or last cell
-        if isFirstAndLastRow || isLastRow {
-            separatorView.isHidden = true
-            return
-        }
-        
-        separatorView.isHidden = !showsSeparator
-        separatorView.backgroundColor = separatorColor
-        separatorView.frame = CGRect(x: self.separatorInsets.left,
-                                     y: self.contentView.bounds.height - self.separatorHeight,
-                                     width: self.contentView.bounds.width - self.separatorInsets.left - self.separatorInsets.right,
-                                     height: self.separatorHeight)
-    }
-    
-    func handleContextMenuActivation(isHighlighted: Bool) {
-        UIView.animate(withDuration: 0.3) {
-            if isHighlighted {
-                self.separatorView.alpha = .zero
-            }  else {
-                self.separatorView.alpha = 1
-            }
-        }
-    }
-}
-
 extension UITableViewCell {
     // MARK: - Public
     func setSeparatorInset(in tableView: UITableView, at indexPath: IndexPath) {

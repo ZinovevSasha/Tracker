@@ -13,7 +13,6 @@ protocol DaysUpdatingViewProtocol {
 }
 
 final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
-    
     var incrementClosure: (() -> Void)?
     var decrementClosure: (() -> Void)?
     
