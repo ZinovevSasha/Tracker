@@ -135,6 +135,12 @@ final class CreateTrackerViewController: UIViewController {
                 self?.updateTracked(days: updateTrackedDaysViewModel)
             }
             .store(in: &cancellables)
+
+        viewModel.$warningType
+            .sink { [weak self] warningType in
+                self?.handleWarningType(warningType)
+            }
+            .store(in: &cancellables)
     }
 
     // IndexPath representing selected item
@@ -266,7 +272,7 @@ private extension CreateTrackerViewController {
         warningLabelHeight?.isActive = true
     }
     
-    private func setCreateButton(enabled: Bool) {
+    func setCreateButton(enabled: Bool) {
         if enabled {
             createButton.buttonState = .enabled
         } else {
@@ -274,15 +280,37 @@ private extension CreateTrackerViewController {
         }
     }
     
-    private func updateCollectionView(emojiIndexPath: IndexPath, colorIndexPath: IndexPath) {
+    func updateCollectionView(emojiIndexPath: IndexPath, colorIndexPath: IndexPath) {
         selectedEmojiIndexPath = emojiIndexPath
         selectedColorIndexPath = colorIndexPath
         collectionView.reloadItems(at: [emojiIndexPath])
         collectionView.reloadItems(at: [colorIndexPath])
     }
     
-    private func updateTracked(days: UpdateTrackedDaysViewModel) {
+    func updateTracked(days: UpdateTrackedDaysViewModel) {
         daysUpdatingView.configure(with: days)
+    }
+
+    func handleWarningType(_ warningType: CreateTrackerViewModelImpl.WarningType) {
+        switch warningType {
+        case .animateToShow:
+            let height: CGFloat = 20
+            if warningLabelHeight?.constant ==  height {
+                warningCharactersLabel.shakeSelf()
+            }
+            animateHeight(height)
+        case .animateToHide:
+            animateHeight(.zero)
+        }
+    }
+
+    func animateHeight(_ height: CGFloat) {
+        UIView.animate(withDuration: 0.3) {
+            if self.warningLabelHeight?.constant != height {
+                self.warningLabelHeight?.constant = height
+                self.view.layoutIfNeeded()
+            }
+        }
     }
 }
 
@@ -436,43 +464,8 @@ extension CreateTrackerViewController: UICollectionViewDelegate {
 // MARK: - UITextFieldDelegate
 extension CreateTrackerViewController: TrackerUITextFieldDelegate {
     func isChangeText(text: String, newLength: Int) -> Bool? {
-        // Save text as tracker Name
-        if text.isEmpty {
-            self.viewModel?.name = nil
-        } else {
-            self.viewModel?.name = text
-        }
-        
-        let maxLength = 38
-        let isTextTooLong = newLength > maxLength
-        
-        // Show animation if text more than 38, and shake if continue typing
-        forbidEnterTextAnimationWillShowIf(isTextTooLong)
-        return !isTextTooLong
-    }
-    
-    // Private methods
-    private func forbidEnterTextAnimationWillShowIf(_ isTextTooLong: Bool) {
-        if isTextTooLong {
-            let warningHeight: CGFloat = 20
-            // Shake if label fully opened
-            if warningLabelHeight?.constant == warningHeight {
-                warningCharactersLabel.shakeSelf()
-            }
-            // Animate constraint to 20
-            animateHeight(warningHeight)
-        } else {
-            // Animate constraint back to 0
-            animateHeight(.zero)
-        }
-    }
-    
-    private func animateHeight(_ height: CGFloat) {
-        UIView.animate(withDuration: 0.3) {
-            if self.warningLabelHeight?.constant != height {
-                self.warningLabelHeight?.constant = height
-                self.view.layoutIfNeeded()
-            }
-        }
+        guard let viewModel = viewModel else { return true }
+        viewModel.handleNameLogic(name: text, newNameLength: newLength)
+        return !viewModel.isTextTooLong(newLength)
     }
 }

@@ -178,14 +178,15 @@ private extension TrackersViewController {
     func handle(filters: FiltersViewController.Filters) {
         switch filters {
         case .all:
-            print("all")
+            try? dataProvider?.getAllTrackers()
         case .forToday:
-            print("forToday")
+            try? dataProvider?.getTrackersForToday()
         case .completed:
-            print("completed")
+            try? dataProvider?.getCompletedTrackers()
         case .uncompleted:
-            print("uncompleted")
+            try? dataProvider?.getUnCompletedTrackers()
         }
+        collectionView.reloadData()
     }
 }
 
@@ -218,7 +219,6 @@ extension TrackersViewController: UICollectionViewDataSource {
         header.configure(with: dataProvider?.header(for: indexPath.section) ?? "")
         return header
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
         return false

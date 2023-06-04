@@ -27,6 +27,7 @@ final class CreateTrackerViewModelImpl: ObservableObject {
     // Property for updating a screen in eddit mode
     @Published var updateTrackerViewModel: UpdateTrackerViewModel?
     @Published var updateTrackedDaysViewModel: UpdateTrackedDaysViewModel?
+    @Published var warningType: WarningType = .animateToHide
     
     // Properties for creating a new tracker
     @Published var name: String?
@@ -41,7 +42,12 @@ final class CreateTrackerViewModelImpl: ObservableObject {
     private let trackerKind: Tracker.Kind
     private let trackerManager: TrackerManagerProtocol
     private let date: String?
-    
+
+    enum WarningType {
+        case animateToShow
+        case animateToHide
+    }
+
     // MARK: - Init
     init(
         trackerKind: Tracker.Kind,
@@ -150,6 +156,17 @@ final class CreateTrackerViewModelImpl: ObservableObject {
             print(error)
         }
     }
+
+    func handleNameLogic(name: String, newNameLength: Int) {
+        updateName(name)
+        let isTextLong = isTextTooLong(newNameLength)
+        setEnterTextAnimationWarningType(isTextLong)
+    }
+
+    func isTextTooLong(_ newLength: Int) -> Bool {
+        let maxLength = 38
+        return newLength > maxLength
+    }
 }
 
 // MARK: - Public DataSource
@@ -235,6 +252,22 @@ private extension CreateTrackerViewModelImpl {
             )
         } else {
             return UpdateTrackedDaysViewModel(trackedDays: "", isTrackedForToday: false)
+        }
+    }
+
+    func setEnterTextAnimationWarningType(_ isTextTooLong: Bool) {
+        if isTextTooLong {
+            warningType = .animateToShow
+        } else {
+            warningType = .animateToHide
+        }
+    }
+
+    func updateName(_ name: String) {
+        if name.isEmpty {
+            self.name = nil
+        } else {
+            self.name = name
         }
     }
 }
