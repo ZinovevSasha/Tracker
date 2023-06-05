@@ -15,7 +15,7 @@ final class CategoryTableViewCell: UITableViewCell {
     var interactionDelegate: UIContextMenuInteractionDelegate? {
         didSet {
             if let interactionDelegate {
-                contentView.addInteraction(UIContextMenuInteraction(delegate: interactionDelegate))
+                self.addInteraction(UIContextMenuInteraction(delegate: interactionDelegate))
             }
         }
     }

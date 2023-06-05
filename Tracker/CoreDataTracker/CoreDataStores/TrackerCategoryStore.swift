@@ -18,6 +18,7 @@ protocol TrackerCategoryListProtocol {
     func getAllCategories() -> [TrackerCategory]
     func removeCategoryWith(name: String)
     func updateCategoryWith(id: String, byNewName name: String)
+    func addCategory(name: String)
 }
 
 struct TrackerCategoryStore: Store {
@@ -45,6 +46,12 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             category.header = name
             category.addToTrackers(tracker)
         }
+        save()
+    }
+
+    func addCategory(name: String) {
+        let trackerCategory = TrackerCategory(id: UUID().uuidString, header: name, trackers: [], isLastSelected: false)
+        TrackerCategoryCoreData(trackerCategory: trackerCategory, context: context)
         save()
     }
     
@@ -122,6 +129,7 @@ extension TrackerCategoryStore: TrackerCategoryListProtocol {
       
     func updateCategoryWith(id: String, byNewName name: String) {
         if let category = getCategoryBy(id: id) {
+            category.id = id
             category.header = name
             save()
         }
@@ -163,6 +171,20 @@ private extension TrackerCategoryStore {
                 NSNumber(value: true)
             )
         }.first
+    }
+}
+
+extension TrackerCategoryCoreData {
+    convenience init(trackerCategory: TrackerCategory, context: NSManagedObjectContext) {
+        self.init(context: context)
+        update(trackerCategory: trackerCategory)
+    }
+
+    func update(trackerCategory: TrackerCategory) {
+        self.id = trackerCategory.id
+        self.header = trackerCategory.header
+        self.trackers = NSSet(array: trackerCategory.trackers)
+        self.isLastSelected = trackerCategory.isLastSelected
     }
 }
 

@@ -48,7 +48,7 @@ extension CreateNewCategoryViewModel {
     func createButtonTapped() {
         guard let name = name else { return }
         guard let trackerCategory = trackerCategory else {
-            try? categoryStore?.addCategory(with: name)
+            categoryStore?.addCategory(name: name)
             delegate?.categoryUpdatedOrCreated()
             return
         }

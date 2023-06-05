@@ -28,7 +28,6 @@
 		F970EF0B2A0A6F4B00AAAA84 /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F970EF0A2A0A6F4B00AAAA84 /* SplashViewController.swift */; };
 		F970EF0D2A0A725D00AAAA84 /* OnboardingPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F970EF0C2A0A725D00AAAA84 /* OnboardingPageViewController.swift */; };
 		F970EFEC2A0E934900AAAA84 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F970EFEE2A0E934900AAAA84 /* Localizable.strings */; };
-		F970EFF12A0E974900AAAA84 /* LocalizedStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F970EFF02A0E974900AAAA84 /* LocalizedStrings.swift */; };
 		F970EFF42A0EC75400AAAA84 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = F970EFF62A0EC75400AAAA84 /* Localizable.stringsdict */; };
 		F970EFFC2A0FFE0400AAAA84 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F970EFFE2A0FFE0400AAAA84 /* InfoPlist.strings */; };
 		F97774B329D2D69C00959E7C /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F97774B229D2D69C00959E7C /* MainTabBarController.swift */; };
@@ -60,6 +59,7 @@
 		F98840D929F1409500422FD5 /* TrackerCategoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98840D829F1409500422FD5 /* TrackerCategoryStore.swift */; };
 		F98840DB29F140AC00422FD5 /* TrackerRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98840DA29F140AC00422FD5 /* TrackerRecordStore.swift */; };
 		F98840DF29F1699F00422FD5 /* DataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98840DE29F1699F00422FD5 /* DataProvider.swift */; };
+		F991EF7F2A2E327B009B7EE7 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F991EF7E2A2E327B009B7EE7 /* Colors.xcassets */; };
 		F9B926E129E7E57200D98F28 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B926E029E7E57200D98F28 /* UIButton+Extension.swift */; };
 		F9B926E529E85BEB00D98F28 /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B926E429E85BEB00D98F28 /* Array+Extension.swift */; };
 		F9D87F5629F814A40085C483 /* PredicateBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D87F5529F814A40085C483 /* PredicateBuilder.swift */; };
@@ -111,7 +111,6 @@
 		F970EF0C2A0A725D00AAAA84 /* OnboardingPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageViewController.swift; sourceTree = "<group>"; };
 		F970EFED2A0E934900AAAA84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F970EFEF2A0E937100AAAA84 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
-		F970EFF02A0E974900AAAA84 /* LocalizedStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedStrings.swift; sourceTree = "<group>"; };
 		F970EFF52A0EC75400AAAA84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		F970EFF72A0EC75700AAAA84 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		F970EFFD2A0FFE0400AAAA84 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -145,6 +144,7 @@
 		F98840D829F1409500422FD5 /* TrackerCategoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStore.swift; sourceTree = "<group>"; };
 		F98840DA29F140AC00422FD5 /* TrackerRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordStore.swift; sourceTree = "<group>"; };
 		F98840DE29F1699F00422FD5 /* DataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProvider.swift; sourceTree = "<group>"; };
+		F991EF7E2A2E327B009B7EE7 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		F9B926E029E7E57200D98F28 /* UIButton+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
 		F9B926E429E85BEB00D98F28 /* Array+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
 		F9D87F5529F814A40085C483 /* PredicateBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredicateBuilder.swift; sourceTree = "<group>"; };
@@ -233,11 +233,13 @@
 		F918019929CEED2600767F16 /* Resourses */ = {
 			isa = PBXGroup;
 			children = (
-				F97E8FE029E3FF5C002BB0C8 /* Style */,
+				F991EF7C2A2E322E009B7EE7 /* Generated */,
 				F970EFF82A0FFD5400AAAA84 /* Localized */,
+				F97E8FE029E3FF5C002BB0C8 /* Style */,
 				F970EFF92A0FFD8700AAAA84 /* Other */,
 				F918019029CEECCC00767F16 /* LaunchScreen.storyboard */,
 				F918018E29CEECCC00767F16 /* Assets.xcassets */,
+				F991EF7E2A2E327B009B7EE7 /* Colors.xcassets */,
 				F918019329CEECCC00767F16 /* Info.plist */,
 			);
 			path = Resourses;
@@ -340,7 +342,6 @@
 		F970EFF82A0FFD5400AAAA84 /* Localized */ = {
 			isa = PBXGroup;
 			children = (
-				F970EFF02A0E974900AAAA84 /* LocalizedStrings.swift */,
 				F970EFFE2A0FFE0400AAAA84 /* InfoPlist.strings */,
 				F970EFF62A0EC75400AAAA84 /* Localizable.stringsdict */,
 				F970EFEE2A0E934900AAAA84 /* Localizable.strings */,
@@ -475,6 +476,13 @@
 			path = CoreDataStores;
 			sourceTree = "<group>";
 		};
+		F991EF7C2A2E322E009B7EE7 /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
 		F9D81BFD2A1E48E0005FE134 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -553,10 +561,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F918019629CEECCC00767F16 /* Build configuration list for PBXNativeTarget "Tracker" */;
 			buildPhases = (
+				F991EF802A2E3311009B7EE7 /* ShellScript */,
+				F97774B129D2D4E600959E7C /* SwiftLint */,
 				F918017E29CEECCB00767F16 /* Sources */,
 				F918017F29CEECCB00767F16 /* Frameworks */,
 				F918018029CEECCB00767F16 /* Resources */,
-				F97774B129D2D4E600959E7C /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -641,6 +650,7 @@
 				F970EFEC2A0E934900AAAA84 /* Localizable.strings in Resources */,
 				F918018F29CEECCC00767F16 /* Assets.xcassets in Resources */,
 				F970EFFC2A0FFE0400AAAA84 /* InfoPlist.strings in Resources */,
+				F991EF7F2A2E327B009B7EE7 /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -673,6 +683,23 @@
 			shellPath = /bin/sh;
 			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
+		F991EF802A2E3311009B7EE7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ -f \"${PODS_ROOT}/SwiftGen/bin/swiftgen\" ]]; then\n  \"${PODS_ROOT}/SwiftGen/bin/swiftgen\"\nelse\n  echo \"warning: SwiftGen is not installed. Run 'pod install --repo-update' to install it.\"\nfi \n\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -693,7 +720,6 @@
 				F967CCF529E1B78900E3C811 /* ActionButton.swift in Sources */,
 				F97E8FE229E3FF82002BB0C8 /* CGFloat+Extension.swift in Sources */,
 				F97E3C0D29FEC053001C252E /* CategoryViewModel.swift in Sources */,
-				F970EFF12A0E974900AAAA84 /* LocalizedStrings.swift in Sources */,
 				F967CCC029E08C2F00E3C811 /* DataSource.swift in Sources */,
 				F978FA9C2A2A6D69002F415F /* StoreProtocol.swift in Sources */,
 				F9053E792A2C806400C93CC7 /* CreateNewCategoryViewModel.swift in Sources */,
