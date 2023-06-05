@@ -159,7 +159,11 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
         else {
             return UIContextMenuConfiguration()
         }
-        
+
+        UIView.animate(withDuration: 0.3) {
+            self.tableView.separatorColor = .clear
+        }
+
         let updateAction = UIAction(title: "Update") { [weak self] _ in
             guard let self = self else { return }
             pushCreateNewCategoryVC(indexPath: indexPath)
@@ -175,6 +179,12 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
         return UIContextMenuConfiguration(
             identifier: nil, previewProvider: nil) { _ in
                 return menu
+        }
+    }
+
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willEndFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+        UIView.animate(withDuration: 0.3) {
+            self.tableView.separatorColor = .myGray
         }
     }
 }

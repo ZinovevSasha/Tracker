@@ -38,6 +38,7 @@ final class CreateTrackerViewController: UIViewController {
         view.register(cellClass: CreateTrackerTableViewCell.self)
         return view
     }()
+
     private let collectionView: UICollectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         view.isScrollEnabled = false
@@ -108,10 +109,7 @@ final class CreateTrackerViewController: UIViewController {
         viewModel.$isTrackersAddedToCoreData
             .sink { [weak self] isAdded in
                 if isAdded {
-                    guard let presentingVC = self?.presentingViewController else { return }
-                    self?.dismiss(animated: false) {
-                        presentingVC.dismiss(animated: true, completion: nil)
-                    }
+                    self?.dismissScreen()
                 }
             }
             .store(in: &cancellables)
@@ -119,12 +117,8 @@ final class CreateTrackerViewController: UIViewController {
         viewModel.$updateTrackerViewModel
             .dropFirst()
             .sink { [weak self] updateViewModel in
-                guard let updateViewModel else { return }
-                
-                self?.updateCollectionView(
-                    emojiIndexPath: updateViewModel.emoji,
-                    colorIndexPath: updateViewModel.color)
-                self?.titleTextfield.set(text: updateViewModel.name)
+                self?.updateCollectionView(with: updateViewModel)
+                self?.titleTextfield.set(text: updateViewModel?.name)
             }
             .store(in: &cancellables)
         
@@ -137,6 +131,7 @@ final class CreateTrackerViewController: UIViewController {
             .store(in: &cancellables)
 
         viewModel.$warningType
+            .dropFirst()
             .sink { [weak self] warningType in
                 self?.handleWarningType(warningType)
             }
@@ -172,7 +167,7 @@ final class CreateTrackerViewController: UIViewController {
     
     // MARK: - Private @objc target action methods
     @objc private func cancelButtonTapped() {
-        dismiss(animated: true)
+        dismissScreen()
     }
 
     @objc private func createButtonTapped() {
@@ -212,6 +207,13 @@ private extension CreateTrackerViewController {
     
     func setupUI() {
         mainScrollView.showsVerticalScrollIndicator = false
+    }
+
+    func dismissScreen() {
+        guard let presentingVC = presentingViewController else { return }
+        dismiss(animated: false) {
+            presentingVC.dismiss(animated: true, completion: nil)
+        }
     }
     
     func setupLayout() {
@@ -280,11 +282,12 @@ private extension CreateTrackerViewController {
         }
     }
     
-    func updateCollectionView(emojiIndexPath: IndexPath, colorIndexPath: IndexPath) {
-        selectedEmojiIndexPath = emojiIndexPath
-        selectedColorIndexPath = colorIndexPath
-        collectionView.reloadItems(at: [emojiIndexPath])
-        collectionView.reloadItems(at: [colorIndexPath])
+    func updateCollectionView(with viewModel: UpdateTrackerViewModel?) {
+        guard let viewModel = viewModel else { return }
+        selectedEmojiIndexPath = viewModel.emoji
+        selectedColorIndexPath = viewModel.color
+        collectionView.reloadItems(at: [viewModel.emoji])
+        collectionView.reloadItems(at: [viewModel.color])
     }
     
     func updateTracked(days: UpdateTrackedDaysViewModel) {

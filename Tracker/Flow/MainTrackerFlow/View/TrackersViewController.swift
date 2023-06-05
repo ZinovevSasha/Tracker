@@ -61,15 +61,12 @@ final class TrackersViewController: UIViewController {
     }()
     
     lazy var alertPresenter = AlertPresenter(presentingViewController: self)
-    
+
+    private var currentFilter: FiltersViewController.Filters = .forToday
     private var currentDay = Date()
-    private var weekDayNumber: String {
-        String(Date.currentWeekDayNumber(from: currentDay))
-    }
-    private var dateString: String {
-        Date.dateString(for: currentDay)
-    }
-    private var currentFilter: FiltersViewController.Filters?
+    private var currentWeekdayString: String {String(Date.currentWeekDayNumber(from: currentDay))}
+    private var currentDateString: String {Date.dateString(for: currentDay)}
+
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -101,8 +98,8 @@ final class TrackersViewController: UIViewController {
     @objc func filterTrackers() {
         let filtersVC = FiltersViewController(filter: currentFilter)
         filtersVC.filterSelected = { [weak self] filter in
-            self?.handle(filters: filter)
             self?.currentFilter = filter
+            self?.handle(filters: filter)
         }
         present(filtersVC, animated: true)
     }
@@ -178,13 +175,15 @@ private extension TrackersViewController {
     func handle(filters: FiltersViewController.Filters) {
         switch filters {
         case .all:
-            try? dataProvider?.getAllTrackers()
+            try? dataProvider?.getAllTrackersFor(day: currentWeekdayString)
         case .forToday:
+            currentDay = Date()
+            headerView.setDate(date: Date())
             try? dataProvider?.getTrackersForToday()
         case .completed:
-            try? dataProvider?.getCompletedTrackers()
+            try? dataProvider?.getCompletedTrackersFor(date: currentDateString)
         case .uncompleted:
-            try? dataProvider?.getUnCompletedTrackers()
+            try? dataProvider?.getUnCompletedTrackersFor(date: currentDateString, weekDay: currentWeekdayString)
         }
         collectionView.reloadData()
     }
@@ -204,7 +203,9 @@ extension TrackersViewController: UICollectionViewDataSource {
         let cell: TrackerCollectionViewCell = collectionView.dequeueReusableCell(for: indexPath)
         let tracker = dataProvider?.getTracker(at: indexPath)
         let daysTracked = dataProvider?.daysTracked(for: indexPath)
-        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: currentDay.todayString)
+
+        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: currentDateString)
+
         cell.configure(with: tracker)
         cell.configure(with: daysTracked, isCompleted: isCompletedForToday)
         cell.delegate = self
@@ -255,7 +256,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func didMarkTrackerCompleted(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         do {
-            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: dateString)
+            try dataProvider?.saveAsCompletedTracker(with: indexPath, for: currentDateString)
         } catch {
             print("⛈️", error)
         }
@@ -282,7 +283,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
         guard let indexPath = collectionView.indexPath(for: cell),
             let tracker = dataProvider?.getTracker(at: indexPath) else { return }
         let updateTrackerViewModel = CreateTrackerViewModelImpl(
-            trackerKind: tracker.kind, tracker: tracker, date: dateString)
+            trackerKind: tracker.kind, tracker: tracker, date: currentDateString)
         
         let updateTrackerViewController = CreateTrackerViewController(viewModel: updateTrackerViewModel)
         
@@ -295,8 +296,13 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
     func datePickerValueChanged(date: Date) {
         currentDay = date
         do {
-            try dataProvider?.fetchTrackersBy(weekDay: weekDayNumber)
-            collectionView.reloadData()
+            if currentFilter == .forToday {
+                try dataProvider?.fetchTrackersBy(weekDay: currentWeekdayString)
+                currentFilter = .all
+                collectionView.reloadData()
+            } else {
+                handle(filters: currentFilter)
+            }
         } catch {
             print("🏹", error)
         }
@@ -307,7 +313,18 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
         do {
-            try dataProvider?.fetchTrackersBy(name: searchText, weekDay: weekDayNumber)
+            switch currentFilter {
+            case .all:
+                try dataProvider?.fetchTrackersBy(name: searchText, weekDay: currentWeekdayString)
+            case .forToday:
+                try dataProvider?.fetchTrackersBy(name: searchText, weekDay: Date().weekDayString)
+            case .completed:
+                try dataProvider?.getCompletedTrackersWithNameFor(
+                    date: currentDateString, name: searchText)
+            case .uncompleted:
+                try dataProvider?.getUnCompletedTrackersWithNameFor(
+                    date: currentDateString, weekDay: currentWeekdayString, name: searchText)
+            }
             collectionView.reloadData()
         } catch {
             print("😎", error)

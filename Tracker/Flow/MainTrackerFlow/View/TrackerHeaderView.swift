@@ -6,6 +6,10 @@ protocol TrackerHeaderViewDelegate: AnyObject {
 }
 
 final class TrackerHeaderView: UIView {
+    func setDate(date: Date) {
+        datePicker.setDate(date, animated: true)
+    }
+    
     // MARK: - Delegate
     weak var delegate: TrackerHeaderViewDelegate?
     
