@@ -13,7 +13,7 @@ final class SearchView: UIView {
     private let searchBar: UISearchBar = {
         let view = UISearchBar()
         view.searchBarStyle = .minimal
-        view.placeholder = Localized.Main.search
+        view.placeholder = Strings.Localizable.Main.search
         return view
     }()
     

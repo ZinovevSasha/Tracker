@@ -3,7 +3,8 @@ import Combine
 
 final class CreateNewCategoryViewController: FrameViewController {
     // MARK: - Private properties
-    private let textField = TrackerUITextField(text: Localized.NewCategory.enterName)
+    private let textField = TrackerUITextField(
+        text: Strings.Localizable.NewCategory.enterName)
     
     private var mainStackView: UIStackView = {
         let view = UIStackView()
@@ -14,7 +15,7 @@ final class CreateNewCategoryViewController: FrameViewController {
     
     private var warningCharactersLabel: UILabel = {
         let view = UILabel()
-        view.text = Localized.NewCategory.existAlready
+        view.text = Strings.Localizable.NewCategory.alreadyExist
         view.numberOfLines = .zero
         view.font = .regular17
         view.textColor = .myRed
@@ -39,8 +40,10 @@ final class CreateNewCategoryViewController: FrameViewController {
     init(viewModel: CreateNewCategoryViewModel) {
         self.viewModel = viewModel
         super.init(
-            title: Localized.NewCategory.new,
-            buttonCenter: ActionButton(colorType: .grey, title: Localized.NewCategory.ready)
+            title: Strings.Localizable.NewCategory.new,
+            buttonCenter: ActionButton(
+                colorType: .grey,
+                title: Strings.Localizable.NewCategory.ready)
         )
         bind()
     }

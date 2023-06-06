@@ -45,10 +45,10 @@ final class FiltersViewController: FrameViewController {
         
         var description: String {
             switch self {
-            case .all: return "Все трекеры"
-            case .forToday: return "Трекеры на сегодня"
-            case .completed: return "Завершенные"
-            case .uncompleted: return "Не завершенные"
+            case .all: return Strings.Localizable.Filters.all
+            case .forToday: return Strings.Localizable.Filters.today
+            case .completed: return Strings.Localizable.Filters.completed
+            case .uncompleted: return Strings.Localizable.Filters.notCompleted
             }
         }
     }
@@ -57,7 +57,7 @@ final class FiltersViewController: FrameViewController {
     
     init(filter: Filters?) {
         self.currentFilter = filter
-        super.init(title: "Filters", buttonCenter: .none)
+        super.init(title: Strings.Localizable.Filters.title, buttonCenter: .none)
     }
     
     required init?(coder: NSCoder) {

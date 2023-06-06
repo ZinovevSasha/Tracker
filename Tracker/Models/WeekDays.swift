@@ -10,25 +10,25 @@ enum WeekDay: Int, CaseIterable {
     
     var abbreviationLong: String {
         switch self {
-        case .monday: return Localized.NewHabit.monday
-        case .tuesday: return Localized.NewHabit.tuesday
-        case .wednesday: return Localized.NewHabit.wednesday
-        case .thursday: return Localized.NewHabit.thursday
-        case .friday: return Localized.NewHabit.friday
-        case .saturday: return Localized.NewHabit.saturday
-        case .sunday: return Localized.NewHabit.sunday
+        case .monday: return Strings.Localizable.Schedule.monday
+        case .tuesday: return Strings.Localizable.Schedule.tuesday
+        case .wednesday: return Strings.Localizable.Schedule.wednesday
+        case .thursday: return Strings.Localizable.Schedule.thursday
+        case .friday: return Strings.Localizable.Schedule.friday
+        case .saturday: return Strings.Localizable.Schedule.saturday
+        case .sunday: return Strings.Localizable.Schedule.sunday
         }
     }
     
     var abbreviationShort: String {
         switch self {
-        case .monday: return Localized.NewHabit.mon
-        case .tuesday: return Localized.NewHabit.tue
-        case .wednesday: return Localized.NewHabit.wed
-        case .thursday: return Localized.NewHabit.thu
-        case .friday: return Localized.NewHabit.fri
-        case .saturday: return Localized.NewHabit.sat
-        case .sunday: return Localized.NewHabit.sun
+        case .monday: return Strings.Localizable.Schedule.mon
+        case .tuesday: return Strings.Localizable.Schedule.tue
+        case .wednesday: return Strings.Localizable.Schedule.wed
+        case .thursday: return Strings.Localizable.Schedule.thu
+        case .friday: return Strings.Localizable.Schedule.fri
+        case .saturday: return Strings.Localizable.Schedule.sat
+        case .sunday: return Strings.Localizable.Schedule.sun
         }
     }
 }
@@ -42,7 +42,7 @@ extension WeekDay: Comparable {
 extension Set<Int> {
     func weekdayStringShort() -> String {
         if self == WeekDay.allDaysOfWeek {
-            return Localized.NewHabit.everyday
+            return Strings.Localizable.Schedule.everyday
         } else {
             let weekDay = WeekDay
                 .allCases // take all cases  from Mon to Sun

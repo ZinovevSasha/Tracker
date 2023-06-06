@@ -9,7 +9,7 @@ final class TrackersViewController: UIViewController {
         let view = UIButton()
         view.layer.cornerRadius = .cornerRadius
         view.layer.masksToBounds = true
-        view.setTitle("Filters", for: .normal)
+        view.setTitle(Strings.Localizable.Filters.title, for: .normal)
         view.titleLabel?.font = .regular17
         view.backgroundColor = .myBlue
         return view
@@ -51,14 +51,7 @@ final class TrackersViewController: UIViewController {
     }
     
     // MARK: - Models
-    private lazy var dataProvider: DataProviderProtocol? = {
-        do {
-            return try DataProvider(delegate: self)
-        } catch {
-            print("Данные недоступны")
-            return nil
-        }
-    }()
+    private var dataProvider: DataProviderProtocol?
     
     lazy var alertPresenter = AlertPresenter(presentingViewController: self)
 
@@ -67,6 +60,15 @@ final class TrackersViewController: UIViewController {
     private var currentWeekdayString: String {String(Date.currentWeekDayNumber(from: currentDay))}
     private var currentDateString: String {Date.dateString(for: currentDay)}
 
+    init(dataProvider: DataProviderProtocol?) {
+        self.dataProvider = dataProvider
+        super.init(nibName: nil, bundle: nil)
+        self.dataProvider?.delegate = self
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -274,7 +276,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     
     func didDeleteTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        alertPresenter.show(message: "Уверены что хотите удалить трекер?") { [weak self] in
+        alertPresenter.show(message: Strings.Localizable.Alert.confirmationTracker) { [weak self] in
             try? self?.dataProvider?.deleteTracker(at: indexPath)
         }
     }

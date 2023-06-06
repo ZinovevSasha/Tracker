@@ -1,27 +1,28 @@
 import CoreData
 
 protocol TrackerStoreManagerProtocol {
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData
-    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCoreData) throws
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCD
+    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCD) throws
     func getCategoryHeaderForTrackerWith(id: String) -> String?
     func getTrackedDaysNumberFor(id: String) -> Int?
-    func getTrackerBy(id: String) -> TrackerCoreData?
+    func getObjectBy(id: String) -> [TrackerCD]?
+    func delete(_ entity: TrackerCD) throws
 }
 
 protocol TrackerStoreDataProviderProtocol {
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData
-    func delete(_ record: TrackerCoreData) throws
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCD
+    func delete(_ record: TrackerCD) throws
 }
 
 struct TrackerStore: Store {
-    typealias EntityType = TrackerCoreData
+    typealias EntityType = TrackerCD
     
     let context: NSManagedObjectContext
-    var predicateBuilder: PredicateBuilder<TrackerCoreData>
+    var predicateBuilder: PredicateBuilder<TrackerCD>
     
     init(
         context: NSManagedObjectContext,
-        predicateBuilder: PredicateBuilder<TrackerCoreData> = PredicateBuilder()
+        predicateBuilder: PredicateBuilder<TrackerCD> = PredicateBuilder()
     ) {
         self.context = context
         self.predicateBuilder = predicateBuilder
@@ -31,16 +32,16 @@ struct TrackerStore: Store {
 // MARK: - TrackerStoreManagerProtocol
 extension TrackerStore: TrackerStoreManagerProtocol {
     func getCategoryHeaderForTrackerWith(id: String) -> String? {
-        let trackerCoreData = getTrackerBy(id: id)
+        let trackerCoreData = getObjectBy(id: id)?.first
         return trackerCoreData?.lastCategory ?? trackerCoreData?.category?.header
     }
     
     func getTrackedDaysNumberFor(id: String) -> Int? {
-        getTrackerBy(id: id)?.trackerRecord?.count
+        getObjectBy(id: id)?.first?.trackerRecord?.count
     }
     
-    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCoreData) throws {
-        if let trackerCoreData = getTrackerBy(id: tracker.id) {
+    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCD) throws {
+        if let trackerCoreData = getObjectBy(id: tracker.id)?.first {
             trackerCoreData.update(with: tracker)
             if trackerCoreData.lastCategory != nil {
                 trackerCoreData.lastCategory = category.header
@@ -50,30 +51,17 @@ extension TrackerStore: TrackerStoreManagerProtocol {
             save()
         }
     }
-    
-    func getTrackerBy(id: String) -> TrackerCoreData? {
-        let fetchRequest = TrackerCoreData.fetchRequest()
-        fetchRequest.predicate = predicateBuilder
-            .addPredicate(.equalTo, keyPath: \.id, value: id).build()
-        let trackerCoreData = try? context.fetch(fetchRequest).first
-        return trackerCoreData
-    }
 }
 
 // MARK: - TrackerStoreDataProviderProtocol
 extension TrackerStore: TrackerStoreDataProviderProtocol {
-    func createTrackerCoreData(_ tracker: Tracker) -> TrackerCoreData {
-        return TrackerCoreData(tracker: tracker, context: context)
-    }
-    
-    func delete(_ record: TrackerCoreData) throws {
-        context.delete(record)
-        save()
+    func createTrackerCoreData(_ tracker: Tracker) -> TrackerCD {
+        return TrackerCD(from: tracker, context: context)
     }
 }
 
-extension TrackerCoreData {
-    convenience init(tracker: Tracker, context: NSManagedObjectContext) {
+extension TrackerCD: Identible {
+    convenience init(from tracker: Tracker, context: NSManagedObjectContext) {
         self.init(context: context)
         update(with: tracker)
     }

@@ -77,13 +77,13 @@ private extension PlaceholderView {
         case .invisible(let isAnimate):
             isAnimate ? setAlphaToZero() : setAlphaToZero(time: .zero)
         case .question:
-            setState(image: .star, text: Localized.Placeholder.question)
+            setState(image: .star, text: Strings.Localizable.Placeholder.question)
         case .noResult:
-            setState(image: .noResult, text: Localized.Placeholder.noResults)
+            setState(image: .noResult, text: Strings.Localizable.Placeholder.noResults)
         case .noStatistic:
-            setState(image: .noStatistic, text: Localized.Placeholder.noStatistic)
+            setState(image: .noStatistic, text: Strings.Localizable.Placeholder.noStatistic)
         case .recomendation:
-            setState(image: .star, text: Localized.Placeholder.recomendation)
+            setState(image: .star, text: Strings.Localizable.Placeholder.recomendation)
         }
     }
     

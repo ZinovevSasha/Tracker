@@ -2,7 +2,7 @@ import Foundation
 
 protocol TrackerManagerProtocol {
     func getCategoryNameFor(trackerID: String) -> String?
-    func getTrackerBy(id: String) -> TrackerCoreData?
+    func getTrackerBy(id: String) -> TrackerCD?
     func getHeaderName() -> String?
     func getTrackedDaysNumberFor(id: String) -> Int?
     func isCompletedFor(date: String, trackerWithId id: String) -> Bool?
@@ -107,8 +107,8 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
         try? trackerRecordStore?.isCompletedFor(date, trackerWithId: id)
     }
     
-    func getTrackerBy(id: String) -> TrackerCoreData? {
-        trackerStore?.getTrackerBy(id: id)
+    func getTrackerBy(id: String) -> TrackerCD? {
+        trackerStore?.getObjectBy(id: id)?.first
     }
     
     func getHeaderName() -> String? {
@@ -116,7 +116,7 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
     }
     
     func markAsTrackedFor(date: String?, trackerWithId id: String?) throws {
-        if let id, let date, let tracker = trackerStore?.getTrackerBy(id: id) {
+        if let id, let date, let tracker = trackerStore?.getObjectBy(id: id)?.first {
             try trackerRecordStore?.removeOrAddRecordOf(tracker: tracker, forParticularDay: date)
         }
     }

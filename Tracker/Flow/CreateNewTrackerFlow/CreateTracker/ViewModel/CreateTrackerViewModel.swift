@@ -114,7 +114,7 @@ final class CreateTrackerViewModelImpl: ObservableObject {
                 color: colorIndexPath)
             
             updateTrackedDaysViewModel = UpdateTrackedDaysViewModel(
-                trackedDays: Localized.Main.numberOf(days: trackedDays),
+                trackedDays: Strings.Localizable.daysNumber(trackedDays),
                 isTrackedForToday: isTrackedTracker)
         }
     }
@@ -247,7 +247,7 @@ private extension CreateTrackerViewModelImpl {
             let trackedDays = trackerManager.getTrackedDaysNumberFor(id: tracker.id),
             let isCompleted = trackerManager.isCompletedFor(date: date, trackerWithId: tracker.id) {
             return UpdateTrackedDaysViewModel(
-                trackedDays: Localized.Main.numberOf(days: trackedDays),
+                trackedDays: Strings.Localizable.daysNumber(trackedDays),
                 isTrackedForToday: isCompleted
             )
         } else {

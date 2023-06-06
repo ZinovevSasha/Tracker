@@ -23,6 +23,7 @@ protocol DataProviderDelegate: AnyObject {
 }
 
 protocol DataProviderProtocol {
+    var delegate: DataProviderDelegate? { get set }
     var isEmpty: Bool { get }
     var numberOfSections: Int { get }
     func numberOfRowsInSection(_ section: Int) -> Int
@@ -58,30 +59,30 @@ final class DataProvider: NSObject {
     // Context -> one for 3 stores
     private let context: NSManagedObjectContext
     // Stores
-    private let trackerStore: TrackerStoreDataProviderProtocol
+    private let trackerStore: TrackerStoreManagerProtocol
     private let trackerCategoryStore: TrackerCategoryStoreProtocol
     private let trackerRecordStore: TrackerRecordStoreProtocol
     // PredicateBuilder
-    private var predicateBuilder = PredicateBuilder<TrackerCoreData>()
+    private var predicateBuilder = PredicateBuilder<TrackerCD>()
     // Delegate
     weak var delegate: DataProviderDelegate?
     
     // Fetch controller
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
-        let fetchRequest = TrackerCoreData.fetchRequest()
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCD> = {
+        let fetchRequest = TrackerCD.fetchRequest()
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
         fetchRequest.predicate = makePredicateBy(Date().weekDayString)
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(TrackerCoreData.isAttached), ascending: false),
-            NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true),
-            NSSortDescriptor(key: #keyPath(TrackerCoreData.name), ascending: true)
+            NSSortDescriptor(key: #keyPath(TrackerCD.isAttached), ascending: false),
+            NSSortDescriptor(key: #keyPath(TrackerCD.category.header), ascending: true),
+            NSSortDescriptor(key: #keyPath(TrackerCD.name), ascending: true)
         ]
 
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: #keyPath(TrackerCoreData.category.header),
+            sectionNameKeyPath: #keyPath(TrackerCD.category.header),
             cacheName: nil
         )
         
@@ -96,10 +97,9 @@ final class DataProvider: NSObject {
     }()
     
     // MARK: - Init
-    init(delegate: DataProviderDelegate?) throws {
+    init(context: NSManagedObjectContext? = nil) throws {
         let context = try Context.getContext()
         
-        self.delegate = delegate
         self.context = context
         self.trackerStore = TrackerStore(context: context)
         self.trackerRecordStore = TrackerRecordStore(context: context)
@@ -151,8 +151,10 @@ extension DataProvider: DataProviderProtocol {
     
     func addTrackerCategory(_ category: TrackerCategory) throws {
         guard let tracker = category.trackers.first else { return }
-        let trackerCoreData = try trackerStore.createTrackerCoreData(tracker)
-        try trackerCategoryStore.addTracker(toCategoryWithName: category.header, tracker: trackerCoreData)
+        try trackerCategoryStore.addTracker(
+            toCategoryWithName: category.header,
+            tracker: TrackerCD(from: tracker, context: context)
+        )
     }
     
     func deleteTracker(at indexPath: IndexPath) throws {
@@ -227,7 +229,7 @@ extension DataProvider: DataProviderProtocol {
     func getUnCompletedTrackersWithNameFor(date: String, weekDay: String, name: String) throws {
         let forDayOfWeek = makePredicateBy(weekDay)
         let uncompleted = NSPredicate(format: "ANY trackerRecord.date != %@", date)
-        let neverTracked = NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCoreData.trackerRecord)
+        let neverTracked = NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCD.trackerRecord)
         )
         let name = predicateBuilder.addPredicate(.contains, keyPath: \.name, value: name).build()
 
@@ -249,7 +251,7 @@ extension DataProvider: DataProviderProtocol {
     func getUnCompletedTrackersFor(date: String, weekDay: String) throws {
         let forDayOfWeek = makePredicateBy(weekDay)
         let uncompleted = NSPredicate(format: "ANY trackerRecord.date != %@", date)
-        let neverTracked = NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCoreData.trackerRecord)
+        let neverTracked = NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCD.trackerRecord)
         )
 
         let dontTrackedAndForDayOfWeek = NSCompoundPredicate(type: .and, subpredicates: [neverTracked, forDayOfWeek])
