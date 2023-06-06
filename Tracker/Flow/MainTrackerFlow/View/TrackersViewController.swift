@@ -52,13 +52,12 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - Models
     private var dataProvider: DataProviderProtocol?
-    
     lazy var alertPresenter = AlertPresenter(presentingViewController: self)
 
     private var currentFilter: FiltersViewController.Filters = .forToday
     private var currentDay = Date()
-    private var currentWeekdayString: String {String(Date.currentWeekDayNumber(from: currentDay))}
-    private var currentDateString: String {Date.dateString(for: currentDay)}
+    private var currentWeekdayString: String { currentDay.weekDayString }
+    private var currentDateString: String { currentDay.dateString }
 
     init(dataProvider: DataProviderProtocol?) {
         self.dataProvider = dataProvider
@@ -67,7 +66,7 @@ final class TrackersViewController: UIViewController {
     }
     
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("Unsupported")
     }
     
     // MARK: - Lifecycle
