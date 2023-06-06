@@ -53,7 +53,7 @@ extension CreateNewCategoryViewModel {
             return
         }
         
-        categoryStore?.updateCategoryWith(id: trackerCategory.id, byNewName: name)
+        categoryStore?.update(category: trackerCategory.trackerCategory, withNewName: name)
         delegate?.categoryUpdatedOrCreated()
     }
     
@@ -63,7 +63,7 @@ extension CreateNewCategoryViewModel {
             categoryNameStatus = .empty
             return
         }
-        if name != "Attached" && isNameAvailable(name: name) ?? false {
+        if name != Strings.Localizable.Main.pinned && isNameAvailable(name: name) ?? false {
             self.name = name
             categoryNameStatus = .available
         } else {

@@ -27,6 +27,7 @@ final class CategoriesListViewController: FrameViewController {
     private var dataSource: UITableViewDiffableDataSource<Int, CategoryViewModel>?
     private var viewModel: CategoriesListViewModel
     private var cancellables = Set<AnyCancellable>()
+    lazy var alertPresenter = AlertPresenter(presentingViewController: self)
     
     func bind() {
         viewModel.$categories
@@ -43,8 +44,10 @@ final class CategoriesListViewController: FrameViewController {
     init(viewModel: CategoriesListViewModel) {
         self.viewModel = viewModel
         super.init(
-            title: Localized.CategoryList.category,
-            buttonCenter: ActionButton(colorType: .black, title: Localized.CategoryList.newCategory)
+            title: Strings.Localizable.Category.category,
+            buttonCenter: ActionButton(
+                colorType: .black,
+                title: Strings.Localizable.Category.addNew)
         )
         bind()
     }
@@ -164,14 +167,16 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
             self.tableView.separatorColor = .clear
         }
 
-        let updateAction = UIAction(title: "Update") { [weak self] _ in
+        let updateAction = UIAction(title: Strings.Localizable.Context.update) { [weak self] _ in
             guard let self = self else { return }
             pushCreateNewCategoryVC(indexPath: indexPath)
         }
         
-        let deleteAction = UIAction(title: "Delete", attributes: .destructive) { [weak self] _ in
+        let deleteAction = UIAction(title: Strings.Localizable.Context.delete, attributes: .destructive) { [weak self] _ in
             guard let self = self else { return }
-            viewModel.deleteCategoryAt(indexPath: indexPath)
+            alertPresenter.show(message:  Strings.Localizable.Alert.confirmationCategory) { [weak self] in
+                self?.viewModel.deleteCategoryAt(indexPath: indexPath)
+            }
         }
         
         let menu = UIMenu(title: "", children: [updateAction, deleteAction])

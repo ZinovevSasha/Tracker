@@ -15,12 +15,12 @@ struct TrackerCategory: Hashable {
 }
 
 extension TrackerCategory {
-    init(coreData: TrackerCategoryCoreData) {
+    init(coreData: TrackerCategoryCD) {
         self.id = coreData.id ?? ""
         self.header = coreData.header ?? ""
         self.isLastSelected = coreData.isLastSelected
         
-        let trackerCoreDatas = coreData.trackers?.allObjects as? [TrackerCoreData] ?? []
+        let trackerCoreDatas = coreData.trackers?.allObjects as? [TrackerCD] ?? []
         self.trackers = trackerCoreDatas.map { Tracker(coreData: $0) }
     }
 }

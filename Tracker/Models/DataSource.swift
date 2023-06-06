@@ -13,8 +13,12 @@ protocol DataSourceProtocol {
 }
 
 struct DataSourceImpl {
-    private var category = TableData(title: Localized.NewHabit.category, subtitle: "")
-    private var schedule = TableData(title: Localized.NewHabit.schedule, subtitle: "")
+    private var category = TableData(
+        title: Strings.Localizable.Create.category,
+        subtitle: "")
+    private var schedule = TableData(
+        title: Strings.Localizable.Create.schedule,
+        subtitle: "")
     
     // Public data
     private let collectionViewData: [CollectionViewData] = [
@@ -113,9 +117,9 @@ enum CollectionViewData {
     var title: String {
         switch self {
         case .emojiSection:
-            return Localized.NewHabit.emoji
+            return Strings.Localizable.Create.emoji
         case .colorSection:
-            return Localized.NewHabit.color
+            return Strings.Localizable.Create.color
         }
     }
 }

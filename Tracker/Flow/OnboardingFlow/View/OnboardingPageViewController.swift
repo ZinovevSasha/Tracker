@@ -7,11 +7,11 @@ final class OnboardingPageViewController: UIPageViewController {
     private var pages: [UIViewController] = {
         let onboardingBlue = OnboardingViewController(
             image: .onboardingBlue,
-            greetingText: Localized.Onboarding.greeting1
+            greetingText: Strings.Localizable.Onboarding.greeting1
         )
         let onboardingRed = OnboardingViewController(
             image: .onboardingRed,
-            greetingText: Localized.Onboarding.greeting2
+            greetingText: Strings.Localizable.Onboarding.greeting2
         )
         return [onboardingBlue, onboardingRed]
     }()
@@ -25,7 +25,7 @@ final class OnboardingPageViewController: UIPageViewController {
         return pageControll
     }()
     
-    private let button = ActionButton(title: Localized.Onboarding.enter)
+    private let button = ActionButton(title: Strings.Localizable.Onboarding.enter)
     
     // MARK: - Init
    

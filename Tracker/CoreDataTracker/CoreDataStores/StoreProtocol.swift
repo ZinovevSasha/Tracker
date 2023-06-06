@@ -1,8 +1,12 @@
 import CoreData
 import UIKit
 
+protocol Identible {
+    var id: String? { get set }
+}
+
 protocol Store {
-    associatedtype EntityType
+    associatedtype EntityType: NSManagedObject & Identible
     
     var context: NSManagedObjectContext { get }
     var predicateBuilder: PredicateBuilder<EntityType> { get }
@@ -10,6 +14,8 @@ protocol Store {
     init(context: NSManagedObjectContext, predicateBuilder: PredicateBuilder<EntityType>)
     
     func save()
+    func delete(_ entity: EntityType) throws
+    func getObjectBy(id: String) -> [EntityType]?
 }
 
 extension Store {
@@ -17,8 +23,19 @@ extension Store {
         do {
             try context.save()
         } catch {
-            print("Error saving context: \(error.localizedDescription)")
+            context.rollback()
         }
+    }
+
+    func delete(_ entity: EntityType) throws {
+        context.delete(entity)
+        save()
+    }
+
+    func getObjectBy(id: String) -> [EntityType]? {
+        let fetchRequest = EntityType.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id)
+        return try? context.fetch(fetchRequest) as? [EntityType]
     }
     
     init() throws {

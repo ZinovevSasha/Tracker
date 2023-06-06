@@ -23,7 +23,7 @@ final class TrackerHeaderView: UIView {
     
     private let trackerLabel: UILabel = {
         let label = UILabel()
-        label.text = Localized.Main.trackers
+        label.text = Strings.Localizable.Main.trackers
         label.font = .bold34
         return label
     }()

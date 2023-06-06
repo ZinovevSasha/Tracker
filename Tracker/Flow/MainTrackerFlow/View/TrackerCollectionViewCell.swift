@@ -23,7 +23,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             
     func configure(with trackedDays: Int?, isCompleted: Bool?) {
         guard let trackedDays = trackedDays, let isCompleted = isCompleted else { return }
-        trackedDaysLabel.text = Localized.Main.numberOf(days: trackedDays)
+        trackedDaysLabel.text = Strings.Localizable.daysNumber(trackedDays)
         if isCompleted {
             buttonState = .selected
         } else {
@@ -234,18 +234,18 @@ private extension TrackerCollectionViewCell {
 
 extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        let title = isAttached ? "Unattach" : "Attach"
+        let title = isAttached ? Strings.Localizable.Context.unpin : Strings.Localizable.Context.pin
         let attachAction = UIAction(title: title) { [weak self] _ in
             guard let self = self else { return }
             self.pendingAction = isAttached ? .unattach : .attach
         }
         
-        let updateAction = UIAction(title: "Update") { [weak self] _ in
+        let updateAction = UIAction(title: Strings.Localizable.Context.update) { [weak self] _ in
             guard let self = self else { return }
             self.delegate?.didUpdateTracker(for: self)
         }
         
-        let deleteAction = UIAction(title: "Delete", attributes: .destructive) { [weak self] _ in
+        let deleteAction = UIAction(title: Strings.Localizable.Context.delete, attributes: .destructive) { [weak self] _ in
             guard let self = self else { return }
             self.delegate?.didDeleteTracker(for: self)
         }

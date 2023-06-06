@@ -4,7 +4,7 @@ final class ChooseTrackerViewController: UIViewController {
     // MARK: Private properties
     private let nameOfScreenLabel: UILabel = {
         let label = UILabel()
-        label.text = Localized.Choosing.title
+        label.text = Strings.Localizable.Choosing.tracker
         label.font = .medium16
         label.textAlignment = .center
         return label
@@ -19,11 +19,11 @@ final class ChooseTrackerViewController: UIViewController {
     
     let habitButton = ActionButton(
         colorType: .black,
-        title: Localized.Choosing.habit)
+        title: Strings.Localizable.Choosing.trackerType1)
     
     let irregularEventButton = ActionButton(
         colorType: .black,
-        title: Localized.Choosing.irregular)
+        title: Strings.Localizable.Choosing.trackerType2)
     
     // MARK: UIConstants
     private enum UIConstants {

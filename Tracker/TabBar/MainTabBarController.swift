@@ -4,16 +4,16 @@ final class MainTabBarController: UITabBarController {
     // MARK: - Init
     init() {
         super.init(nibName: nil, bundle: nil)
-        
+
         viewControllers = [
             generateViewController(
-                TrackersViewController(),
+                TrackersViewController(dataProvider: try? DataProvider()),
                 image: .leftTabBar,
-                title: Localized.TabBar.trackers),
+                title: Strings.Localizable.TabBar.trackers),
             generateViewController(
                 StatisticViewController(),
                 image: .rightTabBar,
-                title: Localized.TabBar.statistics)
+                title: Strings.Localizable.TabBar.statistics)
         ]
     }
     
