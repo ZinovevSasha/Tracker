@@ -315,7 +315,7 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
             updatedIndexes: updatedItem,
             movedIndexes: movedItem
         )
-        
+        print(update)
         // Update delegate with indexes
         delegate?.didUpdate(update)
         isEmpty ? delegate?.place() : delegate?.resultFound()
