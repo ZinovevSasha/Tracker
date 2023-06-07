@@ -81,8 +81,10 @@ final class TrackersViewController: UIViewController {
         super.viewWillAppear(animated)
         if let isEmpty = dataProvider?.isEmpty, isEmpty {
             placeholderView.state = .question
+            filterButton.isHidden = true
         } else {
             placeholderView.state = .invisible(animate: false)
+            filterButton.isHidden = false
         }
     }
     
@@ -337,14 +339,17 @@ extension TrackersViewController: SearchViewDelegate {
 extension TrackersViewController: DataProviderDelegate {
     func place() {
         placeholderView.state = .question
+
     }
     
     func noResultFound() {
         placeholderView.state = .noResult
+        filterButton.isHidden = true
     }
     
     func resultFound() {
         placeholderView.state = .invisible(animate: true)
+        filterButton.isHidden = false
     }
     
     func didUpdate(_ update: DataProviderUpdate) {

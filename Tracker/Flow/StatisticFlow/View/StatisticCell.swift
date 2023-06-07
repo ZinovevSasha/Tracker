@@ -10,10 +10,6 @@ final class StatisticTableViewCell: UITableViewCell {
     func bind(to viewModel: StatisticCellViewModel) {
         viewModel.$value
             .sink { [weak self] value in
-                if value == "Comming soon" {
-                    self?.daysLabel.alpha = 0.4
-                    self?.daysLabel.font = .bold19
-                }
                 self?.daysLabel.text = value
             }
             .store(in: &cancellables)

@@ -36,8 +36,10 @@ final class StatisticViewController: UIViewController {
             .sink { [weak self] isAny in
                 if isAny {
                     self?.placeholder.state = .invisible(animate: false)
+                    self?.tableView.reloadData()
                 } else {
                     self?.placeholder.state = .noStatistic
+                    self?.tableView.reloadData()
                 }
             }
             .store(in: &cancellables)
@@ -50,9 +52,6 @@ final class StatisticViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         viewModel.viewWillAppear()
-        if viewModel.statisticData.isEmpty {
-
-        }
     }
 
     private func setDelegates() {

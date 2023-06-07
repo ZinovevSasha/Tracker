@@ -85,3 +85,7 @@
 
 // Statistic
 "statistic.title" = "Statistics";
+"statistic.bestPeriod" = "Best period";
+"statistic.idealDays" = "Ideal days";
+"statistic.completed" = "Completed trackers";
+"statistic.avarageValue" = "Avarage value";

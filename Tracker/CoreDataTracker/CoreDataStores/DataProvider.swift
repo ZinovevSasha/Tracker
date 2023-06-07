@@ -203,6 +203,7 @@ extension DataProvider: DataProviderProtocol {
     func getAllTrackersFor(day: String) throws {
         fetchedResultsController.fetchRequest.predicate = makePredicateBy(day)
         try fetchedResultsController.performFetch()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
     func getCompletedTrackersWithNameFor(date: String, name: String) throws {

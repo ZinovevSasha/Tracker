@@ -62,7 +62,11 @@ extension TrackerStore: TrackerStoreDataProviderProtocol {
 
     var isAnyTrackers: Bool {
         let fetchRequest = TrackerCD.fetchRequest()
-        return ((try? context.fetch(fetchRequest).isEmpty) != nil)
+        let trackers = try? context.fetch(fetchRequest)
+        if let trackers {
+            return trackers.isEmpty ? false : true
+        }
+        return false
     }
 }
 

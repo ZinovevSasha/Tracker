@@ -10,27 +10,57 @@ final class StatisticViewModel {
     }
 
     func viewWillAppear() {
-        let completedTrackersCount = trackerRecordStore.getNumberOfCompletedTrackers()
+        // Check if there are any trackers
+        let isAnyTrackers = trackerStore.isAnyTrackers
 
-        isAnyTrackers = trackerStore.isAnyTrackers
+        // If there are any trackers
+        if isAnyTrackers {
+            // Get the number of completed trackers
+            let completedTrackersCount = trackerRecordStore.getNumberOfCompletedTrackers()
 
-        if statisticData.isEmpty {
-            statisticData = [
-                .bestPeriod(StatisticCellViewModel()),
-                .idealDays(StatisticCellViewModel()),
-                .completedTrackers(StatisticCellViewModel(value: "\(completedTrackersCount)")),
-                .averageValue(StatisticCellViewModel())
-            ]
-        } else {
-            statisticData.forEach { data in
-                switch data {
-                case .completedTrackers(var statisticCellViewModel):
-                    statisticCellViewModel.value = "\(completedTrackersCount)"
-                default: break
-                }
+            // If statisticData is empty, set initial values for each cell
+            if statisticData.isEmpty {
+                setInitialStatisticData(completedTrackersCount: completedTrackersCount)
+            }
+            // Otherwise, update the completed trackers cell with the current count
+            else {
+                updateCompletedTrackersCell(value: completedTrackersCount)
+            }
+        }
+        // If there are no trackers, reset the statistic data
+        else {
+            resetStatisticData()
+        }
+
+        // Update the isAnyTrackers property
+        self.isAnyTrackers = isAnyTrackers
+    }
+
+    private func setInitialStatisticData(completedTrackersCount: Int) {
+        // Set up initial statistic data for each cell
+        statisticData = [
+            .bestPeriod(StatisticCellViewModel()),
+            .idealDays(StatisticCellViewModel()),
+            .completedTrackers(StatisticCellViewModel(value: "\(completedTrackersCount)")),
+            .averageValue(StatisticCellViewModel())
+        ]
+    }
+
+    private func updateCompletedTrackersCell(value: Int) {
+        // Find the completed trackers cell and update its value
+        for (index, data) in statisticData.enumerated() {
+            if case .completedTrackers(let viewModel) = data {
+                statisticData[index] = .completedTrackers(StatisticCellViewModel(value: "\(value)"))
+                break
             }
         }
     }
+
+    private func resetStatisticData() {
+        // Reset the statistic data when there are no trackers
+        statisticData = []
+    }
+
 
     // MARK: - Private
     private let trackerRecordStore: TrackerRecordStoreProtocol
@@ -49,7 +79,7 @@ final class StatisticViewModel {
 final class StatisticCellViewModel {
     @Published var value: String
 
-    init(value: String = "Comming soon") {
+    init(value: String = "-") {
         self.value = value
     }
 }
@@ -63,13 +93,13 @@ enum StatisticTableData {
     var title: String {
         switch self {
         case .bestPeriod:
-            return "Лучший период"
+            return Strings.Localizable.Statistic.bestPeriod
         case .idealDays:
-            return "Идеальные дни"
+            return Strings.Localizable.Statistic.idealDays
         case .completedTrackers:
-            return "Трекеров завершено"
+            return Strings.Localizable.Statistic.completed
         case .averageValue:
-            return "Среднее значение"
+            return Strings.Localizable.Statistic.avarageValue
         }
     }
 }

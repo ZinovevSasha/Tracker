@@ -159,6 +159,14 @@ public enum Strings {
       public static let wednesday = Strings.tr("Localizable", "schedule.wednesday", fallback: "Wednesday")
     }
     public enum Statistic {
+      /// Avarage value
+      public static let avarageValue = Strings.tr("Localizable", "statistic.avarageValue", fallback: "Avarage value")
+      /// Best period
+      public static let bestPeriod = Strings.tr("Localizable", "statistic.bestPeriod", fallback: "Best period")
+      /// Completed trackers
+      public static let completed = Strings.tr("Localizable", "statistic.completed", fallback: "Completed trackers")
+      /// Ideal days
+      public static let idealDays = Strings.tr("Localizable", "statistic.idealDays", fallback: "Ideal days")
       /// Statistics
       public static let title = Strings.tr("Localizable", "statistic.title", fallback: "Statistics")
     }
