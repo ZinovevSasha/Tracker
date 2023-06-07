@@ -10,31 +10,31 @@ final class StatisticViewModel {
     }
 
     func viewWillAppear() {
-        // Check if there are any trackers
         let isAnyTrackers = trackerStore.isAnyTrackers
 
-        // If there are any trackers
         if isAnyTrackers {
-            // Get the number of completed trackers
-            let completedTrackersCount = trackerRecordStore.getNumberOfCompletedTrackers()
-
-            // If statisticData is empty, set initial values for each cell
-            if statisticData.isEmpty {
-                setInitialStatisticData(completedTrackersCount: completedTrackersCount)
-            }
-            // Otherwise, update the completed trackers cell with the current count
-            else {
-                updateCompletedTrackersCell(value: completedTrackersCount)
-            }
+            handleTrackersExistence()
+        } else {
+            handleNoTrackersExistence()
         }
-        // If there are no trackers, reset the statistic data
-        else {
-            resetStatisticData()
-        }
-
-        // Update the isAnyTrackers property
-        self.isAnyTrackers = isAnyTrackers
     }
+
+    func handleTrackersExistence() {
+        let completedTrackersCount = trackerRecordStore.getNumberOfCompletedTrackers()
+
+        if statisticData.isEmpty {
+            setInitialStatisticData(completedTrackersCount: completedTrackersCount)
+            self.isAnyTrackers = true
+        } else {
+            updateCompletedTrackersCell(value: completedTrackersCount)
+        }
+    }
+
+    func handleNoTrackersExistence() {
+        resetStatisticData()
+        self.isAnyTrackers = false
+    }
+
 
     private func setInitialStatisticData(completedTrackersCount: Int) {
         // Set up initial statistic data for each cell
@@ -48,10 +48,11 @@ final class StatisticViewModel {
 
     private func updateCompletedTrackersCell(value: Int) {
         // Find the completed trackers cell and update its value
-        for (index, data) in statisticData.enumerated() {
-            if case .completedTrackers(let viewModel) = data {
-                statisticData[index] = .completedTrackers(StatisticCellViewModel(value: "\(value)"))
-                break
+        statisticData.forEach { data in
+            switch data {
+            case .completedTrackers(let viewModel):
+                viewModel.value = "\(value)"
+            default: break
             }
         }
     }
