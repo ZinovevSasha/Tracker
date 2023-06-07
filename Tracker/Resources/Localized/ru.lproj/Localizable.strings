@@ -37,21 +37,21 @@
 // Schedule
 "schedule" = "Расписание";
 "schedule.ready" = "Готово";
-"scheule.monday" = "Понедельник";
-"scheule.tuesday" = "Вторник";
-"scheule.wednesday" = "Среда";
-"scheule.thursday" = "Четверг";
-"scheule.friday" = "Пятница";
-"scheule.saturday" = "Суббота";
-"scheule.sunday" = "Воскресенье";
-"scheule.mon" = "Пн";
-"scheule.tue" = "Вт";
-"scheule.wed" = "Ср";
-"scheule.thu" = "Чт";
-"scheule.fri" = "Пт";
-"scheule.sat" = "Сб";
-"scheule.sun" = "Вс";
-"scheule.everyday" = "Каждый день";
+"schedule.monday" = "Понедельник";
+"schedule.tuesday" = "Вторник";
+"schedule.wednesday" = "Среда";
+"schedule.thursday" = "Четверг";
+"schedule.friday" = "Пятница";
+"schedule.saturday" = "Суббота";
+"schedule.sunday" = "Воскресенье";
+"schedule.mon" = "Пн";
+"schedule.tue" = "Вт";
+"schedule.wed" = "Ср";
+"schedule.thu" = "Чт";
+"schedule.fri" = "Пт";
+"schedule.sat" = "Сб";
+"schedule.sun" = "Вс";
+"schedule.everyday" = "Каждый день";
 
 // CategoryList
 "category.category" = "Категория";
@@ -81,3 +81,6 @@
 "alert.confirmationTracker" = "Уверены что хотите удалить трекер?";
 "alert.cancel" = "Отменить";
 "alert.delete" = "Удалить";
+
+// Statistic
+"statistic.title" = "Статистика";

@@ -38,22 +38,26 @@ extension Store {
         return try? context.fetch(fetchRequest) as? [EntityType]
     }
     
-    init() throws {
-        let context = try Context.getContext()
+    init() {
+        let context = Context.shared.context
         self.init(context: context, predicateBuilder: PredicateBuilder())
     }
 }
 
-enum Context {
-    enum DataProviderError: Error {
-        case contextUnavailable
+final class Context {
+    static let shared = Context()
+
+    var context: NSManagedObjectContext {
+        persistentContainer.viewContext
     }
-    
-    static func getContext() throws -> NSManagedObjectContext {
-        guard let context = (UIApplication.shared.delegate as? AppDelegate)?
-            .persistentContainer.viewContext else {
-            throw DataProviderError.contextUnavailable
+
+    lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "TrackerModel")
+        container.loadPersistentStores { _, error in
+            if let error = error as NSError? {
+                print("Unresolved error \(error), \(error.userInfo)")
+            }
         }
-        return context
-    }
+        return container
+    }()
 }

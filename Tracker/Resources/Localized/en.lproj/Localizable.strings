@@ -83,3 +83,5 @@
 "alert.cancel" = "Cancel";
 "alert.delete" = "Delete";
 
+// Statistic
+"statistic.title" = "Statistics";

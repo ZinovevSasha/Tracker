@@ -13,29 +13,9 @@ protocol TrackerManagerProtocol {
 
 struct TrackerManagerImpl: TrackerManagerProtocol {
     // MARK: - Dependencies
-    private var trackerCategoryStore: TrackerCategoryStoreProtocol? = {
-        do {
-            return try TrackerCategoryStore()
-        } catch {
-            return nil
-        }
-    }()
-    
-    private var trackerStore: TrackerStoreManagerProtocol? = {
-        do {
-            return try TrackerStore()
-        } catch {
-            return nil
-        }
-    }()
-    
-    private var trackerRecordStore: TrackerRecordStoreProtocol? = {
-        do {
-            return try TrackerRecordStore()
-        } catch {
-            return nil
-        }
-    }()
+    private var trackerCategoryStore: TrackerCategoryStoreProtocol = TrackerCategoryStore()
+    private var trackerStore: TrackerStoreManagerProtocol = TrackerStore()
+    private var trackerRecordStore: TrackerRecordStoreProtocol = TrackerRecordStore()
     
     // MARK: - Public methods
     func createTracker(kind: Tracker.Kind, name: String?, emoji: String?, color: String?, schedule: Set<Int>?, categoryHeader: String?) throws {
@@ -67,9 +47,8 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
             )
         }
         
-        if let trackerCoreData = try trackerStore?.createTrackerCoreData(tracker) {
-            try trackerCategoryStore?.addTracker(toCategoryWithName: categoryHeader, tracker: trackerCoreData)
-        }
+        let trackerCoreData = try trackerStore.createTrackerCoreData(tracker)
+        try trackerCategoryStore.addTracker(toCategoryWithName: categoryHeader, tracker: trackerCoreData)
     }
     
     func updateTracker(kind: Tracker.Kind, id: String?, name: String?, emoji: String?, color: String?, schedule: Set<Int>?, categoryHeader: String?, isAttached: Bool) throws {
@@ -90,34 +69,34 @@ struct TrackerManagerImpl: TrackerManagerProtocol {
             kind: kind
         )
         
-        if let category = try? trackerCategoryStore?.addCategory(with: categoryHeader) {
-            try? trackerStore?.save(tracker: tracker, andUpdateItsCategory: category)
+        if let category = try trackerCategoryStore.addCategory(with: categoryHeader) {
+            try trackerStore.save(tracker: tracker, andUpdateItsCategory: category)
         }
     }
     
     func getCategoryNameFor(trackerID: String) -> String? {
-        trackerStore?.getCategoryHeaderForTrackerWith(id: trackerID)
+        trackerStore.getCategoryHeaderForTrackerWith(id: trackerID)
     }
     
     func getTrackedDaysNumberFor(id: String) -> Int? {
-        trackerStore?.getTrackedDaysNumberFor(id: id)
+        trackerStore.getTrackedDaysNumberFor(id: id)
     }
     
     func isCompletedFor(date: String, trackerWithId id: String) -> Bool? {
-        try? trackerRecordStore?.isCompletedFor(date, trackerWithId: id)
+        try? trackerRecordStore.isCompletedFor(date, trackerWithId: id)
     }
     
     func getTrackerBy(id: String) -> TrackerCD? {
-        trackerStore?.getObjectBy(id: id)?.first
+        trackerStore.getObjectBy(id: id)?.first
     }
     
     func getHeaderName() -> String? {
-        trackerCategoryStore?.getNameOfLastSelectedCategory()
+        trackerCategoryStore.getNameOfLastSelectedCategory()
     }
     
     func markAsTrackedFor(date: String?, trackerWithId id: String?) throws {
-        if let id, let date, let tracker = trackerStore?.getObjectBy(id: id)?.first {
-            try trackerRecordStore?.removeOrAddRecordOf(tracker: tracker, forParticularDay: date)
+        if let id, let date, let tracker = trackerStore.getObjectBy(id: id)?.first {
+            try trackerRecordStore.removeOrAddRecordOf(tracker: tracker, forParticularDay: date)
         }
     }
 }

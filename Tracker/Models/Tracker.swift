@@ -36,3 +36,23 @@ extension Tracker {
         self.schedule = Set.fromString(coreData.schedule ?? "") ?? []
     }
 }
+
+
+let mockSport = [
+    Tracker(name: "Run 1km", emoji: "🥇", color: "#FD4C49", schedule: [1,3,5], kind: .habit),
+    Tracker(name: "Swim 1km", emoji: "🏊‍♀️", color: "#FF881E", schedule: [2,4,6], kind: .habit),
+    Tracker(name: "Sky 1km", emoji: "⛷️", color: "#35347C", schedule: [7], kind: .habit),
+    Tracker(name: "Cycle", emoji: "🚴‍♀️", color: "##33CF69", schedule: [7], kind: .habit),
+]
+
+let mockReading = [
+    Tracker(name: "Swift in depth", emoji: "🚀", color: "#FD4C49", schedule: WeekDay.allDaysOfWeek, kind: .ocasional),
+    Tracker(name: "Swift apprentice", emoji: "🚁", color: "#8D72E6", schedule: [2,4,6], kind: .habit),
+    Tracker(name: "Any book", emoji: "⛵️", color: "#FF99CC", schedule: [7], kind: .habit),
+    Tracker(name: "Cycle", emoji: "🗿", color: "#F6C48B", schedule: [7], kind: .habit),
+]
+let mockCategories = [
+TrackerCategory(header: "Sport", trackers: mockSport, isLastSelected: false),
+TrackerCategory(header: "Reading", trackers: mockReading, isLastSelected: false),
+TrackerCategory(header: "Walking", trackers: mockReading, isLastSelected: false)
+]

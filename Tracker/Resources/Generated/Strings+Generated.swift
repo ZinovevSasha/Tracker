@@ -158,6 +158,10 @@ public enum Strings {
       /// Wednesday
       public static let wednesday = Strings.tr("Localizable", "schedule.wednesday", fallback: "Wednesday")
     }
+    public enum Statistic {
+      /// Statistics
+      public static let title = Strings.tr("Localizable", "statistic.title", fallback: "Statistics")
+    }
     public enum TabBar {
       /// Statistics
       public static let statistics = Strings.tr("Localizable", "tabBar.statistics", fallback: "Statistics")

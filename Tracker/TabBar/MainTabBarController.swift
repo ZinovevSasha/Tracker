@@ -7,11 +7,19 @@ final class MainTabBarController: UITabBarController {
 
         viewControllers = [
             generateViewController(
-                TrackersViewController(dataProvider: try? DataProvider()),
+                TrackersViewController(
+                    dataProvider: DataProvider(context: Context.shared.context)
+                ),
                 image: .leftTabBar,
                 title: Strings.Localizable.TabBar.trackers),
             generateViewController(
-                StatisticViewController(),
+                UINavigationController(rootViewController: StatisticViewController(
+                    viewModel: StatisticViewModel(
+                        trackerRecordStore: TrackerRecordStore(),
+                        trackerStore: TrackerStore()
+                        )
+                    )
+                ),
                 image: .rightTabBar,
                 title: Strings.Localizable.TabBar.statistics)
         ]

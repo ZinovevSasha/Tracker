@@ -97,9 +97,7 @@ final class DataProvider: NSObject {
     }()
     
     // MARK: - Init
-    init(context: NSManagedObjectContext? = nil) throws {
-        let context = try Context.getContext()
-        
+    init(context: NSManagedObjectContext) {
         self.context = context
         self.trackerStore = TrackerStore(context: context)
         self.trackerRecordStore = TrackerRecordStore(context: context)
@@ -211,12 +209,17 @@ extension DataProvider: DataProviderProtocol {
         if !name.isEmpty {
             let completed = NSPredicate(format: "ANY trackerRecord.date == %@", date)
             let name = predicateBuilder.addPredicate(.contains, keyPath: \.name, value: name).build()
-            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [completed, name])
+            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(
+                type: .and,
+                subpredicates: [completed, name])
             try fetchedResultsController.performFetch()
+            isEmpty ? delegate?.place() : delegate?.resultFound()
         } else {
             let completed = NSPredicate(format: "ANY trackerRecord.date == %@", date)
-            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [completed])
+            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(
+                type: .and, subpredicates: [completed])
             try fetchedResultsController.performFetch()
+            isEmpty ? delegate?.place() : delegate?.resultFound()
         }
     }
 
@@ -224,6 +227,7 @@ extension DataProvider: DataProviderProtocol {
         let completed = NSPredicate(format: "ANY trackerRecord.date == %@", date)
         fetchedResultsController.fetchRequest.predicate = completed
         try fetchedResultsController.performFetch()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
     func getUnCompletedTrackersWithNameFor(date: String, weekDay: String, name: String) throws {
@@ -246,6 +250,7 @@ extension DataProvider: DataProviderProtocol {
 
         fetchedResultsController.fetchRequest.predicate = combinedPredicate
         try fetchedResultsController.performFetch()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
     func getUnCompletedTrackersFor(date: String, weekDay: String) throws {
@@ -263,12 +268,13 @@ extension DataProvider: DataProviderProtocol {
 
         fetchedResultsController.fetchRequest.predicate = combinedPredicate
         try fetchedResultsController.performFetch()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
     func getTrackersForToday() throws {
-        print(Date().weekDayString)
         fetchedResultsController.fetchRequest.predicate = makePredicateBy(Date().weekDayString)
         try fetchedResultsController.performFetch()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
     // Private

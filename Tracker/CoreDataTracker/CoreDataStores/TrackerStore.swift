@@ -12,6 +12,7 @@ protocol TrackerStoreManagerProtocol {
 protocol TrackerStoreDataProviderProtocol {
     func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCD
     func delete(_ record: TrackerCD) throws
+    var isAnyTrackers: Bool { get }
 }
 
 struct TrackerStore: Store {
@@ -57,6 +58,11 @@ extension TrackerStore: TrackerStoreManagerProtocol {
 extension TrackerStore: TrackerStoreDataProviderProtocol {
     func createTrackerCoreData(_ tracker: Tracker) -> TrackerCD {
         return TrackerCD(from: tracker, context: context)
+    }
+
+    var isAnyTrackers: Bool {
+        let fetchRequest = TrackerCD.fetchRequest()
+        return ((try? context.fetch(fetchRequest).isEmpty) != nil)
     }
 }
 
