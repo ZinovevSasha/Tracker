@@ -35,6 +35,7 @@ final class StatisticTableViewCell: UITableViewCell {
     }()
 
     let container = UIView()
+    let gradient = CAGradientLayer()
 
     // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -46,6 +47,11 @@ final class StatisticTableViewCell: UITableViewCell {
         super.layoutSubviews()
         addConstraints()
         addGradient()
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        container.layer.removeAllAnimations()
     }
 
     required init?(coder: NSCoder) {
@@ -77,7 +83,7 @@ final class StatisticTableViewCell: UITableViewCell {
     }
 
     func addGradient() {
-        let gradient = CAGradientLayer()
+
         gradient.frame =  CGRect(origin: CGPoint.zero, size: container.frame.size)
         gradient.colors = [
             Asset.Colors.gradientRed.color.cgColor,

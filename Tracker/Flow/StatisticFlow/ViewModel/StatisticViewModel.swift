@@ -19,7 +19,20 @@ final class StatisticViewModel {
         }
     }
 
-    func handleTrackersExistence() {
+    // MARK: - Private
+    private let trackerRecordStore: TrackerRecordStoreProtocol
+    private let trackerStore: TrackerStoreDataProviderProtocol
+
+    // MARK: - Init
+    init(
+        trackerRecordStore: TrackerRecordStoreProtocol,
+        trackerStore: TrackerStoreDataProviderProtocol
+    ) {
+        self.trackerRecordStore = trackerRecordStore
+        self.trackerStore = trackerStore
+    }
+
+    private func handleTrackersExistence() {
         let completedTrackersCount = trackerRecordStore.getNumberOfCompletedTrackers()
 
         if statisticData.isEmpty {
@@ -30,7 +43,7 @@ final class StatisticViewModel {
         }
     }
 
-    func handleNoTrackersExistence() {
+    private func handleNoTrackersExistence() {
         resetStatisticData()
         self.isAnyTrackers = false
     }
@@ -60,20 +73,6 @@ final class StatisticViewModel {
     private func resetStatisticData() {
         // Reset the statistic data when there are no trackers
         statisticData = []
-    }
-
-
-    // MARK: - Private
-    private let trackerRecordStore: TrackerRecordStoreProtocol
-    private let trackerStore: TrackerStoreDataProviderProtocol
-
-    // MARK: - Init
-    init(
-        trackerRecordStore: TrackerRecordStoreProtocol,
-        trackerStore: TrackerStoreDataProviderProtocol
-    ) {
-        self.trackerRecordStore = trackerRecordStore
-        self.trackerStore = trackerStore
     }
 }
 
