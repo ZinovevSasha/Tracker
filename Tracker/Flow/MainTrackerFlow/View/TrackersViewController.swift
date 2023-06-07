@@ -51,8 +51,9 @@ final class TrackersViewController: UIViewController {
     }
     
     // MARK: - Models
+    private let analiticService = AnalyticsService()
     private var dataProvider: DataProviderProtocol?
-    lazy var alertPresenter = AlertPresenter(presentingViewController: self)
+    private lazy var alertPresenter = AlertPresenter(presentingViewController: self)
 
     private var currentFilter: FiltersViewController.Filters = .forToday
     private var currentDay = Date()
@@ -79,6 +80,7 @@ final class TrackersViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        analiticService.handleAnalitics(event: .screenOpen(.main))
         if let isEmpty = dataProvider?.isEmpty, isEmpty {
             placeholderView.state = .question
             filterButton.isHidden = true
@@ -87,9 +89,15 @@ final class TrackersViewController: UIViewController {
             filterButton.isHidden = false
         }
     }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        analiticService.handleAnalitics(event: .screenClose(.main))
+    }
     
     // MARK: - @objc target action methods
     func handlePlusButtonTap() {
+        analiticService.handleAnalitics(event: .addTracker(.main, .addTrack))
         let trackerCreationViewController = ChooseTrackerViewController()
         present(trackerCreationViewController, animated: true)
     }
@@ -99,6 +107,7 @@ final class TrackersViewController: UIViewController {
     }
     
     @objc func filterTrackers() {
+        analiticService.handleAnalitics(event: .filterItemClick(.main, .filter))
         let filtersVC = FiltersViewController(filter: currentFilter)
         filtersVC.filterSelected = { [weak self] filter in
             self?.currentFilter = filter
@@ -259,6 +268,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func didMarkTrackerCompleted(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         do {
+            analiticService.handleAnalitics(event: .trackItemClick(.main, .track))
             try dataProvider?.saveAsCompletedTracker(with: indexPath, for: currentDateString)
         } catch {
             print("⛈️", error)
@@ -277,6 +287,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     
     func didDeleteTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
+        analiticService.handleAnalitics(event: .deleteItemClick(.main, .delete))
         alertPresenter.show(message: Strings.Localizable.Alert.confirmationTracker) { [weak self] in
             try? self?.dataProvider?.deleteTracker(at: indexPath)
         }
@@ -285,6 +296,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     func didUpdateTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell),
             let tracker = dataProvider?.getTracker(at: indexPath) else { return }
+        analiticService.handleAnalitics(event: .editItemClick(.main, .edit))
         let updateTrackerViewModel = CreateTrackerViewModelImpl(
             trackerKind: tracker.kind, tracker: tracker, date: currentDateString)
         

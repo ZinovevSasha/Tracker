@@ -31,6 +31,8 @@ struct AnalyticsService {
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue, item: item.stringValue)
         case let .deleteItemClick(screen, item):
             setParamsAndReport(event: event.stringValue, screen: screen.rawValue, item: item.stringValue)
+        case let .addTracker(screen, item):
+            setParamsAndReport(event: event.stringValue, screen: screen.rawValue, item: item.stringValue)
         }
     }
 
@@ -45,6 +47,7 @@ struct AnalyticsService {
 enum TrackerEvent {
     case screenOpen(Screen)
     case screenClose(Screen)
+    case addTracker(Screen, Item)
     case trackItemClick(Screen, Item)
     case filterItemClick(Screen, Item)
     case editItemClick(Screen, Item)
@@ -56,13 +59,11 @@ enum TrackerEvent {
             return "open"
         case .screenClose:
             return "close"
-        case .trackItemClick:
-            return "click"
-        case .filterItemClick:
-            return "click"
-        case .editItemClick:
-            return "click"
-        case .deleteItemClick:
+        case.addTracker,
+                .trackItemClick,
+                .filterItemClick,
+                .editItemClick,
+                .deleteItemClick:
             return "click"
         }
     }
