@@ -1,5 +1,3 @@
-import Foundation
-
 enum WeekDay: Int, CaseIterable {
     case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
@@ -12,25 +10,25 @@ enum WeekDay: Int, CaseIterable {
     
     var abbreviationLong: String {
         switch self {
-        case .monday: return "Понедельник"
-        case .tuesday: return "Вторник"
-        case .wednesday: return "Среда"
-        case .thursday: return "Четверг"
-        case .friday: return "Пятница"
-        case .saturday: return "Суббота"
-        case .sunday: return "Воскресенье"
+        case .monday: return Strings.Localizable.Schedule.monday
+        case .tuesday: return Strings.Localizable.Schedule.tuesday
+        case .wednesday: return Strings.Localizable.Schedule.wednesday
+        case .thursday: return Strings.Localizable.Schedule.thursday
+        case .friday: return Strings.Localizable.Schedule.friday
+        case .saturday: return Strings.Localizable.Schedule.saturday
+        case .sunday: return Strings.Localizable.Schedule.sunday
         }
     }
     
     var abbreviationShort: String {
         switch self {
-        case .sunday: return "Вс"
-        case .monday: return "Пн"
-        case .tuesday: return "Вт"
-        case .wednesday: return "Ср"
-        case .thursday: return "Чт"
-        case .friday: return "Пт"
-        case .saturday: return "Сб"
+        case .monday: return Strings.Localizable.Schedule.mon
+        case .tuesday: return Strings.Localizable.Schedule.tue
+        case .wednesday: return Strings.Localizable.Schedule.wed
+        case .thursday: return Strings.Localizable.Schedule.thu
+        case .friday: return Strings.Localizable.Schedule.fri
+        case .saturday: return Strings.Localizable.Schedule.sat
+        case .sunday: return Strings.Localizable.Schedule.sun
         }
     }
 }
@@ -44,13 +42,14 @@ extension WeekDay: Comparable {
 extension Set<Int> {
     func weekdayStringShort() -> String {
         if self == WeekDay.allDaysOfWeek {
-            return "Каждый день"
+            return Strings.Localizable.Schedule.everyday
         } else {
-            return WeekDay
+            let weekDay = WeekDay
                 .allCases // take all cases  from Mon to Sun
                 .filter { self.contains($0.rawValue) } // check if set has any of weekDays
                 .map { $0.abbreviationShort } // map(transform) to string
                 .joined(separator: ", ") // joing with coma
+            return weekDay
         }
     }
     

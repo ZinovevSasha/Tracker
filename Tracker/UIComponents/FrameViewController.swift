@@ -93,17 +93,17 @@ private extension FrameViewController {
         if let buttonLeft, let buttonRight  {
             screenButtons.addArrangedSubview(buttonLeft)
             screenButtons.addArrangedSubview(buttonRight)
-            buttonLeft.heightAnchor.constraint(equalToConstant: .buttonsHeight)
         }
+        
         if let buttonCenter {
             screenButtons.addArrangedSubview(buttonCenter)
-            buttonCenter.heightAnchor.constraint(equalToConstant: .buttonsHeight)
         }
     }
     
     func setupLayout() {
         NSLayoutConstraint.activate([
-            screenTitle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: UIConstants.nameLabelTopInset),
+            screenTitle.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor, constant: UIConstants.nameLabelTopInset),
             screenTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
         
@@ -113,11 +113,11 @@ private extension FrameViewController {
                 constant: UIConstants.containerToTitleInset),
             container.leadingAnchor.constraint(
                 equalTo: view.leadingAnchor,
-                constant: UIConstants.leading),
+                constant: .leadingInset),
             container.trailingAnchor.constraint(
                 equalTo: view.trailingAnchor,
-                constant: UIConstants.trailing),
-            container.bottomAnchor.constraint(equalTo: screenButtons.topAnchor),
+                constant: .trailingInset),
+            container.bottomAnchor.constraint(equalTo: screenButtons.topAnchor)
         ])
         
         NSLayoutConstraint.activate([

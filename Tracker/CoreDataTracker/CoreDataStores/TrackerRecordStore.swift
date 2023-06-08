@@ -1,77 +1,71 @@
 import CoreData
 
 protocol TrackerRecordStoreProtocol {
-    func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int
-    func removeTrackerRecordOrAdd(_ record: TrackerCoreData, with day: String) throws
-    func isTrackerCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool
-    func isTrackerCompletedFor(selectedDay: String, _ tracker: TrackerCoreData) throws -> Bool
+    func getTrackedDaysNumberFor(trackerWithId id: String?) throws -> Int
+    func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool
+    func removeOrAddRecordOf(tracker: TrackerCD, forParticularDay day: String) throws
+    func getNumberOfCompletedTrackers() -> Int
 }
 
-final class TrackerRecordStore {
-    private let context: NSManagedObjectContext
-    private let predicate = PredecateBuilder<TrackerRecordCoreData>()
+extension TrackerRecordCD: Identible {}
+struct TrackerRecordStore: Store {
+    typealias EntityType = TrackerRecordCD
         
-    init(context: NSManagedObjectContext) {
+    let context: NSManagedObjectContext
+    var predicateBuilder: PredicateBuilder<TrackerRecordCD>
+    
+    init(
+        context: NSManagedObjectContext,
+        predicateBuilder: PredicateBuilder<TrackerRecordCD> = PredicateBuilder()
+    ) {
         self.context = context
+        self.predicateBuilder = predicateBuilder
+    }
+
+    init() {
+        let context = Context.shared.context
+        self.init(context: context)
     }
 }
 
 // MARK: - Public
 extension TrackerRecordStore: TrackerRecordStoreProtocol {
-    func getTrackedDaysNumberFor(tracker: TrackerCoreData) throws -> Int {
-        let fetchRequest = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.predicate = predicate
-            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "").build()
-        let trackerRecordsCoreData = try context.fetch(fetchRequest)
-        return trackerRecordsCoreData.count
-    }
-    
-    func isTrackerCompletedForToday(_ tracker: TrackerCoreData) throws -> Bool {
-        let fetchRequest = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.predicate = predicate
-            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "")
-            .addPredicate(.equalTo, keyPath: \.date, value: Date.dateString(for: Date()))
-            .build(type: .and)
-        let trackerRecordsCoreData = try context.fetch(fetchRequest)
-        return trackerRecordsCoreData.first != nil ? true : false
+    func getTrackedDaysNumberFor(trackerWithId id: String?) throws -> Int {
+        guard let id = id else { return .zero }
+        return getObjectBy(id: id)?.count ?? .zero
     }
 
-    func isTrackerCompletedFor(selectedDay: String, _ tracker: TrackerCoreData) throws -> Bool {
-        let fetchRequest = TrackerRecordCoreData.fetchRequest()
-        fetchRequest.predicate = predicate
-            .addPredicate(.equalTo, keyPath: \.recordId, value: tracker.id ?? "")
+    func getNumberOfCompletedTrackers() -> Int {
+        let fetchRequest = TrackerRecordCD.fetchRequest()
+        let trackerRecordsCoreData = try? context.fetch(fetchRequest)
+        return trackerRecordsCoreData?.count ?? .zero
+    }
+    
+    func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool {
+        let fetchRequest = TrackerRecordCD.fetchRequest()
+        fetchRequest.predicate = predicateBuilder
+            .addPredicate(.equalTo, keyPath: \.id, value: id ?? "")
             .addPredicate(.equalTo, keyPath: \.date, value: selectedDay)
             .build(type: .and)
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.first != nil ? true : false
     }
     
-    func removeTrackerRecordOrAdd(_ record: TrackerCoreData, with day: String) throws {
-        let fetchRequest = TrackerRecordCoreData.fetchRequest()
+    func removeOrAddRecordOf(tracker: TrackerCD, forParticularDay day: String) throws {
+        let fetchRequest = TrackerRecordCD.fetchRequest()
         let trackerRecordCoreData = try context.fetch(fetchRequest)
         
         if let trackerToRemoveIndex = trackerRecordCoreData.firstIndex(
-            where: { $0.date == day && $0.recordId == record.id }) {
+            where: { $0.date == day && $0.id == tracker.id }) {
             // Remove the tracker record from the array
             context.delete(trackerRecordCoreData[trackerToRemoveIndex])
         } else {
             // Create new record
-            let trackerRecord = TrackerRecordCoreData(context: context)
-            trackerRecord.recordId = record.id
+            let trackerRecord = TrackerRecordCD(context: context)
+            trackerRecord.id = tracker.id
             trackerRecord.date = day
-            trackerRecord.tracker = record
+            trackerRecord.tracker = tracker
         }
-        saveContext()
-    }
-}
-
-// MARK: - Private
-private extension TrackerRecordStore {
-    func saveContext() {
-        do {
-            try context.save()
-        } catch {
-            print("Error saving context: \(error.localizedDescription)")
-        }
+        save()
     }
 }

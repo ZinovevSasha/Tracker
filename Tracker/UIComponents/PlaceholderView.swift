@@ -2,14 +2,14 @@ import UIKit
 
 final class PlaceholderView: UIView {
     // MARK: - Public
-    var state: PlaceholderState = .star {
+    var state: PlaceholderState = .question {
         didSet {
             updateAppearance()
         }
     }
     
     enum PlaceholderState {
-        case star, noResult, noStatistic, recomendation
+        case question, noResult, noStatistic, recomendation
         case invisible(animate: Bool)
     }
     
@@ -74,16 +74,16 @@ private extension PlaceholderView {
     
     func updateAppearance() {
         switch state {
-        case .invisible(let isAnimate):            
+        case .invisible(let isAnimate):
             isAnimate ? setAlphaToZero() : setAlphaToZero(time: .zero)
-        case .star:
-            setState(image: .star, text: "Что будем отслеживать?")
+        case .question:
+            setState(image: .star, text: Strings.Localizable.Placeholder.question)
         case .noResult:
-            setState(image: .noResult, text: "Ничего не найдено")
+            setState(image: .noResult, text: Strings.Localizable.Placeholder.noResults)
         case .noStatistic:
-            setState(image: .noStatistic, text: "Анализировать пока нечего")
+            setState(image: .noStatistic, text: Strings.Localizable.Placeholder.noStatistic)
         case .recomendation:
-            setState(image: .star, text: "Привычки и события\n можно объединить по смыслу")
+            setState(image: .star, text: Strings.Localizable.Placeholder.recomendation)
         }
     }
     

@@ -1,71 +1,59 @@
 import Foundation
 
-final class SearchLogicProvider {
-    let predicate = PredecateBuilder<TrackerCoreData>()
-    
-    func weekDay(weekDay: String) -> NSPredicate {
-        return predicate
-            .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
-            .build(type: .or)
-    }
-    
-    func nameAndWeekDay(name: String, weekDay: String) -> NSPredicate {
-        return predicate
-            .addPredicate(.contains, keyPath: \.name, value: name)
-            .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
-            .build()
-    }
-    
-    func onlyName(_ name: String) -> NSPredicate {
-        return predicate
-            .addPredicate(.contains, keyPath: \.name, value: name)
-            .build()
-    }
-}
-
-final class PredecateBuilder<T> {
+struct PredicateBuilder<T> {
     private var predicates: [NSPredicate] = []
-    
-    func addPredicate(_ predicateType: PredicateType, keyPath: KeyPath<T, String?>, value: String) -> PredecateBuilder {
+
+    func addPredicate(
+        _ predicateType: PredicateType,
+        keyPath: KeyPath<T, String?>,
+        value: String
+    ) -> PredicateBuilder<T> {
+        var copy = self
         let predicate = predicateType.predicate(keyPath: keyPath, value: value)
-        predicates.append(predicate)
-        return self
+        copy.predicates.append(predicate)
+        return copy
     }
-    
+
     func build(type: NSCompoundPredicate.LogicalType = .and) -> NSPredicate {
-        let predicates = predicates
-        self.predicates.removeAll()
         return NSCompoundPredicate(type: type, subpredicates: predicates)
     }
 }
 
-enum PredicateType {
-    case equalTo
-    case notEqualTo
-    case greaterThan
-    case lessThan
-    case contains
-    case beginsWith
-    case endsWith
-    
-    func predicate<T>(keyPath: KeyPath<T, String?>, value: String) -> NSPredicate {
-        let format: String
-        switch self {
-        case .equalTo:
-            format = "%K == %@"
-        case .notEqualTo:
-            format = "NOT (%K == %@)"
-        case .greaterThan:
-            format = "%K > %@"
-        case .lessThan:
-            format = "%K < %@"
-        case .contains:
-            format = "%K CONTAINS[cd] %@"
-        case .beginsWith:
-            format = "%K BEGINSWITH[cd] %@"
-        case .endsWith:
-            format = "%K ENDSWITH[cd] %@"
+extension PredicateBuilder {
+    enum PredicateType {
+        case equalTo
+        case notEqualTo
+        case greaterThan
+        case lessThan
+        case contains
+        case beginsWith
+        case endsWith
+        case anyNotEqualTo
+        case countEqualsZero
+
+        func predicate<T>(keyPath: KeyPath<T, String?>, value: String) -> NSPredicate {
+            let format: String
+            switch self {
+            case .equalTo:
+                format = "%K == %@"
+            case .notEqualTo:
+                format = "NOT (%K == %@)"
+            case .greaterThan:
+                format = "%K > %@"
+            case .lessThan:
+                format = "%K < %@"
+            case .contains:
+                format = "%K CONTAINS[cd] %@"
+            case .beginsWith:
+                format = "%K BEGINSWITH[cd] %@"
+            case .endsWith:
+                format = "%K ENDSWITH[cd] %@"
+            case .anyNotEqualTo:
+                format = "ANY %K != %@"
+            case .countEqualsZero:
+                format = "%K.@count == 0"
+            }
+            return NSPredicate(format: format, keyPath._kvcKeyPathString ?? "", value)
         }
-        return NSPredicate(format: format, keyPath._kvcKeyPathString ?? "", value)
     }
 }

@@ -36,6 +36,10 @@ final class TrackerUITextField: UIView {
         setupLayout()
     }
     
+    func set(text: String?) {
+        textField.text = text
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
     }
@@ -83,7 +87,7 @@ extension TrackerUITextField: UITextFieldDelegate {
         return delegate?.isChangeText(text: updatedText, newLength: newLength) ?? true
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {       
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }

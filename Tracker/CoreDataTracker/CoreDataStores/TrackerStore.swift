@@ -1,87 +1,88 @@
 import CoreData
 
-protocol TrackerStoreProtocol {
-    func delete(_ record: TrackerCoreData) throws
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData
+protocol TrackerStoreManagerProtocol {
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCD
+    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCD) throws
+    func getCategoryHeaderForTrackerWith(id: String) -> String?
+    func getTrackedDaysNumberFor(id: String) -> Int?
+    func getObjectBy(id: String) -> [TrackerCD]?
+    func delete(_ entity: TrackerCD) throws
 }
 
-final class TrackerStore {
-    private let context: NSManagedObjectContext
+protocol TrackerStoreDataProviderProtocol {
+    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCD
+    func delete(_ record: TrackerCD) throws
+    var isAnyTrackers: Bool { get }
+}
+
+struct TrackerStore: Store {
+    typealias EntityType = TrackerCD
     
+    let context: NSManagedObjectContext
+
     init(context: NSManagedObjectContext) {
         self.context = context
     }
-}
 
-// MARK: - Public
-extension TrackerStore: TrackerStoreProtocol {
-    func delete(_ record: TrackerCoreData) throws {
-        context.delete(record)
-        saveContext()
-    }
-    
-    func createTrackerCoreData(_ tracker: Tracker) throws -> TrackerCoreData {
-        let trackerCoreData = convertToTrackerCoreData(tracker)
-        return trackerCoreData
+    init() {
+        let context = Context.shared.context
+        self.init(context: context)
     }
 }
 
-// MARK: - Private
-private extension TrackerStore {
-    func convertToTrackerCoreData(
-        _ tracker: Tracker
-    ) -> TrackerCoreData {
-        let trackerCoreData = TrackerCoreData(context: context)
-        trackerCoreData.name = tracker.name
-        trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.id = tracker.id
-        trackerCoreData.color = tracker.color
-        trackerCoreData.schedule = tracker.schedule
-        return trackerCoreData
+// MARK: - TrackerStoreManagerProtocol
+extension TrackerStore: TrackerStoreManagerProtocol {
+    func getCategoryHeaderForTrackerWith(id: String) -> String? {
+        let trackerCoreData = getObjectBy(id: id)?.first
+        return trackerCoreData?.lastCategory ?? trackerCoreData?.category?.header
     }
     
-    func saveContext() {
-        do {
-            try context.save()
-        } catch {
-            print("Error saving context: \(error.localizedDescription)")
+    func getTrackedDaysNumberFor(id: String) -> Int? {
+        getObjectBy(id: id)?.first?.trackerRecord?.count
+    }
+    
+    func save(tracker: Tracker, andUpdateItsCategory category: TrackerCategoryCD) throws {
+        if let trackerCoreData = getObjectBy(id: tracker.id)?.first {
+            trackerCoreData.update(with: tracker)
+            if trackerCoreData.lastCategory != nil {
+                trackerCoreData.lastCategory = category.header
+            } else {
+                trackerCoreData.category = category
+            }
+            save()
         }
     }
 }
 
-enum TrackerStoreError: Error {
-    case decodingErrorInvalidId
-    case decodingErrorInvalidName
-    case decodingErrorInvalidColor
-    case decodingErrorInvalidEmoji
-    case decodingErrorInvalidSchedule
+// MARK: - TrackerStoreDataProviderProtocol
+extension TrackerStore: TrackerStoreDataProviderProtocol {
+    func createTrackerCoreData(_ tracker: Tracker) -> TrackerCD {
+        return TrackerCD(from: tracker, context: context)
+    }
+
+    var isAnyTrackers: Bool {
+        let fetchRequest = TrackerCD.fetchRequest()
+        let trackers = try? context.fetch(fetchRequest)
+        if let trackers {
+            return trackers.isEmpty ? false : true
+        }
+        return false
+    }
 }
-extension TrackerCoreData {
-    convenience init(tracker: Tracker, context: NSManagedObjectContext) {
+
+extension TrackerCD: Identible {
+    convenience init(from tracker: Tracker, context: NSManagedObjectContext) {
         self.init(context: context)
+        update(with: tracker)
+    }
+    
+    func update(with tracker: Tracker) {
         self.id = tracker.id
         self.name = tracker.name
         self.emoji = tracker.emoji
         self.color = tracker.color
-        self.schedule = tracker.schedule
-    }
-    
-    func tracker() throws -> Tracker {
-        guard let id = self.id else {
-            throw TrackerStoreError.decodingErrorInvalidId
-        }
-        guard let name = self.name else {
-            throw TrackerStoreError.decodingErrorInvalidName
-        }
-        guard let color = self.color else {
-            throw TrackerStoreError.decodingErrorInvalidColor
-        }
-        guard let emoji = self.emoji else {
-            throw TrackerStoreError.decodingErrorInvalidEmoji
-        }
-        guard let schedule = self.schedule else {
-            throw TrackerStoreError.decodingErrorInvalidEmoji
-        }
-        return Tracker(id: id, name: name, emoji: emoji, color: color, schedule: schedule)
+        self.schedule = tracker.schedule.toNumbersString()
+        self.isAttached = tracker.isAttached
+        self.type = tracker.kind.rawValue
     }
 }

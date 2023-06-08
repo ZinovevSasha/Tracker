@@ -54,7 +54,7 @@ final class ActionButton: UIButton {
         updateAppearance()
     }
     
-    convenience init(title: String) {       
+    convenience init(title: String) {
         self.init(colorType: .trueBlack, title: title)
     }
     
@@ -71,7 +71,7 @@ final class ActionButton: UIButton {
         switch colorType {
         case .black:
             backgroundColor = .myBlack
-            setTitleColor(.myWhite, for: .normal)
+            setTitleColor(Asset.Colors.myWhite.color, for: .normal)
             setTitle(title, for: .normal)
         case .red:
             backgroundColor = .myWhite

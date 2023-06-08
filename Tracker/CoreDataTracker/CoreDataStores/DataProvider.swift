@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 import CoreData
 
 // Struct for updates, will be sent to delegate to update collection
@@ -24,19 +23,27 @@ protocol DataProviderDelegate: AnyObject {
 }
 
 protocol DataProviderProtocol {
+    var delegate: DataProviderDelegate? { get set }
     var isEmpty: Bool { get }
     var numberOfSections: Int { get }
     func numberOfRowsInSection(_ section: Int) -> Int
     func header(for section: Int) -> String
     func daysTracked(for indexPath: IndexPath) -> Int
     func getCategories() -> [TrackerCategory]
-    func addTrackerCategory(_ record: TrackerCategory) throws
+    func addTrackerCategory(_ category: TrackerCategory) throws
     func getTracker(at indexPath: IndexPath) -> Tracker?
     func deleteTracker(at indexPath: IndexPath) throws
     func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws
     func fetchTrackersBy(name: String, weekDay: String) throws
     func fetchTrackersBy(weekDay: String) throws
+    func attachTrackerAt(indexPath: IndexPath)
+    func unattachTrackerAt(indexPath: IndexPath)
+    func getCompletedTrackersFor(date: String) throws
+    func getUnCompletedTrackersFor(date: String, weekDay: String) throws
+    func getAllTrackersFor(day: String) throws
+    func getUnCompletedTrackersWithNameFor(date: String, weekDay: String, name: String) throws
+    func getCompletedTrackersWithNameFor(date: String, name: String) throws
 }
 
 final class DataProvider: NSObject {
@@ -51,33 +58,30 @@ final class DataProvider: NSObject {
     // Context -> one for 3 stores
     private let context: NSManagedObjectContext
     // Stores
-    private let trackerStore: TrackerStoreProtocol
+    private let trackerStore: TrackerStoreManagerProtocol
     private let trackerCategoryStore: TrackerCategoryStoreProtocol
     private let trackerRecordStore: TrackerRecordStoreProtocol
     // PredicateBuilder
-    private let searchLogic = SearchLogicProvider()
+    private var predicateBuilder = PredicateBuilder<TrackerCD>()
     // Delegate
     weak var delegate: DataProviderDelegate?
     
     // Fetch controller
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
-        let fetchRequest = TrackerCoreData.fetchRequest()
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCD> = {
+        let fetchRequest = TrackerCD.fetchRequest()
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
+        fetchRequest.predicate = makePredicateFor(weekDay: Date().weekDayString)
         fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(TrackerCoreData.category.header), ascending: true),
-            NSSortDescriptor(key: #keyPath(TrackerCoreData.name), ascending: true)
+            NSSortDescriptor(key: #keyPath(TrackerCD.isAttached), ascending: false),
+            NSSortDescriptor(key: #keyPath(TrackerCD.category.header), ascending: true),
+            NSSortDescriptor(key: #keyPath(TrackerCD.name), ascending: true)
         ]
 
-        let weekDay = String(Date().weekDayNumber)
-        fetchRequest.predicate = searchLogic.weekDay(weekDay: weekDay)
-        
-        let sectionKeyPath = #keyPath(TrackerCoreData.category.header)
-        
         let fetchedResultsController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
             managedObjectContext: context,
-            sectionNameKeyPath: sectionKeyPath,
+            sectionNameKeyPath: #keyPath(TrackerCD.category.header),
             cacheName: nil
         )
         
@@ -92,10 +96,7 @@ final class DataProvider: NSObject {
     }()
     
     // MARK: - Init
-    init(delegate: DataProviderDelegate?) throws {
-        let context = try Context.getContext()
-        
-        self.delegate = delegate
+    init(context: NSManagedObjectContext) {
         self.context = context
         self.trackerStore = TrackerStore(context: context)
         self.trackerRecordStore = TrackerRecordStore(context: context)
@@ -111,26 +112,22 @@ extension DataProvider: DataProviderProtocol {
     }
     
     var numberOfSections: Int {
-        let numberOfSections = fetchedResultsController.sections?.count ?? .zero
-        return numberOfSections
+        fetchedResultsController.sections?.count ?? .zero
     }
     
     func numberOfRowsInSection(_ section: Int) -> Int {
-        let number = fetchedResultsController.sections?[section].numberOfObjects ?? .zero
-        return number
+        fetchedResultsController.sections?[section].numberOfObjects ?? .zero
     }
     
     func header(for section: Int) -> String {
-        let header = fetchedResultsController.sections?[section].name ?? ""
-        return header
+        fetchedResultsController.sections?[section].name ?? ""
     }
     
     func daysTracked(for indexPath: IndexPath) -> Int {
         let tracker = fetchedResultsController.object(at: indexPath)
         do {
-            return try trackerRecordStore.getTrackedDaysNumberFor(tracker: tracker)
+            return try trackerRecordStore.getTrackedDaysNumberFor(trackerWithId: tracker.id)
         } catch {
-            print(error)
             return .zero
         }
     }
@@ -138,21 +135,23 @@ extension DataProvider: DataProviderProtocol {
     func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool {
         let tracker = fetchedResultsController.object(at: indexPath)
         do {
-            return try trackerRecordStore.isTrackerCompletedFor(selectedDay: date, tracker)
+            return try trackerRecordStore.isCompletedFor(date, trackerWithId: tracker.id)
         } catch {
-            print(error)
             return false
         }
     }
     
     func getTracker(at indexPath: IndexPath) -> Tracker? {
-        try? fetchedResultsController.object(at: indexPath).tracker()
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        return Tracker(coreData: trackerCoreData)
     }
     
-    func addTrackerCategory(_ record: TrackerCategory) throws {
-        guard let tracker = record.trackers.first else { return }
-        let trackerCoreData = try trackerStore.createTrackerCoreData(tracker)
-        try trackerCategoryStore.addCategory(with: record.header, and: trackerCoreData)
+    func addTrackerCategory(_ category: TrackerCategory) throws {
+        guard let tracker = category.trackers.first else { return }
+        try trackerCategoryStore.addTracker(
+            toCategoryWithName: category.header,
+            tracker: TrackerCD(from: tracker, context: context)
+        )
     }
     
     func deleteTracker(at indexPath: IndexPath) throws {
@@ -162,37 +161,166 @@ extension DataProvider: DataProviderProtocol {
     
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws {
         let trackerCoreData = fetchedResultsController.object(at: indexPath)
-        try? trackerRecordStore.removeTrackerRecordOrAdd(trackerCoreData, with: day)
+        try? trackerRecordStore.removeOrAddRecordOf(tracker: trackerCoreData, forParticularDay: day)
     }
     
     func getCategories() -> [TrackerCategory] {
         trackerCategoryStore.getAllCategories()
     }
     
-    // Searching
-    func fetchTrackersBy(name: String, weekDay: String) throws {
-        if !name.isEmpty {
-            fetchedResultsController
-                .fetchRequest
-                .predicate = searchLogic.nameAndWeekDay(name: name, weekDay: weekDay)
-            try fetchedResultsController.performFetch()
-            isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
-        } else {
-            fetchedResultsController
-                .fetchRequest
-                .predicate = searchLogic.weekDay(weekDay: weekDay)
-            try fetchedResultsController.performFetch()
-            isEmpty ? delegate?.place() : delegate?.resultFound()
-        }
+    func attachTrackerAt(indexPath: IndexPath) {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        trackerCategoryStore.putToAttachedCategory(tracker: trackerCoreData)
     }
     
-    // Searching
+    func unattachTrackerAt(indexPath: IndexPath) {
+        let trackerCoreData = fetchedResultsController.object(at: indexPath)
+        trackerCategoryStore.putBackToOriginalCategory(tracker: trackerCoreData)
+    }
+    
+    // Searching by name
+    func fetchTrackersBy(name: String, weekDay: String) throws {
+        if !name.isEmpty {
+            fetchedResultsController.fetchRequest
+                .predicate = makePredicateBy(name: name, weekDay: weekDay)
+        } else {
+            fetchedResultsController.fetchRequest.predicate = makePredicateFor(weekDay: weekDay)
+        }
+        try performFetch()
+        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
+    }
+    
+    // Searching by weekDay
     func fetchTrackersBy(weekDay: String) throws {
-        fetchedResultsController
-            .fetchRequest
-            .predicate = searchLogic.weekDay(weekDay: weekDay)
-        try fetchedResultsController.performFetch()
+        fetchedResultsController.fetchRequest.predicate = makePredicateFor(weekDay: weekDay)
+        try performFetch()
         isEmpty ? delegate?.place() : delegate?.resultFound()
+    }
+
+    // Fetch all
+    func getAllTrackersFor(day: String) throws {
+        fetchedResultsController.fetchRequest.predicate = makePredicateFor(weekDay: day)
+        try performFetch()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
+    }
+
+    func getCompletedTrackersWithNameFor(date: String, name: String) throws {
+        let completed = makeCompletedTrackersPredicateFor(date: date)
+        if !name.isEmpty {
+            let name = makePredicateFor(name: name)
+
+            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(
+                type: .and,
+                subpredicates: [completed, name]
+            )
+        } else {
+            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(
+                type: .and, subpredicates: [completed])
+        }
+        try performFetch()
+        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
+    }
+
+    func getCompletedTrackersFor(date: String) throws {
+        let completed = makeCompletedTrackersPredicateFor(date: date)
+        fetchedResultsController.fetchRequest.predicate = completed
+        try performFetch()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
+    }
+
+    func getUnCompletedTrackersWithNameFor(date: String, weekDay: String, name: String) throws {
+        let forDayOfWeek = makePredicateFor(weekDay: weekDay)
+        let uncompleted = makeUnCompletedTrackersPredicateFor(date: date)
+        let neverTracked = makeNeverTrackedPredicate()
+
+        if !name.isEmpty {
+            let namePredicate = makePredicateFor(name: name)
+
+            let dontTrackedAndForDayOfWeek = makeAndPredicate(
+                subpredicates: [neverTracked, forDayOfWeek, namePredicate]
+            )
+            let uncompletedAndForDayOfWeek = makeAndPredicate(
+                subpredicates: [uncompleted, forDayOfWeek, namePredicate]
+            )
+
+            let combinedPredicate = NSCompoundPredicate(
+                type: .or,
+                subpredicates: [uncompletedAndForDayOfWeek, dontTrackedAndForDayOfWeek]
+            )
+            fetchedResultsController.fetchRequest.predicate = combinedPredicate
+        } else {
+            let dontTrackedAndForDayOfWeek = makeAndPredicate(
+                subpredicates: [neverTracked, forDayOfWeek]
+            )
+            let uncompletedAndForDayOfWeek = makeAndPredicate(
+                subpredicates: [uncompleted, forDayOfWeek]
+            )
+
+            let combinedPredicate = NSCompoundPredicate(
+                type: .or,
+                subpredicates: [uncompletedAndForDayOfWeek, dontTrackedAndForDayOfWeek]
+            )
+            fetchedResultsController.fetchRequest.predicate = combinedPredicate
+        }
+        try performFetch()
+        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
+    }
+
+    func getUnCompletedTrackersFor(date: String, weekDay: String) throws {
+        let forDayOfWeek = makePredicateFor(weekDay: weekDay)
+        let uncompleted = makeUnCompletedTrackersPredicateFor(date: date)
+        let neverTracked = makeNeverTrackedPredicate()
+
+        let dontTrackedAndForDayOfWeek = makeAndPredicate(
+            subpredicates: [neverTracked, forDayOfWeek]
+        )
+        let uncompletedAndForDayOfWeek = makeAndPredicate(
+            subpredicates: [uncompleted, forDayOfWeek]
+        )
+
+        let combinedPredicate = NSCompoundPredicate(
+            type: .or,
+            subpredicates: [uncompletedAndForDayOfWeek, dontTrackedAndForDayOfWeek])
+
+        fetchedResultsController.fetchRequest.predicate = combinedPredicate
+        try performFetch()
+        isEmpty ? delegate?.place() : delegate?.resultFound()
+    }
+
+    // Making Predicates Private
+    private func performFetch() throws {
+        try fetchedResultsController.performFetch()
+    }
+
+    private func makeAndPredicate(subpredicates: [NSPredicate]) -> NSCompoundPredicate {
+        return NSCompoundPredicate(type: .and, subpredicates: subpredicates)
+    }
+
+    private func makeNeverTrackedPredicate() -> NSPredicate {
+        NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCD.trackerRecord))
+    }
+
+    private func makeUnCompletedTrackersPredicateFor(date: String) -> NSPredicate {
+        NSPredicate(format: "ANY trackerRecord.date != %@", date)
+    }
+
+    private func makeCompletedTrackersPredicateFor(date: String) -> NSPredicate {
+        NSPredicate(format: "ANY trackerRecord.date == %@", date)
+    }
+
+    private func makePredicateFor(weekDay: String) -> NSPredicate {
+        return predicateBuilder
+            .addPredicate(.contains, keyPath: \.schedule, value: weekDay).build()
+    }
+
+    private func makePredicateFor(name: String) -> NSPredicate {
+         predicateBuilder.addPredicate(.contains, keyPath: \.name, value: name).build()
+    }
+    
+    private func makePredicateBy(name: String, weekDay: String) -> NSPredicate {
+        return predicateBuilder
+            .addPredicate(.contains, keyPath: \.name, value: name)
+            .addPredicate(.contains, keyPath: \.schedule, value: weekDay).build()
     }
 }
 
@@ -206,7 +334,7 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
         updatedIndexes = IndexPath()
         movedIndexes = Set<DataProviderUpdate.Move>()
     }
-
+    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         guard let insertedSectionIndexSet = insertedSection,
             let deletedSectionIndexSet = deletedSection,
@@ -225,7 +353,7 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
             updatedIndexes: updatedItem,
             movedIndexes: movedItem
         )
-
+        print(update)
         // Update delegate with indexes
         delegate?.didUpdate(update)
         isEmpty ? delegate?.place() : delegate?.resultFound()
@@ -272,8 +400,8 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
             guard let indexPath = indexPath else { return }
             updatedIndexes = indexPath
         case .move:
-            guard let oldIndexPath = indexPath, let newIndexPath = newIndexPath else { return }
-            movedIndexes?.insert(.init(oldIndexPath: oldIndexPath, newIndexPath: newIndexPath))
+            guard let indexPath = indexPath, let newIndexPath = newIndexPath else { return }
+            movedIndexes?.insert(.init(oldIndexPath: indexPath, newIndexPath: newIndexPath))
         @unknown default:
             break
         }
