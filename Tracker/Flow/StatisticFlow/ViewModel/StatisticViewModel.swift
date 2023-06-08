@@ -2,12 +2,8 @@ import Combine
 
 final class StatisticViewModel {
     // MARK: - Public
-    var statisticData: [StatisticTableData] = []
     @Published var isAnyTrackers = false
-
-    func statisticDataPublisher() -> AnyPublisher<[StatisticTableData], Never> {
-        Just(statisticData).eraseToAnyPublisher()
-    }
+    var statisticData: [StatisticTableData] = []
 
     func viewWillAppear() {
         let isAnyTrackers = trackerStore.isAnyTrackers

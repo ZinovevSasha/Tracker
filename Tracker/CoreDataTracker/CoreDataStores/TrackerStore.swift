@@ -19,14 +19,14 @@ struct TrackerStore: Store {
     typealias EntityType = TrackerCD
     
     let context: NSManagedObjectContext
-    var predicateBuilder: PredicateBuilder<TrackerCD>
-    
-    init(
-        context: NSManagedObjectContext,
-        predicateBuilder: PredicateBuilder<TrackerCD> = PredicateBuilder()
-    ) {
+
+    init(context: NSManagedObjectContext) {
         self.context = context
-        self.predicateBuilder = predicateBuilder
+    }
+
+    init() {
+        let context = Context.shared.context
+        self.init(context: context)
     }
 }
 

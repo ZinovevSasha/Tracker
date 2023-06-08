@@ -9,10 +9,7 @@ protocol Store {
     associatedtype EntityType: NSManagedObject & Identible
     
     var context: NSManagedObjectContext { get }
-    var predicateBuilder: PredicateBuilder<EntityType> { get }
-    
-    init(context: NSManagedObjectContext, predicateBuilder: PredicateBuilder<EntityType>)
-    
+        
     func save()
     func delete(_ entity: EntityType) throws
     func getObjectBy(id: String) -> [EntityType]?
@@ -36,11 +33,6 @@ extension Store {
         let fetchRequest = EntityType.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "id == %@", id)
         return try? context.fetch(fetchRequest) as? [EntityType]
-    }
-    
-    init() {
-        let context = Context.shared.context
-        self.init(context: context, predicateBuilder: PredicateBuilder())
     }
 }
 

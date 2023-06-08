@@ -34,6 +34,11 @@ struct TrackerCategoryStore: Store {
         self.context = context
         self.predicateBuilder = predicateBuilder
     }
+
+    init() {
+        let context = Context.shared.context
+        self.init(context: context)
+    }
 }
 
 // MARK: - TrackerCategoryStoreProtocol

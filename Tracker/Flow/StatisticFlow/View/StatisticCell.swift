@@ -51,7 +51,7 @@ final class StatisticTableViewCell: UITableViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        container.layer.removeAllAnimations()
+        gradient.removeFromSuperlayer()
     }
 
     required init?(coder: NSCoder) {
@@ -78,12 +78,11 @@ final class StatisticTableViewCell: UITableViewCell {
             daysLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
 
             descriptionLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
-            descriptionLabel.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -12),
+            descriptionLabel.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -12)
         ])
     }
 
     func addGradient() {
-
         gradient.frame =  CGRect(origin: CGPoint.zero, size: container.frame.size)
         gradient.colors = [
             Asset.Colors.gradientRed.color.cgColor,

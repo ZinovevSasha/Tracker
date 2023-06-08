@@ -41,7 +41,6 @@ protocol DataProviderProtocol {
     func unattachTrackerAt(indexPath: IndexPath)
     func getCompletedTrackersFor(date: String) throws
     func getUnCompletedTrackersFor(date: String, weekDay: String) throws
-    func getTrackersForToday() throws
     func getAllTrackersFor(day: String) throws
     func getUnCompletedTrackersWithNameFor(date: String, weekDay: String, name: String) throws
     func getCompletedTrackersWithNameFor(date: String, name: String) throws
@@ -72,7 +71,7 @@ final class DataProvider: NSObject {
         let fetchRequest = TrackerCD.fetchRequest()
         fetchRequest.fetchBatchSize = 20
         fetchRequest.fetchLimit = 50
-        fetchRequest.predicate = makePredicateBy(Date().weekDayString)
+        fetchRequest.predicate = makePredicateFor(weekDay: Date().weekDayString)
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(key: #keyPath(TrackerCD.isAttached), ascending: false),
             NSSortDescriptor(key: #keyPath(TrackerCD.category.header), ascending: true),
@@ -184,112 +183,144 @@ extension DataProvider: DataProviderProtocol {
         if !name.isEmpty {
             fetchedResultsController.fetchRequest
                 .predicate = makePredicateBy(name: name, weekDay: weekDay)
-            try fetchedResultsController.performFetch()
-            isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
         } else {
-            fetchedResultsController.fetchRequest.predicate = makePredicateBy(weekDay)
-            try fetchedResultsController.performFetch()
-            isEmpty ? delegate?.place() : delegate?.resultFound()
+            fetchedResultsController.fetchRequest.predicate = makePredicateFor(weekDay: weekDay)
         }
+        try performFetch()
+        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
     
     // Searching by weekDay
     func fetchTrackersBy(weekDay: String) throws {
-        fetchedResultsController.fetchRequest.predicate = makePredicateBy(weekDay)
-        try fetchedResultsController.performFetch()
+        fetchedResultsController.fetchRequest.predicate = makePredicateFor(weekDay: weekDay)
+        try performFetch()
         isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
+    // Fetch all
     func getAllTrackersFor(day: String) throws {
-        fetchedResultsController.fetchRequest.predicate = makePredicateBy(day)
-        try fetchedResultsController.performFetch()
+        fetchedResultsController.fetchRequest.predicate = makePredicateFor(weekDay: day)
+        try performFetch()
         isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
     func getCompletedTrackersWithNameFor(date: String, name: String) throws {
+        let completed = makeCompletedTrackersPredicateFor(date: date)
         if !name.isEmpty {
-            let completed = NSPredicate(format: "ANY trackerRecord.date == %@", date)
-            let name = predicateBuilder.addPredicate(.contains, keyPath: \.name, value: name).build()
+            let name = makePredicateFor(name: name)
+
             fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(
                 type: .and,
-                subpredicates: [completed, name])
-            try fetchedResultsController.performFetch()
-            isEmpty ? delegate?.place() : delegate?.resultFound()
+                subpredicates: [completed, name]
+            )
         } else {
-            let completed = NSPredicate(format: "ANY trackerRecord.date == %@", date)
             fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(
                 type: .and, subpredicates: [completed])
-            try fetchedResultsController.performFetch()
-            isEmpty ? delegate?.place() : delegate?.resultFound()
         }
+        try performFetch()
+        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
 
     func getCompletedTrackersFor(date: String) throws {
-        let completed = NSPredicate(format: "ANY trackerRecord.date == %@", date)
+        let completed = makeCompletedTrackersPredicateFor(date: date)
         fetchedResultsController.fetchRequest.predicate = completed
-        try fetchedResultsController.performFetch()
+        try performFetch()
         isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
     func getUnCompletedTrackersWithNameFor(date: String, weekDay: String, name: String) throws {
-        let forDayOfWeek = makePredicateBy(weekDay)
-        let uncompleted = NSPredicate(format: "ANY trackerRecord.date != %@", date)
-        let neverTracked = NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCD.trackerRecord)
-        )
-        let name = predicateBuilder.addPredicate(.contains, keyPath: \.name, value: name).build()
+        let forDayOfWeek = makePredicateFor(weekDay: weekDay)
+        let uncompleted = makeUnCompletedTrackersPredicateFor(date: date)
+        let neverTracked = makeNeverTrackedPredicate()
 
-        let dontTrackedAndForDayOfWeek = NSCompoundPredicate(
-            type: .and,
-            subpredicates: [neverTracked, forDayOfWeek, name])
-        let uncompletedAndForDayOfWeek = NSCompoundPredicate(
-            type: .and,
-            subpredicates: [uncompleted, forDayOfWeek, name])
+        if !name.isEmpty {
+            let namePredicate = makePredicateFor(name: name)
 
-        let combinedPredicate = NSCompoundPredicate(
-            type: .or,
-            subpredicates: [uncompletedAndForDayOfWeek, dontTrackedAndForDayOfWeek])
+            let dontTrackedAndForDayOfWeek = makeAndPredicate(
+                subpredicates: [neverTracked, forDayOfWeek, namePredicate]
+            )
+            let uncompletedAndForDayOfWeek = makeAndPredicate(
+                subpredicates: [uncompleted, forDayOfWeek, namePredicate]
+            )
 
-        fetchedResultsController.fetchRequest.predicate = combinedPredicate
-        try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.place() : delegate?.resultFound()
+            let combinedPredicate = NSCompoundPredicate(
+                type: .or,
+                subpredicates: [uncompletedAndForDayOfWeek, dontTrackedAndForDayOfWeek]
+            )
+            fetchedResultsController.fetchRequest.predicate = combinedPredicate
+        } else {
+            let dontTrackedAndForDayOfWeek = makeAndPredicate(
+                subpredicates: [neverTracked, forDayOfWeek]
+            )
+            let uncompletedAndForDayOfWeek = makeAndPredicate(
+                subpredicates: [uncompleted, forDayOfWeek]
+            )
+
+            let combinedPredicate = NSCompoundPredicate(
+                type: .or,
+                subpredicates: [uncompletedAndForDayOfWeek, dontTrackedAndForDayOfWeek]
+            )
+            fetchedResultsController.fetchRequest.predicate = combinedPredicate
+        }
+        try performFetch()
+        isEmpty ? delegate?.noResultFound() : delegate?.resultFound()
     }
 
     func getUnCompletedTrackersFor(date: String, weekDay: String) throws {
-        let forDayOfWeek = makePredicateBy(weekDay)
-        let uncompleted = NSPredicate(format: "ANY trackerRecord.date != %@", date)
-        let neverTracked = NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCD.trackerRecord)
-        )
+        let forDayOfWeek = makePredicateFor(weekDay: weekDay)
+        let uncompleted = makeUnCompletedTrackersPredicateFor(date: date)
+        let neverTracked = makeNeverTrackedPredicate()
 
-        let dontTrackedAndForDayOfWeek = NSCompoundPredicate(type: .and, subpredicates: [neverTracked, forDayOfWeek])
-        let uncompletedAndForDayOfWeek = NSCompoundPredicate(type: .and, subpredicates: [uncompleted, forDayOfWeek])
+        let dontTrackedAndForDayOfWeek = makeAndPredicate(
+            subpredicates: [neverTracked, forDayOfWeek]
+        )
+        let uncompletedAndForDayOfWeek = makeAndPredicate(
+            subpredicates: [uncompleted, forDayOfWeek]
+        )
 
         let combinedPredicate = NSCompoundPredicate(
             type: .or,
             subpredicates: [uncompletedAndForDayOfWeek, dontTrackedAndForDayOfWeek])
 
         fetchedResultsController.fetchRequest.predicate = combinedPredicate
-        try fetchedResultsController.performFetch()
+        try performFetch()
         isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
-    func getTrackersForToday() throws {
-        fetchedResultsController.fetchRequest.predicate = makePredicateBy(Date().weekDayString)
+    // Making Predicates Private
+    private func performFetch() throws {
         try fetchedResultsController.performFetch()
-        isEmpty ? delegate?.place() : delegate?.resultFound()
     }
 
-    // Private
-    private func makePredicateBy(_ weekDay: String) -> NSPredicate {
+    private func makeAndPredicate(subpredicates: [NSPredicate]) -> NSCompoundPredicate {
+        return NSCompoundPredicate(type: .and, subpredicates: subpredicates)
+    }
+
+    private func makeNeverTrackedPredicate() -> NSPredicate {
+        NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCD.trackerRecord))
+    }
+
+    private func makeUnCompletedTrackersPredicateFor(date: String) -> NSPredicate {
+        NSPredicate(format: "ANY trackerRecord.date != %@", date)
+    }
+
+    private func makeCompletedTrackersPredicateFor(date: String) -> NSPredicate {
+        NSPredicate(format: "ANY trackerRecord.date == %@", date)
+    }
+
+    private func makePredicateFor(weekDay: String) -> NSPredicate {
         return predicateBuilder
-            .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
-            .build()
+            .addPredicate(.contains, keyPath: \.schedule, value: weekDay).build()
+    }
+
+    private func makePredicateFor(name: String) -> NSPredicate {
+         predicateBuilder.addPredicate(.contains, keyPath: \.name, value: name).build()
     }
     
     private func makePredicateBy(name: String, weekDay: String) -> NSPredicate {
         return predicateBuilder
             .addPredicate(.contains, keyPath: \.name, value: name)
-            .addPredicate(.contains, keyPath: \.schedule, value: weekDay)
-            .build()
+            .addPredicate(.contains, keyPath: \.schedule, value: weekDay).build()
     }
 }
 

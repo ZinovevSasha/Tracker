@@ -83,7 +83,14 @@ final class TrackersViewController: UIViewController {
         analiticService.handleAnalitics(event: .screenOpen(.main))
         if let isEmpty = dataProvider?.isEmpty, isEmpty {
             placeholderView.state = .question
-            filterButton.isHidden = true
+            switch currentFilter {
+            case .all:
+                filterButton.isHidden = true
+            case .forToday:
+                filterButton.isHidden = true
+            case .completed, .uncompleted:
+                filterButton.isHidden = false
+            }
         } else {
             placeholderView.state = .invisible(animate: false)
             filterButton.isHidden = false
@@ -111,7 +118,7 @@ final class TrackersViewController: UIViewController {
         let filtersVC = FiltersViewController(filter: currentFilter)
         filtersVC.filterSelected = { [weak self] filter in
             self?.currentFilter = filter
-            self?.handle(filters: filter)
+            self?.handle(filters: filter, searchText: nil)
         }
         present(filtersVC, animated: true)
     }
@@ -184,20 +191,42 @@ private extension TrackersViewController {
         ])
     }
     
-    func handle(filters: FiltersViewController.Filters) {
-        switch filters {
-        case .all:
-            try? dataProvider?.getAllTrackersFor(day: currentWeekdayString)
-        case .forToday:
-            currentDay = Date()
-            headerView.setDate(date: Date())
-            try? dataProvider?.getTrackersForToday()
-        case .completed:
-            try? dataProvider?.getCompletedTrackersFor(date: currentDateString)
-        case .uncompleted:
-            try? dataProvider?.getUnCompletedTrackersFor(date: currentDateString, weekDay: currentWeekdayString)
+    func handle(filters: FiltersViewController.Filters, searchText: String?) {
+        do {
+            switch filters {
+            case .all:
+                if let searchText {
+                    try dataProvider?.fetchTrackersBy(name: searchText, weekDay: currentWeekdayString)
+                } else {
+                    try dataProvider?.getAllTrackersFor(day: currentWeekdayString)
+                }
+            case .forToday:
+                currentDay = Date()
+                headerView.setDate(date: Date())
+                if let searchText {
+                    try dataProvider?.fetchTrackersBy(name: searchText, weekDay: Date().weekDayString)
+                } else {
+                    try dataProvider?.getAllTrackersFor(day: currentWeekdayString)
+                }
+            case .completed:
+                if let searchText {
+                    try dataProvider?.getCompletedTrackersWithNameFor(
+                        date: currentDateString, name: searchText)
+                } else {
+                    try dataProvider?.getCompletedTrackersFor(date: currentDateString)
+                }
+            case .uncompleted:
+                if let searchText {
+                    try dataProvider?.getUnCompletedTrackersWithNameFor(
+                        date: currentDateString, weekDay: currentWeekdayString, name: searchText)
+                } else {
+                    try dataProvider?.getUnCompletedTrackersFor(date: currentDateString, weekDay: currentWeekdayString)
+                }
+            }
+            collectionView.reloadData()
+        } catch {
+            print(error)
         }
-        collectionView.reloadData()
     }
 }
 
@@ -316,7 +345,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
                 currentFilter = .all
                 collectionView.reloadData()
             } else {
-                handle(filters: currentFilter)
+                handle(filters: currentFilter, searchText: nil)
             }
         } catch {
             print("🏹", error)
@@ -327,23 +356,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
 // MARK: - SearchViewDelegate
 extension TrackersViewController: SearchViewDelegate {
     func searchView(_ searchView: SearchView, textDidChange searchText: String) {
-        do {
-            switch currentFilter {
-            case .all:
-                try dataProvider?.fetchTrackersBy(name: searchText, weekDay: currentWeekdayString)
-            case .forToday:
-                try dataProvider?.fetchTrackersBy(name: searchText, weekDay: Date().weekDayString)
-            case .completed:
-                try dataProvider?.getCompletedTrackersWithNameFor(
-                    date: currentDateString, name: searchText)
-            case .uncompleted:
-                try dataProvider?.getUnCompletedTrackersWithNameFor(
-                    date: currentDateString, weekDay: currentWeekdayString, name: searchText)
-            }
-            collectionView.reloadData()
-        } catch {
-            print("😎", error)
-        }
+        handle(filters: currentFilter, searchText: searchText)
     }
 }
 
@@ -351,17 +364,14 @@ extension TrackersViewController: SearchViewDelegate {
 extension TrackersViewController: DataProviderDelegate {
     func place() {
         placeholderView.state = .question
-
     }
     
     func noResultFound() {
         placeholderView.state = .noResult
-        filterButton.isHidden = true
     }
     
     func resultFound() {
         placeholderView.state = .invisible(animate: true)
-        filterButton.isHidden = false
     }
     
     func didUpdate(_ update: DataProviderUpdate) {
