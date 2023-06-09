@@ -10,7 +10,7 @@ final class FiltersViewController: FrameViewController {
         tableView: tableView) { [weak self] collectionView, indexPath, filter in
         let cell = collectionView.dequeueReusableCell(for: indexPath)
         cell.textLabel?.text = filter.description
-        cell.backgroundColor = .myBackground
+        cell.backgroundColor = Asset.Colors.myBackground.color
         cell.selectionStyle = .none
         if Filters.allCases[indexPath.row] == self?.currentFilter {
             cell.accessoryType = .checkmark
@@ -27,7 +27,7 @@ final class FiltersViewController: FrameViewController {
         view.contentInset.top = UIConstants.topInset
         view.separatorInset.left = .leadingInset
         view.separatorInset.right = .leadingInset
-        view.separatorColor = .myGray
+        view.separatorColor = Asset.Colors.myGray.color
         view.backgroundColor = .clear
         view.showsVerticalScrollIndicator = false
         view.register(cellClass: UITableViewCell.self)

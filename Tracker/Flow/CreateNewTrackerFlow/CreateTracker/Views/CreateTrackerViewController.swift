@@ -26,15 +26,15 @@ final class CreateTrackerViewController: UIViewController {
         let view = UILabel()
         view.text = Strings.Localizable.Create.restriction
         view.font = .regular17
-        view.textColor = .myRed
+        view.textColor = Asset.Colors.myRed.color
         view.textAlignment = .center
         return view
     }()
     
     private let tableView: UITableView = {
         let view = UITableView()
-        view.separatorColor = .myGray
-        view.backgroundColor = .myWhite
+        view.separatorColor = Asset.Colors.myGray.color
+        view.backgroundColor = Asset.Colors.myWhite.color
         view.layer.cornerRadius = .cornerRadius
         view.register(cellClass: CreateTrackerTableViewCell.self)
         return view
@@ -223,7 +223,7 @@ private extension CreateTrackerViewController {
     
     func setupLayout() {
         view.addSubviews(nameOfScreenLabel, container, buttonStackView)
-        view.backgroundColor = .myWhite
+        view.backgroundColor = Asset.Colors.myWhite.color
         
         buttonStackView.addSubviews(cancelButton, createButton)
         container.addSubviews(mainScrollView)

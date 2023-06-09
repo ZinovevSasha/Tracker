@@ -300,8 +300,9 @@ extension DataProvider: DataProviderProtocol {
         NSPredicate(format: "%K.@count == 0", #keyPath(TrackerCD.trackerRecord))
     }
 
+    // this predicate will check all objects in NSSet for date. and after that it will check if there are any in resulting array. If there are any condition fails.
     private func makeUnCompletedTrackersPredicateFor(date: String) -> NSPredicate {
-        NSPredicate(format: "ANY trackerRecord.date != %@", date)
+        NSPredicate(format: "SUBQUERY(trackerRecord, $record, $record.date == %@).@count == 0", date)
     }
 
     private func makeCompletedTrackersPredicateFor(date: String) -> NSPredicate {
@@ -352,8 +353,7 @@ extension DataProvider: NSFetchedResultsControllerDelegate {
             deletedIndexes: deletedItem,
             updatedIndexes: updatedItem,
             movedIndexes: movedItem
-        )
-        print(update)
+        )       
         // Update delegate with indexes
         delegate?.didUpdate(update)
         isEmpty ? delegate?.place() : delegate?.resultFound()

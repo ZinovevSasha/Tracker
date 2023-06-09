@@ -72,7 +72,7 @@ private extension ChooseTrackerViewController {
         // Add subviews
         stackView.addSubviews(habitButton, irregularEventButton)
         view.addSubviews(nameOfScreenLabel, stackView)
-        view.backgroundColor = .myWhite
+        view.backgroundColor = Asset.Colors.myWhite.color
     }
     
     func setupLayout() {

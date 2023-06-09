@@ -21,7 +21,7 @@ final class StatisticTableViewCell: UITableViewCell {
     private let daysLabel: UILabel = {
         let label = UILabel()
         label.font = .bold34
-        label.textColor = .myBlack
+        label.textColor = Asset.Colors.myBlack.color
         label.numberOfLines = 1
         return label
     }()
@@ -29,7 +29,7 @@ final class StatisticTableViewCell: UITableViewCell {
     private let descriptionLabel: UILabel = {
         let label = UILabel()
         label.font = .medium12
-        label.textColor = .myBlack
+        label.textColor = Asset.Colors.myBlack.color
         label.numberOfLines = 1
         return label
     }()
@@ -59,7 +59,7 @@ final class StatisticTableViewCell: UITableViewCell {
     }
 
     func setupUI() {
-        contentView.backgroundColor = .myWhite
+        contentView.backgroundColor = Asset.Colors.myWhite.color
         contentView.addSubviews(container)
         container.addSubviews(daysLabel, descriptionLabel)
         container.layer.cornerRadius = 16

@@ -4,7 +4,7 @@ final class SplashViewController: UIViewController {
     // MARK: Private properties
     private var imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = .logo
+        imageView.image = Asset.Assets._07Logo.image
         return imageView
     }()
     
@@ -33,7 +33,7 @@ final class SplashViewController: UIViewController {
     
     func setLayout() {
         view.addSubviews(imageView)
-        view.backgroundColor = .myBlue
+        view.backgroundColor = Asset.Colors.myBlue.color
         imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }

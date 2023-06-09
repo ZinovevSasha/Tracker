@@ -40,14 +40,14 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         view.layer.cornerRadius = UIConstants.trackerCornerRadius
         view.layer.masksToBounds = true
         view.layer.borderWidth = UIConstants.trackerBorderWidth
-        view.layer.borderColor = UIColor.myCellBorderColor?.cgColor
-        view.backgroundColor = .myBlue
+        view.layer.borderColor = Asset.Colors.myCellBorderColor.color.cgColor
+        view.backgroundColor = Asset.Colors.myBlue.color
         return view
     }()
     
     private let trackerNameLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .myWhite
+        label.textColor = Asset.Colors.myWhite.color
         label.font = .medium12
         label.numberOfLines = .zero
         label.textAlignment = .left
@@ -64,7 +64,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private let emojiContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .myTranspatent
+        view.backgroundColor = Asset.Colors.myTranspatent.color
         view.layer.cornerRadius = UIConstants.emojiContainerSize / 2
         view.layer.masksToBounds = true
         return view
@@ -72,7 +72,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private let trackedDaysLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .myBlack
+        label.textColor = Asset.Colors.myBlack.color
         return label
     }()
     
@@ -84,7 +84,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }()
     
     private let attachedSighView: UIImageView = {
-        let imageView = UIImageView(image: .pin)
+        let imageView = UIImageView(image: Asset.Assets._15pin.image)
         imageView.isHidden = true
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -221,11 +221,15 @@ private extension TrackerCollectionViewCell {
     func configureButton() {
         switch buttonState {
         case .selected:
-            let image = UIImage.done?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite ?? .white)
+            let image = Asset.Assets._11done.image
+                .withRenderingMode(.alwaysOriginal)
+                .withTintColor(Asset.Colors.myWhite.color)
             addButton.setImage(image, for: .normal)
             addButton.alpha = 0.3
         case .unselected:
-            let image = UIImage.plus?.withRenderingMode(.alwaysOriginal).withTintColor(.myWhite ?? .white)
+            let image = Asset.Assets._06plus.image
+                .withRenderingMode(.alwaysOriginal)
+                .withTintColor(Asset.Colors.myWhite.color)
             addButton.setImage(image, for: .normal)
             addButton.alpha = 1
         }

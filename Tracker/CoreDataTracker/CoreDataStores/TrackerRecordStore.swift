@@ -5,6 +5,7 @@ protocol TrackerRecordStoreProtocol {
     func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool
     func removeOrAddRecordOf(tracker: TrackerCD, forParticularDay day: String) throws
     func getNumberOfCompletedTrackers() -> Int
+    func getAllRecords() -> [TrackerRecordCD]?
 }
 
 extension TrackerRecordCD: Identible {}
@@ -67,5 +68,10 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
             trackerRecord.tracker = tracker
         }
         save()
+    }
+
+    func getAllRecords() -> [TrackerRecordCD]? {
+        let request = TrackerRecordCD.fetchRequest()
+        return try? context.fetch(request)
     }
 }

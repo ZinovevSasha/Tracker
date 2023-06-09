@@ -6,7 +6,7 @@ final class CategoryTableViewCell: UITableViewCell {
         didSet {
             categoryName.text = viewModel?.header
             if let isSelected = viewModel?.isLastSelectedCategory {
-                let image = isSelected ? UIImage.checkmarkBlue : nil
+                let image = isSelected ? Asset.Assets._14checkmark.image : nil
                 selectedCategory.image = image
             }
         }
@@ -23,7 +23,7 @@ final class CategoryTableViewCell: UITableViewCell {
     // MARK: - Private properties
     private let categoryName: UILabel = {
         let view = UILabel()
-        view.textColor = .myBlack
+        view.textColor = Asset.Colors.myBlack.color
         view.font = .regular17
         return view
     }()
@@ -58,7 +58,7 @@ private extension CategoryTableViewCell {
     func setupUI() {
         stackView.addSubviews(categoryName, selectedCategory)
         contentView.addSubviews(stackView)
-        contentView.backgroundColor = .myBackground
+        contentView.backgroundColor = Asset.Colors.myBackground.color
         selectionStyle = .none
     }
     

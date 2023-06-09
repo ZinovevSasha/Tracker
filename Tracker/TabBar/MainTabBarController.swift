@@ -10,7 +10,7 @@ final class MainTabBarController: UITabBarController {
                 TrackersViewController(
                     dataProvider: DataProvider(context: Context.shared.context)
                 ),
-                image: .leftTabBar,
+                image: Asset.Assets._01leftTabBar.image,
                 title: Strings.Localizable.TabBar.trackers),
             generateViewController(
                 UINavigationController(rootViewController: StatisticViewController(
@@ -20,7 +20,7 @@ final class MainTabBarController: UITabBarController {
                         )
                     )
                 ),
-                image: .rightTabBar,
+                image: Asset.Assets._02rightTabBar.image,
                 title: Strings.Localizable.TabBar.statistics)
         ]
     }
@@ -47,11 +47,11 @@ private extension MainTabBarController {
     func setAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .myWhite
+        appearance.backgroundColor = Asset.Colors.myWhite.color
         tabBar.standardAppearance = appearance
         if #available(iOS 15.0, *) {
             tabBar.scrollEdgeAppearance = appearance
         }
-        tabBar.tintColor = .myBlue
+        tabBar.tintColor = Asset.Colors.myBlue.color
     }
 }

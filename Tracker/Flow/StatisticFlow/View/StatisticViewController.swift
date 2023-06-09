@@ -62,7 +62,7 @@ final class StatisticViewController: UIViewController {
     private func setupUI() {
         title = Strings.Localizable.Statistic.title
         navigationController?.navigationBar.prefersLargeTitles = true
-        view.backgroundColor = .myWhite
+        view.backgroundColor = Asset.Colors.myWhite.color
         view.addSubviews(placeholder, tableView)
 
         NSLayoutConstraint.activate([

@@ -6,11 +6,11 @@ final class OnboardingPageViewController: UIPageViewController {
     // MARK: Private properties
     private var pages: [UIViewController] = {
         let onboardingBlue = OnboardingViewController(
-            image: .onboardingBlue,
+            image: Asset.Assets._03onboardingBlue.image,
             greetingText: Strings.Localizable.Onboarding.greeting1
         )
         let onboardingRed = OnboardingViewController(
-            image: .onboardingRed,
+            image: Asset.Assets._04onboardingRed.image,
             greetingText: Strings.Localizable.Onboarding.greeting2
         )
         return [onboardingBlue, onboardingRed]

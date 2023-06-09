@@ -32,13 +32,13 @@ final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
     
     private let incrementButton: UIButton = {
         let view = UIButton()
-        view.setImage(.increment, for: .normal)
+        view.setImage(Asset.Assets._17increment.image, for: .normal)
         return view
     }()
     
     private let decrementButton: UIButton = {
         let view = UIButton()
-        view.setImage(.decrement, for: .normal)
+        view.setImage(Asset.Assets._16decrement.image, for: .normal)
         return view
     }()
     

@@ -12,6 +12,23 @@ final class PlaceholderView: UIView {
         case question, noResult, noStatistic, recomendation
         case invisible(animate: Bool)
     }
+
+    enum Placeholder {
+        case star
+        case noResult
+        case noStatistic
+
+        var image: UIImage? {
+            switch self {
+            case .star:
+                return Asset.Assets._05placeholderTracker.image
+            case .noResult:
+                return Asset.Assets._13placeholderNoResult.image
+            case .noStatistic:
+                return Asset.Assets._12placeholderNoStatistic.image
+            }
+        }
+    }
     
     // MARK: - UIConstants
     private enum UIConstants {
@@ -87,13 +104,13 @@ private extension PlaceholderView {
         }
     }
     
-    func setState(image: UIImage.Placeholder, text: String) {
+    func setState(image: Placeholder, text: String) {
         setAlphaToZero()
         setImageAndText(placeholder: image, text: text)
         setAlphaToOne()
     }
     
-    func setImageAndText(placeholder: UIImage.Placeholder, text: String) {
+    func setImageAndText(placeholder: Placeholder, text: String) {
         placeholderImageView.image = placeholder.image
         placeholderText.text = text
     }

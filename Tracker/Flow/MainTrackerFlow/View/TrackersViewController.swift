@@ -11,13 +11,13 @@ final class TrackersViewController: UIViewController {
         view.layer.masksToBounds = true
         view.setTitle(Strings.Localizable.Filters.title, for: .normal)
         view.titleLabel?.font = .regular17
-        view.backgroundColor = .myBlue
+        view.backgroundColor = Asset.Colors.myBlue.color
         return view
     }()
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        view.backgroundColor = .myWhite
+        view.backgroundColor = Asset.Colors.myWhite.color
         view.allowsSelection = true
         view.registerHeader(TrackerCollectionHeader.self)
         view.register(cellClass: TrackerCollectionViewCell.self)
@@ -130,7 +130,7 @@ private extension TrackersViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
         filterButton.addTarget(self, action: #selector(filterTrackers), for: .touchUpInside)
         view.addGestureRecognizer(tapGesture)
-        view.backgroundColor = .myWhite
+        view.backgroundColor = Asset.Colors.myWhite.color
         view.addSubviews(headerView, searchView, collectionView, placeholderView, filterButton)
     }
     

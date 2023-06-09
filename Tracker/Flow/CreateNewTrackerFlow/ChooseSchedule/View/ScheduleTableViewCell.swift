@@ -22,15 +22,15 @@ final class ScheduleTableViewCell: UITableViewCell {
     // MARK: - Private properties
     private let weakDayLabel: UILabel = {
         let view = UILabel()
-        view.textColor = .myBlack
+        view.textColor = Asset.Colors.myBlack.color
         view.font = .regular17
         return view
     }()
     
     private let weakDaySwitch: UISwitch = {
         let weakDaySwitch = UISwitch()
-        weakDaySwitch.onTintColor = .myBlue
-        weakDaySwitch.backgroundColor = .myLightGrey
+        weakDaySwitch.onTintColor = Asset.Colors.myBlue.color
+        weakDaySwitch.backgroundColor = Asset.Colors.myLightGrey.color
         weakDaySwitch.layer.cornerRadius = .cornerRadius
         weakDaySwitch.layer.masksToBounds = true
         return weakDaySwitch
@@ -70,7 +70,7 @@ private extension ScheduleTableViewCell {
         weakDaySwitch.addTarget(self, action: #selector(handleWeakDaySwitch), for: .touchUpInside)
         stackView.addSubviews(weakDayLabel, weakDaySwitch)
         contentView.addSubviews(stackView)
-        contentView.backgroundColor = .myBackground
+        contentView.backgroundColor = Asset.Colors.myBackground.color
         
         selectionStyle = .none
         

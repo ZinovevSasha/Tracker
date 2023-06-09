@@ -11,21 +11,21 @@ final class CreateTrackerTableViewCell: UITableViewCell {
     // MARK: - Private properties
     private let accessoryImageView: UIImageView = {
         let view = UIImageView()
-        view.image = UIImage.chevron?
-            .withTintColor(.myGray ?? .gray, renderingMode: .alwaysOriginal)
+        view.image = Asset.Assets._10chevron.image
+            .withTintColor(Asset.Colors.myGray.color, renderingMode: .alwaysOriginal)
         return view
     }()
     
     private let titleLabelName: UILabel = {
         let view = UILabel()
-        view.textColor = .myBlack
+        view.textColor = Asset.Colors.myBlack.color
         view.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         return view
     }()
     
     private let subtitleLabelName: UILabel = {
         let view = UILabel()
-        view.textColor = .myGray
+        view.textColor = Asset.Colors.myGray.color
         view.font = .regular17
         return view
     }()
@@ -54,7 +54,7 @@ final class CreateTrackerTableViewCell: UITableViewCell {
 private extension CreateTrackerTableViewCell {
     func setupUI() {
         contentView.addSubviews(stackView, accessoryImageView)
-        contentView.backgroundColor = .myBackground
+        contentView.backgroundColor = Asset.Colors.myBackground.color
         selectionStyle = .none
         stackView.addSubviews(titleLabelName, subtitleLabelName)
         

@@ -10,7 +10,6 @@ struct AnalyticsService {
     func handleAnalitics(event: TrackerEvent) {
         var params: [String: String] = [:]
         func setParamsAndReport(event: String, screen: String, item: String? = nil) {
-            print("\(event)_\(screen)\(item != nil ? "_\(item!)" : "")")
             params["screen"] = screen
             if let item = item {
                 params["item"] = item
@@ -59,11 +58,11 @@ enum TrackerEvent {
             return "open"
         case .screenClose:
             return "close"
-        case.addTracker,
-                .trackItemClick,
-                .filterItemClick,
-                .editItemClick,
-                .deleteItemClick:
+        case .addTracker,
+            .trackItemClick,
+            .filterItemClick,
+            .editItemClick,
+            .deleteItemClick:
             return "click"
         }
     }

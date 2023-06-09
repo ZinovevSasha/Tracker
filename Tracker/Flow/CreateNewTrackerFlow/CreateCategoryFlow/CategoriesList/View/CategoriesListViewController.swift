@@ -10,7 +10,7 @@ final class CategoriesListViewController: FrameViewController {
         view.contentInset.top = UIConstants.topInset
         view.separatorInset.left = 16
         view.separatorInset.right = 16
-        view.separatorColor = .myGray
+        view.separatorColor = Asset.Colors.myGray.color
         view.backgroundColor = .clear
         view.showsVerticalScrollIndicator = false
         view.register(cellClass: CategoryTableViewCell.self)
@@ -189,7 +189,7 @@ extension CategoriesListViewController: UIContextMenuInteractionDelegate {
 
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willEndFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
         UIView.animate(withDuration: 0.3) {
-            self.tableView.separatorColor = .myGray
+            self.tableView.separatorColor = Asset.Colors.myGray.color
         }
     }
 }

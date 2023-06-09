@@ -12,8 +12,8 @@ final class ChooseScheduleViewController: FrameViewController {
     private let tableView: UITableView = {
         let view = UITableView()
         view.contentInset.top = UIConstants.topInset
-        view.separatorColor = .myGray
-        view.backgroundColor = .myWhite
+        view.separatorColor = Asset.Colors.myGray.color
+        view.backgroundColor = Asset.Colors.myWhite.color
         view.allowsSelection = true
         view.separatorStyle = .singleLine
         view.showsVerticalScrollIndicator = false

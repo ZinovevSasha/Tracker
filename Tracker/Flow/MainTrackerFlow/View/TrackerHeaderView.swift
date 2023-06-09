@@ -16,8 +16,8 @@ final class TrackerHeaderView: UIView {
     // MARK: - Private properties
     private let plusButton: ExtendedButton = {
         let button = ExtendedButton(type: .system)
-        button.setImage(.plus, for: .normal)
-        button.tintColor = .myBlack
+        button.setImage(Asset.Assets._06plus.image, for: .normal)
+        button.tintColor = Asset.Colors.myBlack.color
         return button
     }()
     
@@ -33,7 +33,7 @@ final class TrackerHeaderView: UIView {
         datePicker.datePickerMode = .date
         datePicker.locale = Locale.current
         datePicker.tintColor = .systemBlue
-        datePicker.backgroundColor = .myWhite
+        datePicker.backgroundColor = Asset.Colors.myWhite.color
         datePicker.layer.cornerRadius = UIConstants.datePickerCornerRadius
         datePicker.layer.masksToBounds = true
         datePicker.setContentHuggingPriority(.defaultHigh, for: .horizontal)

@@ -18,7 +18,7 @@ final class CreateNewCategoryViewController: FrameViewController {
         view.text = Strings.Localizable.NewCategory.alreadyExist
         view.numberOfLines = .zero
         view.font = .regular17
-        view.textColor = .myRed
+        view.textColor = Asset.Colors.myRed.color
         view.alpha = .zero
         view.textAlignment = .center
         return view

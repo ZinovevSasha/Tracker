@@ -87,7 +87,7 @@ private extension FrameViewController {
         buttonLeft?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
         buttonRight?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
         buttonCenter?.addTarget(self, action: #selector(handleButtonCenterTap), for: .touchUpInside)
-        view.backgroundColor = .myWhite
+        view.backgroundColor = Asset.Colors.myWhite.color
         view.addSubviews(screenTitle, container, screenButtons)
         
         if let buttonLeft, let buttonRight  {
