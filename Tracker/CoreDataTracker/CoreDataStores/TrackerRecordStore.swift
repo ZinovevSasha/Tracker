@@ -13,11 +13,11 @@ struct TrackerRecordStore: Store {
     typealias EntityType = TrackerRecordCD
         
     let context: NSManagedObjectContext
-    var predicateBuilder: PredicateBuilder<TrackerRecordCD>
+    var predicateBuilder: TrackerRecordPredicateBuilderProtocol
     
     init(
         context: NSManagedObjectContext,
-        predicateBuilder: PredicateBuilder<TrackerRecordCD> = PredicateBuilder()
+        predicateBuilder: TrackerRecordPredicateBuilderProtocol = PredicateBuilder()
     ) {
         self.context = context
         self.predicateBuilder = predicateBuilder
@@ -43,11 +43,10 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
     }
     
     func isCompletedFor(_ selectedDay: String, trackerWithId id: String?) throws -> Bool {
+        guard let id = id else { return false }
         let fetchRequest = TrackerRecordCD.fetchRequest()
-        fetchRequest.predicate = predicateBuilder
-            .addPredicate(.equalTo, keyPath: \.id, value: id ?? "")
-            .addPredicate(.equalTo, keyPath: \.date, value: selectedDay)
-            .build(type: .and)
+        let predicate = predicateBuilder.buildPredicateIsCompletedFor(selectedDate: selectedDay, trackerWithId: id)
+        fetchRequest.predicate = predicate
         let trackerRecordsCoreData = try context.fetch(fetchRequest)
         return trackerRecordsCoreData.first != nil ? true : false
     }
@@ -63,7 +62,7 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
         } else {
             // Create new record
             let trackerRecord = TrackerRecordCD(context: context)
-            trackerRecord.id = tracker.id
+            trackerRecord.identifier = tracker.identifier
             trackerRecord.date = day
             trackerRecord.tracker = tracker
         }

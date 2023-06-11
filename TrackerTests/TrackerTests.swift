@@ -73,29 +73,29 @@ final class MockDataProvider: DataProviderProtocol {
 
     func deleteTracker(at indexPath: IndexPath) throws {}
 
-    func isTrackerCompletedForToday(_ indexPath: IndexPath, date: String) -> Bool {
+    func isTrackerAt(_ indexPath: IndexPath, completedForDate date: String) -> Bool {
         false
     }
 
     func saveAsCompletedTracker(with indexPath: IndexPath, for day: String) throws {}
 
-    func fetchTrackersBy(name: String, weekDay: String) throws {}
+    func fetchTrackersWith(name: String, forWeekDay: String) throws {}
 
     func fetchTrackersBy(weekDay: String) throws {}
 
-    func attachTrackerAt(indexPath: IndexPath) {}
+    func pinTrackerAt(indexPath: IndexPath) {}
 
-    func unattachTrackerAt(indexPath: IndexPath) {}
+    func unPinTrackerAt(indexPath: IndexPath) {}
 
-    func getCompletedTrackersFor(date: String) throws {}
+    func fetchCompletedTrackersFor(date: String) throws {}
 
-    func getUnCompletedTrackersFor(date: String, weekDay: String) throws {}
+    func fetchUncompletedTrackersFor(weekDay: String, andForDate date: String) throws {}
 
     func getTrackersForToday() throws {}
 
-    func getAllTrackersFor(day: String) throws {}
+    func fetchTrackersFor(weekDay: String) throws {}
 
-    func getUnCompletedTrackersWithNameFor(date: String, weekDay: String, name: String) throws {}
+    func fetchUncompletedTrackersWith(name: String, forWeekDay weekDay: String, andForDate: String) throws {}
 
-    func getCompletedTrackersWithNameFor(date: String, name: String) throws {}
+    func fetchCompletedTrackersWith(name: String, forDate date: String) throws {}
 }

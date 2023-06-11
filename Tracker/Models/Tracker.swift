@@ -27,7 +27,7 @@ struct Tracker: Hashable {
 
 extension Tracker {
     init(coreData: TrackerCD) {
-        self.id = coreData.id ?? UUID().uuidString
+        self.id = coreData.identifier ?? UUID().uuidString
         self.name = coreData.name ?? ""
         self.emoji = coreData.emoji ?? ""
         self.color = coreData.color ?? ""

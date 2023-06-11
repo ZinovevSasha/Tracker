@@ -196,31 +196,30 @@ private extension TrackersViewController {
             switch filters {
             case .all:
                 if let searchText {
-                    try dataProvider?.fetchTrackersBy(name: searchText, weekDay: currentWeekdayString)
+                    try dataProvider?.fetchTrackersWith(name: searchText, forWeekDay: currentWeekdayString)
                 } else {
-                    try dataProvider?.getAllTrackersFor(day: currentWeekdayString)
+                    try dataProvider?.fetchTrackersFor(weekDay: currentWeekdayString)
                 }
             case .forToday:
                 currentDay = Date()
                 headerView.setDate(date: Date())
                 if let searchText {
-                    try dataProvider?.fetchTrackersBy(name: searchText, weekDay: Date().weekDayString)
+                    try dataProvider?.fetchTrackersWith(name: searchText, forWeekDay: Date().weekDayString)
                 } else {
-                    try dataProvider?.getAllTrackersFor(day: currentWeekdayString)
+                    try dataProvider?.fetchTrackersFor(weekDay: currentWeekdayString)
                 }
             case .completed:
                 if let searchText {
-                    try dataProvider?.getCompletedTrackersWithNameFor(
-                        date: currentDateString, name: searchText)
+                    try dataProvider?.fetchCompletedTrackersWith(
+                        name: searchText, forDate: currentDateString)
                 } else {
-                    try dataProvider?.getCompletedTrackersFor(date: currentDateString)
+                    try dataProvider?.fetchCompletedTrackersFor(date: currentDateString)
                 }
             case .uncompleted:
                 if let searchText {
-                    try dataProvider?.getUnCompletedTrackersWithNameFor(
-                        date: currentDateString, weekDay: currentWeekdayString, name: searchText)
+                    try dataProvider?.fetchUncompletedTrackersWith(name: searchText, forWeekDay: currentWeekdayString, andForDate: currentDateString)
                 } else {
-                    try dataProvider?.getUnCompletedTrackersFor(date: currentDateString, weekDay: currentWeekdayString)
+                    try dataProvider?.fetchUncompletedTrackersFor(weekDay: currentWeekdayString, andForDate: currentDateString)
                 }
             }
             collectionView.reloadData()
@@ -245,10 +244,10 @@ extension TrackersViewController: UICollectionViewDataSource {
         let tracker = dataProvider?.getTracker(at: indexPath)
         let daysTracked = dataProvider?.daysTracked(for: indexPath)
 
-        let isCompletedForToday = dataProvider?.isTrackerCompletedForToday(indexPath, date: currentDateString)
+        let isCompleted = dataProvider?.isTrackerAt(indexPath: indexPath, completedForDate: currentDateString)
 
         cell.configure(with: tracker)
-        cell.configure(with: daysTracked, isCompleted: isCompletedForToday)
+        cell.configure(with: daysTracked, isCompleted: isCompleted)
         cell.delegate = self
         return cell
     }
@@ -306,12 +305,12 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
     
     func didAttachTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        dataProvider?.attachTrackerAt(indexPath: indexPath)
+        dataProvider?.pinTrackerAt(indexPath: indexPath)
     }
     
     func didUnattachTracker(for cell: TrackerCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        dataProvider?.unattachTrackerAt(indexPath: indexPath)
+        dataProvider?.unPinTrackerAt(indexPath: indexPath)
     }
     
     func didDeleteTracker(for cell: TrackerCollectionViewCell) {
@@ -341,7 +340,7 @@ extension TrackersViewController: TrackerHeaderViewDelegate {
         currentDay = date
         do {
             if currentFilter == .forToday {
-                try dataProvider?.fetchTrackersBy(weekDay: currentWeekdayString)
+                try dataProvider?.fetchTrackersFor(weekDay: currentWeekdayString)
                 currentFilter = .all
                 collectionView.reloadData()
             } else {

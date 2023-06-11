@@ -2,14 +2,14 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22C65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="TrackerCategoryCD" representedClassName="TrackerCategoryCD" syncable="YES" codeGenerationType="class">
         <attribute name="header" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="identifier" optional="YES" attributeType="String"/>
         <attribute name="isLastSelected" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <relationship name="trackers" toMany="YES" deletionRule="Cascade" destinationEntity="TrackerCD" inverseName="category" inverseEntity="TrackerCD"/>
     </entity>
     <entity name="TrackerCD" representedClassName="TrackerCD" syncable="YES" codeGenerationType="class">
         <attribute name="color" attributeType="String"/>
         <attribute name="emoji" attributeType="String"/>
-        <attribute name="id" attributeType="String"/>
+        <attribute name="identifier" attributeType="String"/>
         <attribute name="isAttached" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="lastCategory" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
@@ -20,7 +20,7 @@
     </entity>
     <entity name="TrackerRecordCD" representedClassName="TrackerRecordCD" syncable="YES" codeGenerationType="class">
         <attribute name="date" attributeType="String"/>
-        <attribute name="id" attributeType="String"/>
+        <attribute name="identifier" attributeType="String"/>
         <relationship name="tracker" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCD" inverseName="trackerRecord" inverseEntity="TrackerCD"/>
     </entity>
 </model>

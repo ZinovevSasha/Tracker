@@ -2,7 +2,7 @@ import CoreData
 import UIKit
 
 protocol Identible {
-    var id: String? { get set }
+    var identifier: String? { get set }
 }
 
 protocol Store {
@@ -31,7 +31,7 @@ extension Store {
 
     func getObjectBy(id: String) -> [EntityType]? {
         let fetchRequest = EntityType.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "id == %@", id)
+        fetchRequest.predicate = NSPredicate(format: "identifier == %@", id)
         return try? context.fetch(fetchRequest) as? [EntityType]
     }
 }

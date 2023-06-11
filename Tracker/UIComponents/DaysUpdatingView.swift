@@ -44,8 +44,7 @@ final class DaysUpdaitingView: UIView, DaysUpdatingViewProtocol {
     
     private let daysCountLabel: UILabel = {
         let view = UILabel()
-        view.font = .bold32
-        view.text = "5 daysfaf"
+        view.font = .bold32     
         return view
     }()
     

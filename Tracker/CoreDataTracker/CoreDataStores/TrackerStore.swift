@@ -77,7 +77,7 @@ extension TrackerCD: Identible {
     }
     
     func update(with tracker: Tracker) {
-        self.id = tracker.id
+        self.identifier = tracker.id
         self.name = tracker.name
         self.emoji = tracker.emoji
         self.color = tracker.color

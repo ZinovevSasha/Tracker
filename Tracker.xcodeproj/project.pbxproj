@@ -70,7 +70,8 @@
 		F9A68DF72A2F992D0074E1BC /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A68DF62A2F992D0074E1BC /* AnalyticsService.swift */; };
 		F9B926E129E7E57200D98F28 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B926E029E7E57200D98F28 /* UIButton+Extension.swift */; };
 		F9B926E529E85BEB00D98F28 /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B926E429E85BEB00D98F28 /* Array+Extension.swift */; };
-		F9D87F5629F814A40085C483 /* PredicateBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9D87F5529F814A40085C483 /* PredicateBuilder.swift */; };
+		F9CB70AF2A35F7ED000BA9AB /* PredicateBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CB70AE2A35F7ED000BA9AB /* PredicateBuilder.swift */; };
+		F9CB70B12A3612E2000BA9AB /* BatchUpdates.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CB70B02A3612E2000BA9AB /* BatchUpdates.swift */; };
 		F9EC69BC29E2C76E00D77C5F /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EC69BB29E2C76E00D77C5F /* CategoryTableViewCell.swift */; };
 		F9F1233029D897B60039D1B3 /* CreateTrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1232F29D897B60039D1B3 /* CreateTrackerViewController.swift */; };
 		F9F1233B29D899050039D1B3 /* CreateTrackerCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F1233529D899050039D1B3 /* CreateTrackerCollectionReusableView.swift */; };
@@ -167,7 +168,8 @@
 		F9A68DF62A2F992D0074E1BC /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		F9B926E029E7E57200D98F28 /* UIButton+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
 		F9B926E429E85BEB00D98F28 /* Array+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
-		F9D87F5529F814A40085C483 /* PredicateBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredicateBuilder.swift; sourceTree = "<group>"; };
+		F9CB70AE2A35F7ED000BA9AB /* PredicateBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredicateBuilder.swift; sourceTree = "<group>"; };
+		F9CB70B02A3612E2000BA9AB /* BatchUpdates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchUpdates.swift; sourceTree = "<group>"; };
 		F9EC69BB29E2C76E00D77C5F /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
 		F9F1232F29D897B60039D1B3 /* CreateTrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTrackerViewController.swift; sourceTree = "<group>"; };
 		F9F1233529D899050039D1B3 /* CreateTrackerCollectionReusableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateTrackerCollectionReusableView.swift; sourceTree = "<group>"; };
@@ -428,6 +430,7 @@
 				F97774DE29D34F7700959E7C /* GeometryParams.swift */,
 				F967CCCC29E1604B00E3C811 /* WeekDays.swift */,
 				F967CCBF29E08C2F00E3C811 /* DataSource.swift */,
+				F9CB70B02A3612E2000BA9AB /* BatchUpdates.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -525,7 +528,7 @@
 				F98840D829F1409500422FD5 /* TrackerCategoryStore.swift */,
 				F98840DA29F140AC00422FD5 /* TrackerRecordStore.swift */,
 				F98840DE29F1699F00422FD5 /* DataProvider.swift */,
-				F9D87F5529F814A40085C483 /* PredicateBuilder.swift */,
+				F9CB70AE2A35F7ED000BA9AB /* PredicateBuilder.swift */,
 			);
 			path = CoreDataStores;
 			sourceTree = "<group>";
@@ -850,6 +853,7 @@
 				F97774E329D3631500959E7C /* UIView+Extension.swift in Sources */,
 				F97E3C0F29FEF905001C252E /* CreateTrackerViewModel.swift in Sources */,
 				F9F1236429D9E25C0039D1B3 /* TrackerManager.swift in Sources */,
+				F9CB70AF2A35F7ED000BA9AB /* PredicateBuilder.swift in Sources */,
 				F98840D729F1408B00422FD5 /* TrackerStore.swift in Sources */,
 				F93DBC4C2A1D2E8D00E9D7AB /* DaysUpdatingView.swift in Sources */,
 				F97774F129D44CD900959E7C /* ChooseTrackerViewController.swift in Sources */,
@@ -875,12 +879,12 @@
 				F98235CF29FBD1E700B7CEEC /* OnboardingViewController.swift in Sources */,
 				F967CCF929E1C75F00E3C811 /* FrameViewController.swift in Sources */,
 				F97774B529D2DB5900959E7C /* StatisticViewController.swift in Sources */,
+				F9CB70B12A3612E2000BA9AB /* BatchUpdates.swift in Sources */,
 				F946FB562A1938CB00579E93 /* AlertPresenter.swift in Sources */,
 				F918018829CEECCB00767F16 /* SceneDelegate.swift in Sources */,
 				F97E8FE429E407E5002BB0C8 /* UICollectionView+Extension.swift in Sources */,
 				F99B2EAA2A2E51F4007B6E30 /* XCAssets+Generated.swift in Sources */,
 				F9F1233029D897B60039D1B3 /* CreateTrackerViewController.swift in Sources */,
-				F9D87F5629F814A40085C483 /* PredicateBuilder.swift in Sources */,
 				F97E8FDD29E34CFA002BB0C8 /* CreateNewCategoryViewController.swift in Sources */,
 				F918019B29CEED3C00767F16 /* UIColor+Extension.swift in Sources */,
 				F98840D929F1409500422FD5 /* TrackerCategoryStore.swift in Sources */,

@@ -25,11 +25,11 @@ struct TrackerCategoryStore: Store {
     typealias EntityType = TrackerCategoryCD
             
     let context: NSManagedObjectContext
-    var predicateBuilder = PredicateBuilder<TrackerCategoryCD>()
+    var predicateBuilder: TrackerCategoryPredicateBuilderProtocol
     
     init(
         context: NSManagedObjectContext,
-        predicateBuilder: PredicateBuilder<TrackerCategoryCD> = PredicateBuilder()
+        predicateBuilder: TrackerCategoryPredicateBuilderProtocol = PredicateBuilder()
     ) {
         self.context = context
         self.predicateBuilder = predicateBuilder
@@ -156,17 +156,13 @@ private extension TrackerCategoryStore {
 
     func getCategoryWith(name: String) -> TrackerCategoryCD? {
         return try? fetchTrackerCategories(context: context) {
-            predicateBuilder.addPredicate(.equalTo, keyPath: \.header, value: name).build()
+            predicateBuilder.buildPredicateCategory(name: name)
         }.first
     }
     
     func getLastSelectedCategory() -> TrackerCategoryCD? {
         return try? fetchTrackerCategories(context: context) {
-            NSPredicate(
-                format: "%K == %@",
-                #keyPath(TrackerCategoryCD.isLastSelected),
-                NSNumber(value: true)
-            )
+            predicateBuilder.buildPredicateCategoryIsLastSelected()
         }.first
     }
 }
@@ -178,7 +174,7 @@ extension TrackerCategoryCD: Identible {
     }
 
     func update(with trackerCategory: TrackerCategory) {
-        self.id = trackerCategory.id
+        self.identifier = trackerCategory.id
         self.header = trackerCategory.header
         self.trackers = NSSet(array: trackerCategory.trackers)
         self.isLastSelected = trackerCategory.isLastSelected

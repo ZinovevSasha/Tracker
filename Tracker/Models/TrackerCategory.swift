@@ -16,7 +16,7 @@ struct TrackerCategory: Hashable {
 
 extension TrackerCategory {
     init(coreData: TrackerCategoryCD) {
-        self.id = coreData.id ?? ""
+        self.id = coreData.identifier ?? ""
         self.header = coreData.header ?? ""
         self.isLastSelected = coreData.isLastSelected
         
